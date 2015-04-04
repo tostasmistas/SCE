@@ -30,3 +30,13 @@
 
 # Debug files
 *.dSYM/
+
+#MPLAB Ide
+*.cod
+*.cof
+*.err
+*.hex
+*.lst
+*.mcs
+*.mcp
+*.mcw
