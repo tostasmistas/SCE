@@ -12,8 +12,11 @@
 #define TSOM 4
 
 int hours = 0;
+int hours_interna = 0;
 int minutes = 0;
+int minutes_interna = 0;
 int seconds = 0;
+int seconds_interna = 0;
 int alarme_hours = 0;
 int alarme_hours_interna = 0;
 int alarme_minutes = 0;
@@ -32,9 +35,10 @@ int Tu = 0;
 int cursor_pos = 0;
 int lum_2 = 0;
 int n_lum = 0;
-
 int alarme_lum = 0;
+int alarme_lum_interna = 0;
 int alarme_temp = 20;
+int alarme_temp_interna = 0;
 int alarme_sd = 0;
 int alarme_su = 0;
 int alarme_md = 0;
@@ -252,7 +256,7 @@ void EnableHighInterrupts (void)
 //************************* EEPROM Interna **********************************//
 ///////////////////////////////////////////////////////////////////////////////
 
-void update_EEPROM_interna (void)
+void update_EEPROM_interna_relogio_alarme (void)
 {
 	/* ler valor do alarme do relogio actualmente armazenado na EEPROM interna */
 	EEADR = 0x00; // write the address of the memory location to be read
@@ -295,6 +299,95 @@ void update_EEPROM_interna (void)
 	if(alarme_seconds != alarme_seconds_interna){
 		EEADR = 0x02;
 		EEDATA = alarme_seconds;
+		EECON1 |= 0x04;
+		INTCON &= 0x7F; // disable interrupts
+		EECON2 = 0x55;
+		EECON2 = 0xAA;
+		EECON1 = 0x02;
+		INTCON |= 0x80; // enable interrupts
+		EECON1 = 0x00;
+	}
+}
+
+void update_EEPROM_interna_temp_alarme (void)
+{
+	EEADR = 0x03;
+	EECON1 = 0x01;
+	alarme_temp_interna = EEDATA;
+
+	if(alarme_temp != alarme_temp_interna){
+		EEADR = 0x03;
+		EEDATA = alarme_temp;
+		EECON1 |= 0x04;
+		INTCON &= 0x7F; // disable interrupts
+		EECON2 = 0x55;
+		EECON2 = 0xAA;
+		EECON1 = 0x02;
+		INTCON |= 0x80; // enable interrupts
+		EECON1 = 0x00;
+	}
+}
+
+void update_EEPROM_interna_lum_alarme (void)
+{
+	EEADR = 0x04;
+	EECON1 = 0x01;
+	alarme_lum_interna = EEDATA;
+
+	if(alarme_lum != alarme_lum_interna){
+		EEADR = 0x04;
+		EEDATA = alarme_lum;
+		EECON1 |= 0x04;
+		INTCON &= 0x7F; // disable interrupts
+		EECON2 = 0x55;
+		EECON2 = 0xAA;
+		EECON1 = 0x02;
+		INTCON |= 0x80; // enable interrupts
+		EECON1 = 0x00;
+	}
+}
+
+void update_EEPROM_interna_relogio (void)
+{
+	EEADR = 0x05;
+	EECON1 = 0x01;
+	hours_interna = EEDATA;
+
+	if(hours != hours_interna){
+		EEADR = 0x05;
+		EEDATA = hours;
+		EECON1 |= 0x04;
+		INTCON &= 0x7F; // disable interrupts
+		EECON2 = 0x55;
+		EECON2 = 0xAA;
+		EECON1 = 0x02;
+		INTCON |= 0x80; // enable interrupts
+		EECON1 = 0x00;
+	}
+
+	EEADR = 0x06;
+	EECON1 = 0x01;
+	minutes_interna = EEDATA;
+
+	if(minutes != minutes_interna){
+		EEADR = 0x06;
+		EEDATA = minutes;
+		EECON1 |= 0x04;
+		INTCON &= 0x7F; // disable interrupts
+		EECON2 = 0x55;
+		EECON2 = 0xAA;
+		EECON1 = 0x02;
+		INTCON |= 0x80; // enable interrupts
+		EECON1 = 0x00;
+	}
+
+	EEADR = 0x07;
+	EECON1 = 0x01;
+	seconds_interna = EEDATA;
+
+	if(seconds != seconds_interna){
+		EEADR = 0x07;
+		EEDATA = seconds;
 		EECON1 |= 0x04;
 		INTCON &= 0x7F; // disable interrupts
 		EECON2 = 0x55;
@@ -366,6 +459,8 @@ void main (void)
 		mu = minutes%10;
 		hd = hours/10;
 		hu = hours%10;
+
+		update_EEPROM_interna_relogio();
 
 		SetDDRamAddr(0x0D);
 		putsXLCD(alarmes);
@@ -517,7 +612,7 @@ void main (void)
 						}
 					}
 				}
-				update_EEPROM_interna();
+				update_EEPROM_interna_relogio_alarme();
 			}
 
 			else if(cursor_pos == 5){ // acertar alarme da temperatura
@@ -546,6 +641,7 @@ void main (void)
 		  			putsXLCD(nova_T);
 					}
 				}
+				update_EEPROM_interna_temp_alarme();
 			}
 
 			else if(cursor_pos == 6){ // acertar alarme da luminosidade
@@ -574,6 +670,7 @@ void main (void)
 		  			putsXLCD(nova_L);
 					}
 				}
+				update_EEPROM_interna_lum_alarme();
 			}
 
 			else if(cursor_pos == 7){ // activar/desactivar alarmes
