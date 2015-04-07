@@ -282,6 +282,34 @@ void EnableHighInterrupts (void)
 //*************************** EEPROM Interna ********************************//
 ///////////////////////////////////////////////////////////////////////////////
 
+void escrita_EEPROM_interna(char endereco, char dados)
+{
+	EEADR = endereco;
+	EEDATA = dados;
+	EECON1 &= 0x3F;
+	EECON1 |= 0x04;
+	INTCON &= 0x7F; // disable interrupts
+	EECON2 = 0x55;
+	EECON2 = 0xAA;
+	EECON1 |= 0x02;
+	INTCON |= 0x80; // enable interrupts
+	EECON1 &= 0xFB;
+
+	Delay1KTCYx(200);
+}
+
+char ler_EEPROM_interna(char endereco)
+{
+	char dados;
+
+	EEADR = endereco;
+	EECON1 &= 0x3F;
+	EECON1 |= 0x01;
+	dados = EEDATA;
+
+	return dados;
+}
+
 void update_EEPROM_interna_relogio_alarme (void)
 {
 	/* ler valor do alarme do relogio actualmente armazenado na EEPROM interna */
@@ -456,56 +484,25 @@ void update_EEPROM_interna_relogio (void)
 void update_EEPROM_interna_parametros (void)
 {
 		/* update valor de NREG */
-		EEADR = 0x08;
-		EEDATA = 30;
-		EECON1 |= 0x04;
-		INTCON &= 0x7F; // disable interrupts
-		EECON2 = 0x55;
-		EECON2 = 0xAA;
-		EECON1 = 0x02;
-		INTCON |= 0x80; // enable interrupts
-		EECON1 = 0x00;
-
-		Delay1KTCYx(200);
+		escrita_EEPROM_interna(0x08, 30);
 
 		/* update valor de PMON */
-		EEADR = 0x09;
-		EEDATA = 5;
-		EECON1 |= 0x04;
-		INTCON &= 0x7F; // disable interrupts
-		EECON2 = 0x55;
-		EECON2 = 0xAA;
-		EECON1 = 0x02;
-		INTCON |= 0x80; // enable interrupts
-		EECON1 = 0x00;
-
-		Delay1KTCYx(200);
+		escrita_EEPROM_interna(0x09, 5);
 
 		/* update valor de TSOM */
-		EEADR = 0x0A;
-		EEDATA = 2;
-		EECON1 |= 0x04;
-		INTCON &= 0x7F; // disable interrupts
-		EECON2 = 0x55;
-		EECON2 = 0xAA;
-		EECON1 = 0x02;
-		INTCON |= 0x80; // enable interrupts
-		EECON1 = 0x00;
+		escrita_EEPROM_interna(0x0A, 2);
 }
 
 void ler_EEPROM_interna_parametros (void)
 {
-	EEADR = 0x08;
-	EECON1 = 0x01;
-	NREG = EEDATA;
+	/* ler valor de NREG */
+	NREG = ler_EEPROM_interna(0x08);
 
-	EEADR = 0x09;
-	EECON1 = 0x01;
-	PMON = EEDATA;
+	/* ler valor de PMON */
+	PMON = ler_EEPROM_interna(0x09);
 
-	EEADR = 0x0A;
-	EECON1 = 0x01;
-	TSOM = EEDATA;
+	/* ler valor de TSOM */
+	TSOM = ler_EEPROM_interna(0x0A);
 }
 
 
@@ -691,9 +688,9 @@ void main (void)
 	update_EEPROM_interna_parametros();
 	ler_EEPROM_interna_parametros(); // carregar da EEPROM interna os valores de NREG, PMON e TSOM
 
-	ler_EEPROM_interna_relogio_alarme(); // carregar da EEPROM interna o valor do alarme do relogio
+	//ler_EEPROM_interna_relogio_alarme(); // carregar da EEPROM interna o valor do alarme do relogio
 	//ler_EEPROM_interna_temp_alarme(); // carregar da EEPROM interna o valor do alarme da temperatura
-	ler_EEPROM_interna_lum_alarme(); // carregar da EEPROM interna o valor do alarme da luminosidade
+	//ler_EEPROM_interna_lum_alarme(); // carregar da EEPROM interna o valor do alarme da luminosidade
 
 
  	WriteTimer1( 0x8000 ); // load timer: 1 second
