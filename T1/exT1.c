@@ -7,6 +7,7 @@
 #include <stdio.h>
 #include <i2c.h>
 #include <stdlib.h>
+#include <reset.h>
 
 int NREG = 0;
 int PMON = 0;
@@ -83,6 +84,7 @@ unsigned char indwrite = 0;
 unsigned char endereco = 0;
 unsigned char mudei_horas = 0;
 unsigned char disp_ahoras = 1;
+unsigned char IRVSTbit = 0;
 
 /* strings */
 char time[9];
@@ -213,7 +215,7 @@ void isr (void)
 
 	if (INTCONbits.INT0IF == 1){ // button S3 interrupt
 		INTCONbits.INT0IF = 0;
-		if(alarme_OFF==0){ //alarmes estao ligados
+		if(alarme_OFF == 0){ //alarmes estao ligados
 			alarme_OFF = 1; //desligar alarmes
 			alarme_lum_ON = 0;
 			alarme_temp_ON = 0;
@@ -276,6 +278,31 @@ void EnableHighInterrupts (void)
 {
 	RCONbits.IPEN = 1;    /* enable interrupt priority levels */
 	INTCONbits.GIEH = 1;  /* enable all high priority interrupts */
+}
+
+
+void init_LVD (void)
+{
+	/* step 1 */
+	LVDCON &= 0xFE;
+	LVDCON |= 0x0E;
+
+	/* step 2 */
+	PIE2 &= 0xFB; // clear LVDIE bit
+	INTCON &= 0x7F; // clear GIE bit
+
+	/* step 3 */
+	LVDCON |= 0x10;
+
+	/* step 4 */
+	while(!((LVDCON & 0x20) >> 5)); // so avanca quando IRVST estiver a high
+
+	/* step 5 */
+	PIR2 &= 0xFB; // clear LVDIF bit
+
+	/* step 6 */
+	PIE2 |= 0x04; // set LVDIE bit
+	INTCON |= 0x80; // set GIE bit
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -589,6 +616,8 @@ void main (void)
 
 	InitializeBuzzer();
 
+	init_LVD();
+
 	EnableHighInterrupts();
 
 	alarmes[0] = 'a';
@@ -638,7 +667,9 @@ void main (void)
 		hd = hours/10;
 		hu = hours%10;
 
-		//update_EEPROM_interna_relogio();
+		if(isLVD()){
+			update_EEPROM_interna_relogio();
+		}
 
 		SetDDRamAddr(0x0D);
 		putsXLCD(alarmes);
