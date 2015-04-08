@@ -85,7 +85,7 @@ unsigned char endereco = 1;
 unsigned char mudei_horas = 0;
 unsigned char disp_ahoras = 1;
 unsigned char IRVSTbit = 0;
-
+unsigned char full = 0;
 
 /* strings */
 char time[9];
@@ -315,7 +315,7 @@ void init_LVD (void)
 	LVDCON |= 0x10;
 
 	/* step 4 */
-	while(!((LVDCON & 0x20) >> 5)); // so avanca quando IRVST estiver a high
+	//while(!((LVDCON & 0x20) >> 5)); // so avanca quando IRVST estiver a high
 
 	/* step 5 */
 	PIR2 &= 0xFB; // clear LVDIF bit
@@ -594,9 +594,14 @@ void update_EEPROM_external(char codigoev){
 	dataEEPROMext[7]=0;
 	writeEEPROMexterna(0x00,dataEEPROMext); //Cabeçalho NREG
 	EEAckPolling(0xA0);
-<<<<<<< HEAD
 	if(endereco==NREG+1){
 		endereco=1;
+	}
+	if(endereco>NREG/2 && full==0){
+		full=1;
+		SetDDRamAddr(0x48);
+		while( BusyXLCD() );
+		putrsXLCD("M");
 	}
 }
 
