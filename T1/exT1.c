@@ -7,10 +7,11 @@
 #include <stdio.h>
 #include <i2c.h>
 #include <stdlib.h>
+#include <reset.h>
 
-#define PMON 5
-#define TSOM 4
-#define NREG 30
+int NREG = 0;
+int PMON = 0;
+int TSOM = 0;
 
 volatile int hours = 0; //compiler users guide page vinte e oito
 int hours_interna = 0;
@@ -53,38 +54,38 @@ int alarme_lum_prev = 0;
 int alarme_temp_prev = 20;
 
 /* flags */
-volatile char modo_sleep = 0;
-volatile char modo_modificacao = 0;
-volatile char change_L = 0;
-volatile char change_T = 0;
-volatile char change_A = 0;
-volatile char change_AS = 0;
-volatile char change_AM = 0;
-volatile char change_AH = 1;
-volatile char sai_modificacao = 0;
-char up_L = 0;
-char up_T = 0;
-volatile char alarme_OFF = 1;
-volatile char alarme_lum_ON = 0;
-volatile char alarme_temp_ON = 0;
-volatile char alarme_clock_ON = 0;
-volatile char desliga_alarmes = 0;
-char first_iteration = 1;
-char temperatura = 0;
-char nova_L = 0;
-char nova_T = 0;
-char inicio=1;
-char codigoev=0;
-char indwrite=0;
-char endereco=1;
-char mudei_horas=0;
-volatile char mudei_ahoras=0;
-volatile char mudei_alum=0;
-volatile char mudei_atemp=0;
-volatile char d_a_alarmes=0;
-char disp_ahoras=1;
+volatile unsigned char modo_sleep = 0;
+volatile unsigned char modo_modificacao = 0;
+volatile unsigned char change_L = 0;
+volatile unsigned char change_T = 0;
+volatile unsigned char change_A = 0;
+volatile unsigned char change_AS = 0;
+volatile unsigned char change_AM = 0;
+volatile unsigned char change_AH = 1;
+volatile unsigned char sai_modificacao = 0;
+volatile unsigned char mudei_ahoras = 0;
+volatile unsigned char mudei_alum = 0;
+volatile unsigned char mudei_atemp = 0;
+volatile unsigned char d_a_alarmes = 0;
+volatile unsigned char alarme_OFF = 1;
+volatile unsigned char alarme_lum_ON = 0;
+volatile unsigned char alarme_temp_ON = 0;
+volatile unsigned char alarme_clock_ON = 0;
+volatile unsigned char desliga_alarmes = 0;
+unsigned char up_L = 0;
+unsigned char up_T = 0;
+unsigned char first_iteration = 1;
+unsigned char temperatura = 0;
+unsigned char nova_L = 0;
+unsigned char nova_T = 0;
+unsigned char inicio = 1;
+unsigned char codigoev = 0;
+unsigned char indwrite = 0;
+unsigned char endereco = 1;
+unsigned char mudei_horas = 0;
+unsigned char disp_ahoras = 1;
+unsigned char IRVSTbit = 0;
 
-char 	dataEEPROMext [8];
 
 /* strings */
 char time[9];
@@ -94,7 +95,7 @@ char change_seconds[3];
 char change_hours_alarme[3];
 char change_minutes_alarme[3];
 char change_seconds_alarme[3];
-
+char 	dataEEPROMext [8];
 char temperatura_s[5];
 char luminosidade [4];
 char temp[3];
@@ -158,21 +159,21 @@ unsigned char tsttc (void){
 
 
 void writeEEPROMexterna (char endereco, char data[8]){
-	
+
 	char ind=0;
-	char i=0;		
+	char i=0;
 		IdleI2C();
 		StartI2C(); IdleI2C();
-	
+
 			WriteI2C(0xA0); IdleI2C();
 			WriteI2C(0x00); IdleI2C();   //HB
 			WriteI2C(endereco); IdleI2C();   //LB
-		for (ind=0; ind<8; ind++){   
+		for (ind=0; ind<8; ind++){
 			WriteI2C(data[ind]); IdleI2C(); //Dados
 		}
 		//NotAckI2C(); IdleI2C();
 		StopI2C();
-	
+
 }
 
 void InitializeBuzzer (void)
@@ -234,12 +235,12 @@ void isr (void)
 
 	if (INTCONbits.INT0IF == 1){ // button S3 interrupt
 		INTCONbits.INT0IF = 0;
-		if(alarme_OFF==0){ //alarmes estao ligados
-			alarme_OFF=1; //desligar alarmes
-			alarme_lum_ON=0;
-			alarme_temp_ON=0;
-			alarme_clock_ON=0;
-			desliga_alarmes=1;
+		if(alarme_OFF == 0){ //alarmes estao ligados
+			alarme_OFF = 1; //desligar alarmes
+			alarme_lum_ON = 0;
+			alarme_temp_ON = 0;
+			alarme_clock_ON = 0;
+			desliga_alarmes = 1;
 		}else{
 			if(cursor_pos == 4 && change_A == 1){
 				if(change_AH == 1){ // acabei de mudar as horas do alarme
@@ -255,9 +256,9 @@ void isr (void)
 				else if(change_AS == 1){ // acabei de mudar os segundos do alarme
 					change_AS = 0;
 					change_A = 0; // ja defini o alarme do relogio
-					disp_ahoras=1;
+					disp_ahoras = 1;
 					cursor_pos = 5;
-					mudei_ahoras=1; //flag para EEPROM
+					mudei_ahoras = 1; //flag para EEPROM
 				}
 			}
 			else{
@@ -265,15 +266,15 @@ void isr (void)
 				if (cursor_pos >=1 && cursor_pos <= 8){
 					modo_modificacao = 1;
 					if(cursor_pos==8){
-						d_a_alarmes=1;
+						d_a_alarmes = 1;
 					}
 					if(change_L == 1){ //acabei de definir a luminosidade do alarme
 						change_L = 0;
-						mudei_alum=1;
+						mudei_alum = 1;
 					}
 					if(change_T == 1){ //acabei de definir a temperatura do alarme
 						change_T = 0;
-						mudei_atemp=1;
+						mudei_atemp = 1;
 					}
 				}else{
 					modo_modificacao = 0; //sair do modo de modificacaoo
@@ -299,153 +300,172 @@ void EnableHighInterrupts (void)
 	INTCONbits.GIEH = 1;  /* enable all high priority interrupts */
 }
 
+
+void init_LVD (void)
+{
+	/* step 1 */
+	LVDCON &= 0xFE;
+	LVDCON |= 0x0E;
+
+	/* step 2 */
+	PIE2 &= 0xFB; // clear LVDIE bit
+	INTCON &= 0x7F; // clear GIE bit
+
+	/* step 3 */
+	LVDCON |= 0x10;
+
+	/* step 4 */
+	while(!((LVDCON & 0x20) >> 5)); // so avanca quando IRVST estiver a high
+
+	/* step 5 */
+	PIR2 &= 0xFB; // clear LVDIF bit
+
+	/* step 6 */
+	PIE2 |= 0x04; // set LVDIE bit
+	INTCON |= 0x80; // set GIE bit
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 //*************************** EEPROM Interna ********************************//
 ///////////////////////////////////////////////////////////////////////////////
 
+void escrita_EEPROM_interna(char endereco, char dados)
+{
+	EEADR = endereco;
+	EEDATA = dados;
+	EECON1 &= 0x3F;
+	EECON1 |= 0x04;
+	INTCON &= 0x7F; // disable interrupts
+	EECON2 = 0x55;
+	EECON2 = 0xAA;
+	EECON1 |= 0x02;
+	INTCON |= 0x80; // enable interrupts
+	EECON1 &= 0xFB;
+
+	Delay1KTCYx(200);
+}
+
+char ler_EEPROM_interna(char endereco)
+{
+	char dados;
+
+	EEADR = endereco;
+	EECON1 &= 0x3F;
+	EECON1 |= 0x01;
+	dados = EEDATA;
+
+	return dados;
+}
+
 void update_EEPROM_interna_relogio_alarme (void)
 {
-	/* ler valor do alarme do relogio actualmente armazenado na EEPROM interna */
-	EEADR = 0x00; // write the address of the memory location to be read
-	EECON1 = 0x01;
-	alarme_hours_interna = EEDATA;
+	alarme_hours_interna = ler_EEPROM_interna(0x00);
 
 	if(alarme_hours != alarme_hours_interna){
-		/* escrever novo valor do alarme do relogio na EEPROM interna */
-		EEADR = 0x00;
-		EEDATA = alarme_hours;
-		EECON1 |= 0x04;
-		INTCON &= 0x7F; // disable interrupts
-		EECON2 = 0x55;
-		EECON2 = 0xAA;
-		EECON1 = 0x02;
-		INTCON |= 0x80; // enable interrupts
-		EECON1 = 0x00;
+		escrita_EEPROM_interna(0x00, alarme_hours);
 	}
 
-	EEADR = 0x01;
-	EECON1 = 0x01;
-	alarme_minutes_interna = EEDATA;
+	alarme_minutes_interna = ler_EEPROM_interna(0x01);
 
 	if(alarme_minutes != alarme_minutes_interna){
-		EEADR = 0x01;
-		EEDATA = alarme_minutes;
-		EECON1 |= 0x04;
-		INTCON &= 0x7F; // disable interrupts
-		EECON2 = 0x55;
-		EECON2 = 0xAA;
-		EECON1 = 0x02;
-		INTCON |= 0x80; // enable interrupts
-		EECON1 = 0x00;
+		escrita_EEPROM_interna(0x01, alarme_minutes);
 	}
 
-	EEADR = 0x02;
-	EECON1 = 0x01;
-	alarme_seconds_interna = EEDATA;
+	alarme_seconds_interna = ler_EEPROM_interna(0x02);
 
 	if(alarme_seconds != alarme_seconds_interna){
-		EEADR = 0x02;
-		EEDATA = alarme_seconds;
-		EECON1 |= 0x04;
-		INTCON &= 0x7F; // disable interrupts
-		EECON2 = 0x55;
-		EECON2 = 0xAA;
-		EECON1 = 0x02;
-		INTCON |= 0x80; // enable interrupts
-		EECON1 = 0x00;
+		escrita_EEPROM_interna(0x02, alarme_seconds);
 	}
+}
+
+void ler_EEPROM_interna_relogio_alarme (void)
+{
+	alarme_hours = ler_EEPROM_interna(0x00);
+	alarme_hd = alarme_hours/10;
+	alarme_hu = alarme_hours%10;
+
+	alarme_minutes = ler_EEPROM_interna(0x01);
+	alarme_md = alarme_minutes/10;
+	alarme_mu = alarme_minutes%10;
+
+	alarme_seconds = ler_EEPROM_interna(0x02);
+	alarme_sd = alarme_seconds/10;
+	alarme_su = alarme_seconds%10;
 }
 
 void update_EEPROM_interna_temp_alarme (void)
 {
-	EEADR = 0x03;
-	EECON1 = 0x01;
-	alarme_temp_interna = EEDATA;
+	alarme_temp_interna = ler_EEPROM_interna(0x03);
 
 	if(alarme_temp != alarme_temp_interna){
-		EEADR = 0x03;
-		EEDATA = alarme_temp;
-		EECON1 |= 0x04;
-		INTCON &= 0x7F; // disable interrupts
-		EECON2 = 0x55;
-		EECON2 = 0xAA;
-		EECON1 = 0x02;
-		INTCON |= 0x80; // enable interrupts
-		EECON1 = 0x00;
+		escrita_EEPROM_interna(0x03, alarme_temp);
 	}
+}
+
+void ler_EEPROM_interna_temp_alarme (void)
+{
+	alarme_temp = ler_EEPROM_interna(0x03);
 }
 
 void update_EEPROM_interna_lum_alarme (void)
 {
-	EEADR = 0x04;
-	EECON1 = 0x01;
-	alarme_lum_interna = EEDATA;
+	alarme_lum_interna = ler_EEPROM_interna(0x04);
 
 	if(alarme_lum != alarme_lum_interna){
-		EEADR = 0x04;
-		EEDATA = alarme_lum;
-		EECON1 |= 0x04;
-		INTCON &= 0x7F; // disable interrupts
-		EECON2 = 0x55;
-		EECON2 = 0xAA;
-		EECON1 = 0x02;
-		INTCON |= 0x80; // enable interrupts
-		EECON1 = 0x00;
+		escrita_EEPROM_interna(0x04, alarme_lum);
 	}
+}
+
+void ler_EEPROM_interna_lum_alarme (void)
+{
+	alarme_lum = ler_EEPROM_interna(0x04);
 }
 
 void update_EEPROM_interna_relogio (void)
 {
-	EEADR = 0x05;
-	EECON1 = 0x01;
-	hours_interna = EEDATA;
-
+	hours_interna = ler_EEPROM_interna(0x05);
 	if(hours != hours_interna){
-		EEADR = 0x05;
-		EEDATA = hours;
-		EECON1 |= 0x04;
-		INTCON &= 0x7F; // disable interrupts
-		EECON2 = 0x55;
-		EECON2 = 0xAA;
-		EECON1 = 0x02;
-		INTCON |= 0x80; // enable interrupts
-		EECON1 = 0x00;
+		escrita_EEPROM_interna(0x05, hours);
 	}
 
-	EEADR = 0x06;
-	EECON1 = 0x01;
-	minutes_interna = EEDATA;
-
+	minutes_interna = ler_EEPROM_interna(0x06);
 	if(minutes != minutes_interna){
-		EEADR = 0x06;
-		EEDATA = minutes;
-		EECON1 |= 0x04;
-		INTCON &= 0x7F; // disable interrupts
-		EECON2 = 0x55;
-		EECON2 = 0xAA;
-		EECON1 = 0x02;
-		INTCON |= 0x80; // enable interrupts
-		EECON1 = 0x00;
+		escrita_EEPROM_interna(0x06, minutes);
 	}
 
-	EEADR = 0x07;
-	EECON1 = 0x01;
-	seconds_interna = EEDATA;
-
+	seconds_interna = ler_EEPROM_interna(0x05);
 	if(seconds != seconds_interna){
-		EEADR = 0x07;
-		EEDATA = seconds;
-		EECON1 |= 0x04;
-		INTCON &= 0x7F; // disable interrupts
-		EECON2 = 0x55;
-		EECON2 = 0xAA;
-		EECON1 = 0x02;
-		INTCON |= 0x80; // enable interrupts
-		EECON1 = 0x00;
+		escrita_EEPROM_interna(0x07, seconds);
 	}
 }
 
-//EEPROM Externa
+void update_EEPROM_interna_parametros (void)
+{
+		/* update valor de NREG */
+		escrita_EEPROM_interna(0x08, 30);
+
+		/* update valor de PMON */
+		escrita_EEPROM_interna(0x09, 5);
+
+		/* update valor de TSOM */
+		escrita_EEPROM_interna(0x0A, 2);
+}
+
+void ler_EEPROM_interna_parametros (void)
+{
+	/* ler valor de NREG */
+	NREG = ler_EEPROM_interna(0x08);
+
+	/* ler valor de PMON */
+	PMON = ler_EEPROM_interna(0x09);
+
+	/* ler valor de TSOM */
+	TSOM = ler_EEPROM_interna(0x0A);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+//*************************** EEPROM Externa ********************************//
+///////////////////////////////////////////////////////////////////////////////
 
 void update_EEPROM_external(char codigoev){
 
@@ -456,19 +476,20 @@ void update_EEPROM_external(char codigoev){
 	dataEEPROMext[2]=seconds;
 	dataEEPROMext[3]=codigoev;
 
+
 	SetDDRamAddr(0x46);
 
-		
+
 	switch(codigoev){
 		case 1:
 			while( BusyXLCD() );
-		
+
 			putrsXLCD("I");
 			dataEEPROMext[4]=(int)temperatura;
 			dataEEPROMext[5]=0;
 			dataEEPROMext[6]=0;
 			dataEEPROMext[7]=0;
-			writeEEPROMexterna(indwrite,dataEEPROMext); 
+			writeEEPROMexterna(indwrite,dataEEPROMext);
 			EEAckPolling(0xA0);
 		break;
 		case 2:
@@ -480,7 +501,7 @@ void update_EEPROM_external(char codigoev){
 			dataEEPROMext[7]=0;
 			writeEEPROMexterna(indwrite,dataEEPROMext); //Temperatura
 			EEAckPolling(0xA0);
-	
+
 		break;
 		case 3:
 			while( BusyXLCD() );
@@ -491,7 +512,7 @@ void update_EEPROM_external(char codigoev){
 			dataEEPROMext[7]=0;
 			writeEEPROMexterna(indwrite,dataEEPROMext); //Temperatura
 			EEAckPolling(0xA0);
-	
+
 		break;
 		case 4:
 			while( BusyXLCD() );
@@ -502,7 +523,7 @@ void update_EEPROM_external(char codigoev){
 			dataEEPROMext[7]=0;
 			writeEEPROMexterna(indwrite,dataEEPROMext); //Temperatura
 			EEAckPolling(0xA0);
-	
+
 		break;
 		case 5:
 			while( BusyXLCD() );
@@ -524,7 +545,7 @@ void update_EEPROM_external(char codigoev){
 			dataEEPROMext[7]=0;
 			writeEEPROMexterna(indwrite,dataEEPROMext); //Temperatura
 			EEAckPolling(0xA0);
- 
+
 		break;
 		case 7:
 			while( BusyXLCD() );
@@ -573,10 +594,10 @@ void update_EEPROM_external(char codigoev){
 	dataEEPROMext[7]=0;
 	writeEEPROMexterna(0x00,dataEEPROMext); //Cabeçalho NREG
 	EEAckPolling(0xA0);
+<<<<<<< HEAD
 	if(endereco==NREG+1){
 		endereco=1;
 	}
-
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -586,19 +607,19 @@ void update_EEPROM_external(char codigoev){
 void main (void)
 {
 	/* TIMER 1*/
-	OpenTimer1( TIMER_INT_ON   &
-				T1_16BIT_RW    &
-      			T1_SOURCE_EXT  &
-      			T1_PS_1_1      &
-      			T1_OSC1EN_ON   &
-      			T1_SYNC_EXT_ON );// tem que estar off para correr na placa, mas on para correr no proteus
+	OpenTimer1(	TIMER_INT_ON   &
+							T1_16BIT_RW    &
+      				T1_SOURCE_EXT  &
+      				T1_PS_1_1      &
+      				T1_OSC1EN_ON   &
+      				T1_SYNC_EXT_ON );// tem que estar off para correr na placa, mas on para correr no proteus
 
 	ADCON1 = 0x0E; // Port A: A0 - analog; A1-A7 - digital
 
 	OpenADC (ADC_FOSC_RC & ADC_RIGHT_JUST & ADC_1ANA_0REF, ADC_CH0 & ADC_INT_OFF);
 
 	/* BUTTON S3 */
-	OpenRB0INT (PORTB_CHANGE_INT_ON & /* enable the RB0/INT0 interrupt */
+	OpenRB0INT (	PORTB_CHANGE_INT_ON & /* enable the RB0/INT0 interrupt */
                 PORTB_PULLUPS_ON &    /* configure the RB0 pin for input */
                 FALLING_EDGE_INT);    /* trigger interrupt upon S3 button depression */
 
@@ -609,7 +630,9 @@ void main (void)
 	SSPADD = 9; //400kHz Baud clock(9) @16MHz
 	//100kHz Baud clock(39) @16MHz
 
-	//InitializeBuzzer();
+	InitializeBuzzer();
+
+	init_LVD();
 
 	EnableHighInterrupts();
 
@@ -617,6 +640,13 @@ void main (void)
 	alarmes[1] = 0;
 	alarmes_prev[0] = 'a';
 	alarmes_prev[1] = 0;
+
+	update_EEPROM_interna_parametros();
+	ler_EEPROM_interna_parametros(); // carregar da EEPROM interna os valores de NREG, PMON e TSOM
+
+	ler_EEPROM_interna_relogio_alarme(); // carregar da EEPROM interna o valor do alarme do relogio
+	ler_EEPROM_interna_temp_alarme(); // carregar da EEPROM interna o valor do alarme da temperatura
+	ler_EEPROM_interna_lum_alarme(); // carregar da EEPROM interna o valor do alarme da luminosidade
 
  	WriteTimer1( 0x8000 ); // load timer: 1 second
 
@@ -655,7 +685,9 @@ void main (void)
 		hd = hours/10;
 		hu = hours%10;
 
-		update_EEPROM_interna_relogio();
+		if(isLVD()){
+			update_EEPROM_interna_relogio();
+		}
 
 		SetDDRamAddr(0x0D);
 		putsXLCD(alarmes);
@@ -666,7 +698,7 @@ void main (void)
 
 		if(modo_modificacao == 1){ // estamos em modo modificacao
 
-			if(cursor_pos>=4 ){
+			if(cursor_pos  >= 4){
 				SetDDRamAddr(0x00);        // First line, first column
 				while( BusyXLCD() );
 				sprintf(time, "%d%d:%d%d:%d%d", alarme_hd, alarme_hu, alarme_md, alarme_mu, alarme_sd, alarme_su);
@@ -734,13 +766,13 @@ void main (void)
 			else if(cursor_pos == 3){ // acertar segundos
 				SetDDRamAddr(0x06);
 				while(PORTAbits.RA4 && cursor_pos == 3);
-				if(cursor_pos==4 && mudei_horas==1){
-					mudei_horas==0;
+				if(cursor_pos == 4 && mudei_horas == 1){
+					mudei_horas == 0;
 					update_EEPROM_external(2);
 				}
 				if(cursor_pos == 3){
 					seconds++;
-					mudei_horas=1;
+					mudei_horas = 1;
 					Delay1KTCYx(200); // usado para resolver debounce - delay de 50ms
 					if (seconds == 60){
 						seconds = 0;
@@ -779,8 +811,8 @@ void main (void)
 					Delay1KTCYx(200);
 					change_A = 1;
 					while(PORTAbits.RA4 && change_A == 1); // carregar em S2 uma vez para incrementar as horas
-					if(mudei_ahoras==1 && (alarme_hours_prev!=alarme_hours || alarme_minutes_prev!=alarme_minutes || alarme_seconds_prev!=alarme_seconds )){
-						mudei_ahoras=0;
+					if(mudei_ahoras == 1 && (alarme_hours_prev != alarme_hours || alarme_minutes_prev != alarme_minutes || alarme_seconds_prev != alarme_seconds )){
+						mudei_ahoras = 0;
 						update_EEPROM_external(3);
 					}
 					if(change_A == 1){
@@ -836,8 +868,8 @@ void main (void)
 					SetDDRamAddr(0x40);
 				}
 				while(PORTAbits.RA4 && cursor_pos == 5); // carregar em S2 para indicar que se quer definir alarme
-				if(mudei_atemp==1 && alarme_temp_prev!=alarme_temp){
-					mudei_atemp=0;
+				if(mudei_atemp == 1 && alarme_temp_prev != alarme_temp){
+					mudei_atemp = 0;
 					update_EEPROM_external(4);
 				}
 				if(cursor_pos == 5){
@@ -869,8 +901,8 @@ void main (void)
 					SetDDRamAddr(0x4F);
 				}
 				while(PORTAbits.RA4 && cursor_pos == 6); // carregar em S2 para indicar que se quer definir alarme
-				if(mudei_alum==1 && alarme_lum_prev!=alarme_lum){
-					mudei_alum=0;
+				if(mudei_alum == 1 && alarme_lum_prev != alarme_lum){
+					mudei_alum = 0;
 					update_EEPROM_external(5);
 				}
 				if(cursor_pos == 6){
@@ -897,8 +929,8 @@ void main (void)
 			else if(cursor_pos == 7){ // activar/desactivar alarmes
 				SetDDRamAddr(0x0D);
 				while(PORTAbits.RA4 && cursor_pos == 7 && alarme_OFF == 1);
-				if(d_a_alarmes==1 && alarmes_prev[0]!=alarmes[0]){
-					d_a_alarmes=0;
+				if(d_a_alarmes == 1 && alarmes_prev[0] != alarmes[0]){
+					d_a_alarmes = 0;
 					update_EEPROM_external(6);
 				}
 				if(cursor_pos == 7 && alarme_OFF == 1){
@@ -968,7 +1000,6 @@ void main (void)
   			//CCP1CON = 0x0F; // turn the buzzer on
 				update_EEPROM_external(9);
 
-
 				SetDDRamAddr(0x47);
 				while( BusyXLCD() );
 				putrsXLCD("O");
@@ -1011,7 +1042,7 @@ void main (void)
   		}
 
 			if(alarme_hours == hours && alarme_minutes == minutes && alarme_seconds == seconds && disp_ahoras==1){
-				disp_ahoras=0;
+				disp_ahoras = 0;
 				alarme_OFF = 0;
 				alarme_clock_ON = 1;
 				if(modo_modificacao == 1){
@@ -1041,17 +1072,17 @@ void main (void)
   	}
 
   	if(sai_modificacao == 1){
-			mudei_horas=0;
-			mudei_ahoras=0;
-			mudei_alum=0;
-			mudei_atemp=0;
-			d_a_alarmes=0;
-			alarme_temp_prev=alarme_temp;
-			alarme_lum_prev=alarme_lum;
-			alarme_hours_prev=alarme_hours;
-			alarme_minutes_prev=alarme_minutes;
-			alarme_seconds_prev=alarme_seconds;
-			alarmes_prev[0]=alarmes[0];
+			mudei_horas = 0;
+			mudei_ahoras = 0;
+			mudei_alum = 0;
+			mudei_atemp = 0;
+			d_a_alarmes = 0;
+			alarme_temp_prev = alarme_temp;
+			alarme_lum_prev = alarme_lum;
+			alarme_hours_prev = alarme_hours;
+			alarme_minutes_prev = alarme_minutes;
+			alarme_seconds_prev = alarme_seconds;
+			alarmes_prev[0] = alarmes[0];
 
 			change_AH = 1;
 
@@ -1077,7 +1108,7 @@ void main (void)
 			sai_modificacao = 0;
 		}
 
-		if(desliga_alarmes==1){
+		if(desliga_alarmes == 1){
 				SetDDRamAddr(0x09);
 				while( BusyXLCD() );
 				sprintf(spaces_alarmes, "   ");
@@ -1154,16 +1185,11 @@ void main (void)
 				sprintf(temperatura_s, "%d C", (int)temperatura);
 				putsXLCD(temperatura_s);
 			}
-			if(inicio==1){
-				inicio=0;
-				codigoev=1;
+			if(inicio == 1){
+				inicio = 0;
+				codigoev = 1;
 				update_EEPROM_external(codigoev);
 			}
 		}
-
-		//if(first_iteration == 1){
-			//first_iteration = 0;
-			//EEByteWrite(, 0x00, );
-		//}
  	}
 }
