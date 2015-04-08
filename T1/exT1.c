@@ -76,13 +76,15 @@ char nova_T = 0;
 char inicio=1;
 char codigoev=0;
 char indwrite=0;
-char endereco=0;
+char endereco=1;
 char mudei_horas=0;
 volatile char mudei_ahoras=0;
 volatile char mudei_alum=0;
 volatile char mudei_atemp=0;
 volatile char d_a_alarmes=0;
 char disp_ahoras=1;
+
+char 	dataEEPROMext [8];
 
 /* strings */
 char time[9];
@@ -152,6 +154,25 @@ unsigned char tsttc (void){
 	NotAckI2C(); IdleI2C();
 	StopI2C();
 	return value;
+}
+
+
+void writeEEPROMexterna (char endereco, char data[8]){
+	
+	char ind=0;
+	char i=0;		
+		IdleI2C();
+		StartI2C(); IdleI2C();
+	
+			WriteI2C(0xA0); IdleI2C();
+			WriteI2C(0x00); IdleI2C();   //HB
+			WriteI2C(endereco); IdleI2C();   //LB
+		for (ind=0; ind<8; ind++){   
+			WriteI2C(data[ind]); IdleI2C(); //Dados
+		}
+		//NotAckI2C(); IdleI2C();
+		StopI2C();
+	
 }
 
 void InitializeBuzzer (void)
@@ -427,137 +448,133 @@ void update_EEPROM_interna_relogio (void)
 //EEPROM Externa
 
 void update_EEPROM_external(char codigoev){
+
+
 	indwrite=endereco*8;
-	EEByteWrite(0xA0, 0x30, 0xA5);
- EEAckPolling(0xA0);
+	dataEEPROMext[0]=hours;
+	dataEEPROMext[1]=minutes;
+	dataEEPROMext[2]=seconds;
+	dataEEPROMext[3]=codigoev;
 
 	SetDDRamAddr(0x46);
-	EEByteWrite(0xA0,indwrite+4,hours); //Hours
-	EEAckPolling(0xA0);
 
-	EEByteWrite(0xA0,indwrite+5,minutes); //Minutes
-	EEAckPolling(0xA0);
-	EEByteWrite(0xA0,indwrite+6,seconds); //Seconds
-	EEAckPolling(0xA0);
-	EEByteWrite(0xA0,indwrite+7,codigoev); //Código do Evento
-	EEAckPolling(0xA0);
-
+		
 	switch(codigoev){
 		case 1:
 			while( BusyXLCD() );
+		
 			putrsXLCD("I");
-			EEByteWrite(0xA0,indwrite+8,(int)temperatura); //Temperatura
-			EEAckPolling(0xA0);
-			EEByteWrite(0xA0,indwrite+9,n_lum); //Luminosidade
-			EEAckPolling(0xA0);
-			EEByteWrite(0xA0,indwrite+10,0x00);
-			EEAckPolling(0xA0);
-			EEByteWrite(0xA0,indwrite+11,0x00);
+			dataEEPROMext[4]=(int)temperatura;
+			dataEEPROMext[5]=0;
+			dataEEPROMext[6]=0;
+			dataEEPROMext[7]=0;
+			writeEEPROMexterna(indwrite,dataEEPROMext); 
 			EEAckPolling(0xA0);
 		break;
 		case 2:
 			while( BusyXLCD() );
 			putrsXLCD("N");
-			EEByteWrite(0xA0,indwrite+8,hours); //Nova Hora
+			dataEEPROMext[4]=hours;
+			dataEEPROMext[5]=minutes;
+			dataEEPROMext[6]=seconds;
+			dataEEPROMext[7]=0;
+			writeEEPROMexterna(indwrite,dataEEPROMext); //Temperatura
 			EEAckPolling(0xA0);
-			EEByteWrite(0xA0,indwrite+9,minutes); //Minutes
-			EEAckPolling(0xA0);
-			EEByteWrite(0xA0,indwrite+10,seconds); //Seconds
-			EEAckPolling(0xA0);
-			EEByteWrite(0xA0,indwrite+11,0x00);
-			EEAckPolling(0xA0);
+	
 		break;
 		case 3:
 			while( BusyXLCD() );
 			putrsXLCD("h");
-			EEByteWrite(0xA0,indwrite+8,alarme_hours); //Nova Hora Alarme
+			dataEEPROMext[4]=alarme_hours;
+			dataEEPROMext[5]=alarme_minutes;
+			dataEEPROMext[6]=alarme_seconds;
+			dataEEPROMext[7]=0;
+			writeEEPROMexterna(indwrite,dataEEPROMext); //Temperatura
 			EEAckPolling(0xA0);
-			EEByteWrite(0xA0,indwrite+9,alarme_minutes); //Minutes Alarme
-			EEAckPolling(0xA0);
-			EEByteWrite(0xA0,indwrite+10,alarme_seconds); //Seconds Alarme
-			EEAckPolling(0xA0);
-			EEByteWrite(0xA0,indwrite+11,0x00);
-			EEAckPolling(0xA0);
+	
 		break;
 		case 4:
 			while( BusyXLCD() );
 			putrsXLCD("t");
-			EEByteWrite(0xA0,indwrite+8,alarme_temp); //Alarme Temperatura
+			dataEEPROMext[4]=alarme_temp;
+			dataEEPROMext[5]=0;
+			dataEEPROMext[6]=0;
+			dataEEPROMext[7]=0;
+			writeEEPROMexterna(indwrite,dataEEPROMext); //Temperatura
 			EEAckPolling(0xA0);
-			EEByteWrite(0xA0,indwrite+9,0x00);
-			EEAckPolling(0xA0);
-			EEByteWrite(0xA0,indwrite+10,0x00);
-			EEAckPolling(0xA0);
-			EEByteWrite(0xA0,indwrite+11,0x00);
-			EEAckPolling(0xA0);
+	
 		break;
 		case 5:
 			while( BusyXLCD() );
 			putrsXLCD("l");
-			EEByteWrite(0xA0,indwrite+8,alarme_lum); //Alarme Luminosidade
+			dataEEPROMext[4]=alarme_lum;
+			dataEEPROMext[5]=0;
+			dataEEPROMext[6]=0;
+			dataEEPROMext[7]=0;
+			writeEEPROMexterna(indwrite,dataEEPROMext); //Temperatura
 			EEAckPolling(0xA0);
-			EEByteWrite(0xA0,indwrite+9,0x00);
-			EEAckPolling(0xA0);
-			EEByteWrite(0xA0,indwrite+10,0x00);
-			EEAckPolling(0xA0);
-			EEByteWrite(0xA0,indwrite+11,0x00);
-			EEAckPolling(0xA0);
+
 		break;
 		case 6:
 			while( BusyXLCD() );
 			putrsXLCD("A");
- 		  EEByteWrite(0xA0,indwrite+8,(int)temperatura); //Temperatura
-  	  EEAckPolling(0xA0);
-   	  EEByteWrite(0xA0,indwrite+9,n_lum); //Luminosidade
+			dataEEPROMext[4]=(int)temperatura;
+			dataEEPROMext[5]=n_lum;
+			dataEEPROMext[6]=0;
+			dataEEPROMext[7]=0;
+			writeEEPROMexterna(indwrite,dataEEPROMext); //Temperatura
 			EEAckPolling(0xA0);
-			EEByteWrite(0xA0,indwrite+10,0x00);
-			EEAckPolling(0xA0);
-			EEByteWrite(0xA0,indwrite+11,0x00);
-			EEAckPolling(0xA0);
+ 
 		break;
 		case 7:
 			while( BusyXLCD() );
 			putrsXLCD("H");
-			EEByteWrite(0xA0,indwrite+8,(int)temperatura); //Temperatura
+			dataEEPROMext[4]=(int)temperatura;
+			dataEEPROMext[5]=n_lum;
+			dataEEPROMext[6]=0;
+			dataEEPROMext[7]=0;
+			writeEEPROMexterna(indwrite,dataEEPROMext); //Temperatura
 			EEAckPolling(0xA0);
-			EEByteWrite(0xA0,indwrite+9,n_lum); //Luminosidade
-			EEAckPolling(0xA0);
-			EEByteWrite(0xA0,indwrite+10,0x00);
-			EEAckPolling(0xA0);
-			EEByteWrite(0xA0,indwrite+11,0x00);
-			EEAckPolling(0xA0);
+
 		break;
 		case 8:
 			while( BusyXLCD() );
 			putrsXLCD("T");
-			EEByteWrite(0xA0,indwrite+8,(int)temperatura); //Temperatura
+			dataEEPROMext[4]=(int)temperatura;
+			dataEEPROMext[5]=n_lum;
+			dataEEPROMext[6]=0;
+			dataEEPROMext[7]=0;
+
+			writeEEPROMexterna(indwrite,dataEEPROMext); //Temperatura
 			EEAckPolling(0xA0);
-			EEByteWrite(0xA0,indwrite+9,n_lum); //Luminosidade
-			EEAckPolling(0xA0);
-			EEByteWrite(0xA0,indwrite+10,0x00);
-			EEAckPolling(0xA0);
-			EEByteWrite(0xA0,indwrite+11,0x00);
-			EEAckPolling(0xA0);
-		break;
+
+			break;
 		case 9:
 			while( BusyXLCD() );
 			putrsXLCD("L");
-			EEByteWrite(0xA0,indwrite+8,(int)temperatura); //Temperatura
+			dataEEPROMext[4]=(int)temperatura;
+			dataEEPROMext[5]=n_lum;
+			dataEEPROMext[6]=0;
+			dataEEPROMext[7]=0;
+			writeEEPROMexterna(indwrite,dataEEPROMext); //Temperatura
 			EEAckPolling(0xA0);
-			EEByteWrite(0xA0,indwrite+9,n_lum); //Luminosidade
-			EEAckPolling(0xA0);
-			EEByteWrite(0xA0,indwrite+10,0x00);
-			EEAckPolling(0xA0);
-			EEByteWrite(0xA0,indwrite+11,0x00);
-			EEAckPolling(0xA0);
+
 		break;
 	}
 
 	endereco ++;
-	EEByteWrite(0xA0,0x01,endereco); //Cabeçalho Indíce Escrita
+	dataEEPROMext[0]=NREG;
+	dataEEPROMext[1]=endereco;
+	dataEEPROMext[2]=0;
+	dataEEPROMext[3]=0;
+	dataEEPROMext[4]=0;
+	dataEEPROMext[5]=0;
+	dataEEPROMext[6]=0;
+	dataEEPROMext[7]=0;
+	writeEEPROMexterna(0x00,dataEEPROMext); //Cabeçalho NREG
 	EEAckPolling(0xA0);
-	if(endereco==NREG){
-		endereco=0;
+	if(endereco==NREG+1){
+		endereco=1;
 	}
 
 }
@@ -604,13 +621,15 @@ void main (void)
  	WriteTimer1( 0x8000 ); // load timer: 1 second
 
 	//EEPROM External Init
-	EEByteWrite(0xA0,0x00,0x1E); //Cabeçalho NREG
-	EEAckPolling(0xA0);
-	EEByteWrite(0xA0,0x01,0x00); //Cabeçalho Indíce Escrita
-	EEAckPolling(0xA0);
-	EEByteWrite(0xA0,0x02,0x00); //Cabeçalho Indíce Leitura
-	EEAckPolling(0xA0);
-	EEByteWrite(0xA0,0x03,0x00); //Cabeçalho Número Registos Válidos
+	dataEEPROMext[0]=NREG;
+	dataEEPROMext[1]=0;
+	dataEEPROMext[2]=0;
+	dataEEPROMext[3]=0;
+	dataEEPROMext[4]=0;
+	dataEEPROMext[5]=0;
+	dataEEPROMext[6]=0;
+	dataEEPROMext[7]=0;
+	writeEEPROMexterna(0x00,dataEEPROMext); //Cabeçalho NREG
 	EEAckPolling(0xA0);
 
 ///////////////////////////////////////////////////////////////////////////////
