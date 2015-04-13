@@ -72,12 +72,11 @@ volatile unsigned char alarme_lum_ON = 0;
 volatile unsigned char alarme_temp_ON = 0;
 volatile unsigned char alarme_clock_ON = 0;
 volatile unsigned char desliga_alarmes = 0;
+volatile unsigned char segundos_mudou = 0;
 unsigned char up_L = 0;
 unsigned char up_T = 0;
 unsigned char first_iteration = 1;
 unsigned char temperatura = 0;
-unsigned char nova_L = 0;
-unsigned char nova_T = 0;
 unsigned char inicio = 1;
 unsigned char codigoev = 0;
 unsigned char indwrite = 0;
@@ -88,14 +87,14 @@ unsigned char IRVSTbit = 0;
 unsigned char full = 0;
 
 /* strings */
-char time[9];
+char time_s	[9];
 char change_hours[3];
 char change_minutes[3];
 char change_seconds[3];
 char change_hours_alarme[3];
 char change_minutes_alarme[3];
 char change_seconds_alarme[3];
-char 	dataEEPROMext [8];
+char dataEEPROMext [8];
 char temperatura_s[5];
 char luminosidade [4];
 char temp[3];
@@ -103,6 +102,8 @@ char spaces[8];
 char alarmes[2];
 char alarmes_prev[2];
 char spaces_alarmes[4];
+char nova_L[2];
+char nova_T[3];
 
 void DelayFor18TCY( void )
 {
@@ -132,8 +133,10 @@ void DelayXLCD( void )
   	return;
 }
 
-unsigned char tsttc (void){
+unsigned char tsttc (void)
+{
 	unsigned char value;
+
 	do{
 		IdleI2C();
 		StartI2C(); IdleI2C();
@@ -145,6 +148,7 @@ unsigned char tsttc (void){
 		NotAckI2C(); IdleI2C();
 		StopI2C();
 	} while (!(value & 0x40));
+
 	IdleI2C();
 	StartI2C(); IdleI2C();
 	WriteI2C(0x9a | 0x00); IdleI2C();
@@ -154,26 +158,8 @@ unsigned char tsttc (void){
 	value = ReadI2C(); IdleI2C();
 	NotAckI2C(); IdleI2C();
 	StopI2C();
+
 	return value;
-}
-
-
-void writeEEPROMexterna (char endereco, char data[8]){
-
-	char ind=0;
-	char i=0;
-		IdleI2C();
-		StartI2C(); IdleI2C();
-
-			WriteI2C(0xA0); IdleI2C();
-			WriteI2C(0x00); IdleI2C();   //HB
-			WriteI2C(endereco); IdleI2C();   //LB
-		for (ind=0; ind<8; ind++){
-			WriteI2C(data[ind]); IdleI2C(); //Dados
-		}
-		//NotAckI2C(); IdleI2C();
-		StopI2C();
-
 }
 
 void InitializeBuzzer (void)
@@ -210,9 +196,10 @@ void isr (void)
 	if(PIR1bits.TMR1IF == 1){ // timer interrupt
 		WriteTimer1( 0x8000 ); // reload timer: 1 second
 		PIR1bits.TMR1IF = 0; /* clear flag to avoid another interrupt */
+		segundos_mudou = 1;
 		seconds++;
-		if(disp_ahoras==0){
-			disp_ahoras=1;
+		if(disp_ahoras == 0){
+			disp_ahoras = 1;
 		}
 		if(seconds == 60){
 			seconds = 0;
@@ -224,7 +211,7 @@ void isr (void)
 					hours = 0;
 				}
 			}
-	  	}
+	  }
 	}
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -235,6 +222,7 @@ void isr (void)
 
 	if (INTCONbits.INT0IF == 1){ // button S3 interrupt
 		INTCONbits.INT0IF = 0;
+		//WriteCmdXLCD( CURSOR_OFF );// Enable display with no cursor
 		if(alarme_OFF == 0){ //alarmes estao ligados
 			alarme_OFF = 1; //desligar alarmes
 			alarme_lum_ON = 0;
@@ -467,67 +455,82 @@ void ler_EEPROM_interna_parametros (void)
 //*************************** EEPROM Externa ********************************//
 ///////////////////////////////////////////////////////////////////////////////
 
-void update_EEPROM_external(char codigoev){
+void writeEEPROMexterna (char endereco, char data[8])
+{
 
+	char ind=0;
+	char i=0;
+		IdleI2C();
+		StartI2C(); IdleI2C();
 
+			WriteI2C(0xA0); IdleI2C();
+			WriteI2C(0x00); IdleI2C();   //HB
+			WriteI2C(endereco); IdleI2C();   //LB
+		for (ind=0; ind<8; ind++){
+			WriteI2C(data[ind]); IdleI2C(); //Dados
+		}
+		//NotAckI2C(); IdleI2C();
+		StopI2C();
+
+}
+
+void update_EEPROM_external(char codigoev)
+{
 	indwrite=endereco*8;
-	dataEEPROMext[0]=hours;
-	dataEEPROMext[1]=minutes;
-	dataEEPROMext[2]=seconds;
-	dataEEPROMext[3]=codigoev;
-
+	dataEEPROMext[0] = hours;
+	dataEEPROMext[1] = minutes;
+	dataEEPROMext[2] = seconds;
+	dataEEPROMext[3] = codigoev;
 
 	SetDDRamAddr(0x46);
 
-
 	switch(codigoev){
 		case 1:
-			while( BusyXLCD() );
-
-			putrsXLCD("I");
-			dataEEPROMext[4]=(int)temperatura;
-			dataEEPROMext[5]=0;
-			dataEEPROMext[6]=0;
-			dataEEPROMext[7]=0;
+			//while( BusyXLCD() );
+			//putrsXLCD("I");
+			dataEEPROMext[4] = (int)temperatura;
+			dataEEPROMext[5] = 0;
+			dataEEPROMext[6] = 0;
+			dataEEPROMext[7] = 0;
 			writeEEPROMexterna(indwrite,dataEEPROMext);
 			EEAckPolling(0xA0);
 		break;
 		case 2:
-			while( BusyXLCD() );
-			putrsXLCD("N");
-			dataEEPROMext[4]=hours;
-			dataEEPROMext[5]=minutes;
-			dataEEPROMext[6]=seconds;
-			dataEEPROMext[7]=0;
+			//while( BusyXLCD() );
+			//putrsXLCD("N");
+			dataEEPROMext[4] = hours;
+			dataEEPROMext[5] = minutes;
+			dataEEPROMext[6] = seconds;
+			dataEEPROMext[7] = 0;
 			writeEEPROMexterna(indwrite,dataEEPROMext); //Temperatura
 			EEAckPolling(0xA0);
 
 		break;
 		case 3:
-			while( BusyXLCD() );
-			putrsXLCD("h");
-			dataEEPROMext[4]=alarme_hours;
-			dataEEPROMext[5]=alarme_minutes;
-			dataEEPROMext[6]=alarme_seconds;
-			dataEEPROMext[7]=0;
+			//while( BusyXLCD() );
+			//putrsXLCD("h");
+			dataEEPROMext[4] = alarme_hours;
+			dataEEPROMext[5] = alarme_minutes;
+			dataEEPROMext[6] = alarme_seconds;
+			dataEEPROMext[7] = 0;
 			writeEEPROMexterna(indwrite,dataEEPROMext); //Temperatura
 			EEAckPolling(0xA0);
 
 		break;
 		case 4:
-			while( BusyXLCD() );
-			putrsXLCD("t");
-			dataEEPROMext[4]=alarme_temp;
-			dataEEPROMext[5]=0;
-			dataEEPROMext[6]=0;
-			dataEEPROMext[7]=0;
+			//while( BusyXLCD() );
+			//putrsXLCD("t");
+			dataEEPROMext[4] = alarme_temp;
+			dataEEPROMext[5] = 0;
+			dataEEPROMext[6] = 0;
+			dataEEPROMext[7] = 0;
 			writeEEPROMexterna(indwrite,dataEEPROMext); //Temperatura
 			EEAckPolling(0xA0);
 
 		break;
 		case 5:
-			while( BusyXLCD() );
-			putrsXLCD("l");
+			//while( BusyXLCD() );
+			//putrsXLCD("l");
 			dataEEPROMext[4]=alarme_lum;
 			dataEEPROMext[5]=0;
 			dataEEPROMext[6]=0;
@@ -537,68 +540,68 @@ void update_EEPROM_external(char codigoev){
 
 		break;
 		case 6:
-			while( BusyXLCD() );
-			putrsXLCD("A");
-			dataEEPROMext[4]=(int)temperatura;
-			dataEEPROMext[5]=n_lum;
-			dataEEPROMext[6]=0;
-			dataEEPROMext[7]=0;
+			//while( BusyXLCD() );
+			//putrsXLCD("A");
+			dataEEPROMext[4] = (int)temperatura;
+			dataEEPROMext[5] = n_lum;
+			dataEEPROMext[6] = 0;
+			dataEEPROMext[7] = 0;
 			writeEEPROMexterna(indwrite,dataEEPROMext); //Temperatura
 			EEAckPolling(0xA0);
 
 		break;
 		case 7:
-			while( BusyXLCD() );
-			putrsXLCD("H");
-			dataEEPROMext[4]=(int)temperatura;
-			dataEEPROMext[5]=n_lum;
-			dataEEPROMext[6]=0;
-			dataEEPROMext[7]=0;
+			//while( BusyXLCD() );
+			//putrsXLCD("H");
+			dataEEPROMext[4] = (int)temperatura;
+			dataEEPROMext[5] = n_lum;
+			dataEEPROMext[6] = 0;
+			dataEEPROMext[7] = 0;
 			writeEEPROMexterna(indwrite,dataEEPROMext); //Temperatura
 			EEAckPolling(0xA0);
 
 		break;
 		case 8:
-			while( BusyXLCD() );
-			putrsXLCD("T");
-			dataEEPROMext[4]=(int)temperatura;
-			dataEEPROMext[5]=n_lum;
-			dataEEPROMext[6]=0;
-			dataEEPROMext[7]=0;
+			//while( BusyXLCD() );
+			//putrsXLCD("T");
+			dataEEPROMext[4] = (int)temperatura;
+			dataEEPROMext[5] = n_lum;
+			dataEEPROMext[6] = 0;
+			dataEEPROMext[7] = 0;
 
 			writeEEPROMexterna(indwrite,dataEEPROMext); //Temperatura
 			EEAckPolling(0xA0);
 
 			break;
 		case 9:
-			while( BusyXLCD() );
-			putrsXLCD("L");
-			dataEEPROMext[4]=(int)temperatura;
-			dataEEPROMext[5]=n_lum;
-			dataEEPROMext[6]=0;
-			dataEEPROMext[7]=0;
+			//while( BusyXLCD() );
+			//putrsXLCD("L");
+			dataEEPROMext[4] = (int)temperatura;
+			dataEEPROMext[5] = n_lum;
+			dataEEPROMext[6] = 0;
+			dataEEPROMext[7] = 0;
 			writeEEPROMexterna(indwrite,dataEEPROMext); //Temperatura
 			EEAckPolling(0xA0);
 
 		break;
 	}
 
-	endereco ++;
-	dataEEPROMext[0]=NREG;
-	dataEEPROMext[1]=endereco;
-	dataEEPROMext[2]=0;
-	dataEEPROMext[3]=0;
-	dataEEPROMext[4]=0;
-	dataEEPROMext[5]=0;
-	dataEEPROMext[6]=0;
-	dataEEPROMext[7]=0;
+	endereco++;
+	dataEEPROMext[0] = NREG;
+	dataEEPROMext[1] = endereco;
+	dataEEPROMext[2] = 0;
+	dataEEPROMext[3] = 0;
+	dataEEPROMext[4] = 0;
+	dataEEPROMext[5] = 0;
+	dataEEPROMext[6] = 0;
+	dataEEPROMext[7] = 0;
 	writeEEPROMexterna(0x00,dataEEPROMext); //Cabeçalho NREG
 	EEAckPolling(0xA0);
-	if(endereco==NREG+1){
-		endereco=1;
+	if(endereco == NREG + 1){
+		endereco = 1;
 	}
-	if(endereco>NREG/2 && full==0){
-		full=1;
+	if(endereco > NREG/2 && full == 0){
+		full = 1;
 		SetDDRamAddr(0x48);
 		while( BusyXLCD() );
 		putrsXLCD("M");
@@ -617,7 +620,7 @@ void main (void)
       				T1_SOURCE_EXT  &
       				T1_PS_1_1      &
       				T1_OSC1EN_ON   &
-      				T1_SYNC_EXT_ON );// tem que estar off para correr na placa, mas on para correr no proteus
+      				T1_SYNC_EXT_OFF );// tem que estar off para correr na placa, mas on para correr no proteus
 
 	ADCON1 = 0x0E; // Port A: A0 - analog; A1-A7 - digital
 
@@ -637,7 +640,7 @@ void main (void)
 
 	InitializeBuzzer();
 
-	init_LVD();
+	//init_LVD();
 
 	EnableHighInterrupts();
 
@@ -646,17 +649,19 @@ void main (void)
 	alarmes_prev[0] = 'a';
 	alarmes_prev[1] = 0;
 
-	update_EEPROM_interna_parametros();
-	ler_EEPROM_interna_parametros(); // carregar da EEPROM interna os valores de NREG, PMON e TSOM
+	//update_EEPROM_interna_parametros();
+	//ler_EEPROM_interna_parametros(); // carregar da EEPROM interna os valores de NREG, PMON e TSOM
 
-	ler_EEPROM_interna_relogio_alarme(); // carregar da EEPROM interna o valor do alarme do relogio
-	ler_EEPROM_interna_temp_alarme(); // carregar da EEPROM interna o valor do alarme da temperatura
-	ler_EEPROM_interna_lum_alarme(); // carregar da EEPROM interna o valor do alarme da luminosidade
+	// verificar checksum da memoria interna
+
+	//ler_EEPROM_interna_relogio_alarme(); // carregar da EEPROM interna o valor do alarme do relogio
+	//ler_EEPROM_interna_temp_alarme(); // carregar da EEPROM interna o valor do alarme da temperatura
+	//ler_EEPROM_interna_lum_alarme(); // carregar da EEPROM interna o valor do alarme da luminosidade
 
  	WriteTimer1( 0x8000 ); // load timer: 1 second
 
 	//EEPROM External Init
-	dataEEPROMext[0]=NREG;
+	/*dataEEPROMext[0]=NREG;
 	dataEEPROMext[1]=0;
 	dataEEPROMext[2]=0;
 	dataEEPROMext[3]=0;
@@ -665,7 +670,7 @@ void main (void)
 	dataEEPROMext[6]=0;
 	dataEEPROMext[7]=0;
 	writeEEPROMexterna(0x00,dataEEPROMext); //Cabeçalho NREG
-	EEAckPolling(0xA0);
+	EEAckPolling(0xA0);*/
 
 ///////////////////////////////////////////////////////////////////////////////
 //*************************** Ciclo Principal *******************************//
@@ -673,15 +678,17 @@ void main (void)
 
 	while (1){
 
-		while(modo_sleep == 1){
+		if(modo_sleep == 1){
     	WriteCmdXLCD( DOFF );      // Turn display off
 		}
 
- 		while( BusyXLCD() );
-  	WriteCmdXLCD( DOFF );      // Turn display off
-  	while( BusyXLCD() );
-  	WriteCmdXLCD( CURSOR_OFF );// Enable display with no cursor
-  	while( BusyXLCD() );
+		else{
+			while( BusyXLCD() );
+  		WriteCmdXLCD( DOFF );      // Turn display off
+  		while( BusyXLCD() );
+  		WriteCmdXLCD( CURSOR_OFF );// Enable display with no cursor
+  		while( BusyXLCD() );
+		}
 
 		sd = seconds/10;
 		su = seconds%10;
@@ -690,12 +697,126 @@ void main (void)
 		hd = hours/10;
 		hu = hours%10;
 
-		if(isLVD()){
-			update_EEPROM_interna_relogio();
-		}
+		//if(isLVD()){
+			//update_EEPROM_interna_relogio();
+		//}
 
 		SetDDRamAddr(0x0D);
 		putsXLCD(alarmes);
+
+		if(segundos_mudou	== 1){
+			/* verificacao de alarmes */
+			if(alarmes[0] == 'A'){
+
+				if(n_lum > alarme_lum && up_L == 1){
+					modo_sleep = 0;
+	  			alarme_OFF = 0;
+	  			alarme_lum_ON = 1;
+	  			if(modo_modificacao == 1){
+	  				modo_modificacao = 0;
+	  				sai_modificacao = 1;
+	  				cursor_pos = 0;
+	  			}
+	  			seconds_alarme_TSOM = seconds;
+	  			up_L = 0;
+	  			CCP1CON = 0x0F; // turn the buzzer on
+					//update_EEPROM_external(9);
+
+					//SetDDRamAddr(0x47);
+					//while( BusyXLCD() );
+					//putrsXLCD("O");
+	  		}
+
+				if(n_lum < alarme_lum && up_L == 0){
+					modo_sleep = 0;
+	  			alarme_OFF = 0;
+	  			alarme_lum_ON = 1;
+	  			if(modo_modificacao == 1){
+	  				modo_modificacao = 0;
+	  				sai_modificacao = 1;
+	  				cursor_pos = 0;
+	  			}
+	  			seconds_alarme_TSOM = seconds;
+	  			up_L = 1;
+	  			CCP1CON = 0x0F; // turn the buzzer on
+				//	update_EEPROM_external(9);
+
+					//SetDDRamAddr(0x47);
+					//while( BusyXLCD() );
+					//putrsXLCD("O");
+	  		}
+
+				if(((int)temperatura) > alarme_temp && up_T == 1){
+					modo_sleep = 0;
+	  			alarme_OFF = 0;
+	  			alarme_temp_ON = 1;
+	  			if(modo_modificacao == 1){
+	  				modo_modificacao = 0;
+	  				sai_modificacao = 1;
+	  				cursor_pos = 0;
+	  			}
+	  			seconds_alarme_TSOM = seconds;
+	  			up_T = 0;
+	  			CCP1CON = 0x0F; // turn the buzzer on
+					//update_EEPROM_external(8);
+
+					//SetDDRamAddr(0x47);
+					//while( BusyXLCD() );
+					//putrsXLCD("O");
+	  		}
+
+				if(((int)temperatura) < alarme_temp && up_T == 0){
+					modo_sleep = 0;
+					alarme_OFF = 0;
+	  			alarme_temp_ON = 1;
+	  			if(modo_modificacao == 1){
+	  				modo_modificacao = 0;
+	  				sai_modificacao = 1;
+	  				cursor_pos = 0;
+	  			}
+	  			seconds_alarme_TSOM = seconds;
+	  			up_T = 1;
+	  			CCP1CON = 0x0F; // turn the buzzer on
+					//update_EEPROM_external(8);
+
+					//SetDDRamAddr(0x47);
+					//while( BusyXLCD() );
+					//putrsXLCD("O");
+	  		}
+
+				if(alarme_hours == hours && alarme_minutes == minutes && alarme_seconds == seconds && disp_ahoras == 1){
+					modo_sleep = 0;
+					cursor_pos = 0;
+					disp_ahoras = 0;
+					alarme_OFF = 0;
+					alarme_clock_ON = 1;
+					if(modo_modificacao == 1){
+	  				modo_modificacao = 0;
+	  				sai_modificacao = 1;
+	  				cursor_pos = 0;
+	  			}
+	  			seconds_alarme_TSOM = seconds;
+	  			CCP1CON = 0x0F; // turn the buzzer on
+					//update_EEPROM_external(7);
+
+					//SetDDRamAddr(0x47);
+					//while( BusyXLCD() );
+					//putrsXLCD("O");
+				}
+
+				if(seconds == seconds_alarme_TSOM + TSOM){
+					CCP1CON = 0x00;
+
+					//SetDDRamAddr(0x47);
+					//while( BusyXLCD() );
+					//putrsXLCD("J");
+					//SetDDRamAddr(0x46);
+					//while( BusyXLCD() );
+					//putrsXLCD(" ");
+				}
+	  	}
+			segundos_mudou = 0;
+		}
 
 ///////////////////////////////////////////////////////////////////////////////
 //************************** Modo de Modificação ****************************//
@@ -706,8 +827,8 @@ void main (void)
 			if(cursor_pos  >= 4){
 				SetDDRamAddr(0x00);        // First line, first column
 				while( BusyXLCD() );
-				sprintf(time, "%d%d:%d%d:%d%d", alarme_hd, alarme_hu, alarme_md, alarme_mu, alarme_sd, alarme_su);
-				putsXLCD(time);
+				sprintf(time_s, "%d%d:%d%d:%d%d", alarme_hd, alarme_hu, alarme_md, alarme_mu, alarme_sd, alarme_su);
+				putsXLCD(time_s);
 			}
 
 			SetDDRamAddr(0x4D);
@@ -773,7 +894,7 @@ void main (void)
 				while(PORTAbits.RA4 && cursor_pos == 3);
 				if(cursor_pos == 4 && mudei_horas == 1){
 					mudei_horas == 0;
-					update_EEPROM_external(2);
+					//update_EEPROM_external(2);
 				}
 				if(cursor_pos == 3){
 					seconds++;
@@ -789,7 +910,6 @@ void main (void)
 		  		putsXLCD(change_seconds);
 				}
 			}
-
 
 			else if(cursor_pos == 4){ // acertar alarme do relogio
 				if(change_A == 0){
@@ -818,7 +938,7 @@ void main (void)
 					while(PORTAbits.RA4 && change_A == 1); // carregar em S2 uma vez para incrementar as horas
 					if(mudei_ahoras == 1 && (alarme_hours_prev != alarme_hours || alarme_minutes_prev != alarme_minutes || alarme_seconds_prev != alarme_seconds )){
 						mudei_ahoras = 0;
-						update_EEPROM_external(3);
+						//update_EEPROM_external(3);
 					}
 					if(change_A == 1){
 						if(change_AH == 1){
@@ -862,7 +982,7 @@ void main (void)
 						}
 					}
 				}
-				update_EEPROM_interna_relogio_alarme();
+				//update_EEPROM_interna_relogio_alarme();
 			}
 
 			else if(cursor_pos == 5){ // acertar alarme da temperatura
@@ -875,7 +995,7 @@ void main (void)
 				while(PORTAbits.RA4 && cursor_pos == 5); // carregar em S2 para indicar que se quer definir alarme
 				if(mudei_atemp == 1 && alarme_temp_prev != alarme_temp){
 					mudei_atemp = 0;
-					update_EEPROM_external(4);
+					//update_EEPROM_external(4);
 				}
 				if(cursor_pos == 5){
 					SetDDRamAddr(0x40); // levar o cursor ate ao sitio onde aparece o nivel da temperatura
@@ -895,7 +1015,7 @@ void main (void)
 		  			putsXLCD(nova_T);
 					}
 				}
-				update_EEPROM_interna_temp_alarme();
+				//update_EEPROM_interna_temp_alarme();
 			}
 
 			else if(cursor_pos == 6){ // acertar alarme da luminosidade
@@ -908,7 +1028,7 @@ void main (void)
 				while(PORTAbits.RA4 && cursor_pos == 6); // carregar em S2 para indicar que se quer definir alarme
 				if(mudei_alum == 1 && alarme_lum_prev != alarme_lum){
 					mudei_alum = 0;
-					update_EEPROM_external(5);
+					//update_EEPROM_external(5);
 				}
 				if(cursor_pos == 6){
 					SetDDRamAddr(0x4F); // levar o cursor ate ao sitio onde aparece o nivel da luminosidade
@@ -928,7 +1048,7 @@ void main (void)
 		  			putsXLCD(nova_L);
 					}
 				}
-				update_EEPROM_interna_lum_alarme();
+				//update_EEPROM_interna_lum_alarme();
 			}
 
 			else if(cursor_pos == 7){ // activar/desactivar alarmes
@@ -936,7 +1056,7 @@ void main (void)
 				while(PORTAbits.RA4 && cursor_pos == 7 && alarme_OFF == 1);
 				if(d_a_alarmes == 1 && alarmes_prev[0] != alarmes[0]){
 					d_a_alarmes = 0;
-					update_EEPROM_external(6);
+					//update_EEPROM_external(6);
 				}
 				if(cursor_pos == 7 && alarme_OFF == 1){
 					Delay1KTCYx(200);
@@ -954,12 +1074,13 @@ void main (void)
 
 			else{ //activar modo poupanca de energia
 				SetDDRamAddr(0x0F);
-				while(PORTAbits.RA4 && cursor_pos == 8);
+				if (modo_sleep == 0) while(PORTAbits.RA4 && cursor_pos == 8);
 				if(cursor_pos == 8){
 					modo_sleep = 1;
 					Delay1KTCYx(200);
 					while( BusyXLCD() );
 					WriteCmdXLCD(DOFF);
+					//Sleep();
 				}
 			}
 		}
@@ -967,114 +1088,9 @@ void main (void)
 		else{ // nao esta no modo modificao
 			SetDDRamAddr(0x00);        // First line, first column
 			while( BusyXLCD() );
-			sprintf(time, "%d%d:%d%d:%d%d", hd, hu, md, mu, sd, su);
-			putsXLCD(time);
+			sprintf(time_s, "%d%d:%d%d:%d%d", hd, hu, md, mu, sd, su);
+			putsXLCD(time_s);
 		}
-
-    /* verificacao de alarmes */
-  	if(alarmes[0] == 'A'){
-
-			if(n_lum > alarme_lum && up_L == 1){
-  			alarme_OFF = 0;
-  			alarme_lum_ON = 1;
-  			if(modo_modificacao == 1){
-  				modo_modificacao = 0;
-  				sai_modificacao = 1;
-  				cursor_pos = 0;
-  			}
-  			seconds_alarme_TSOM = seconds;
-  			up_L = 0;
-  			//CCP1CON = 0x0F; // turn the buzzer on
-				update_EEPROM_external(9);
-
-				SetDDRamAddr(0x47);
-				while( BusyXLCD() );
-				putrsXLCD("O");
-  		}
-
-			if(n_lum < alarme_lum && up_L == 0){
-  			alarme_OFF = 0;
-  			alarme_lum_ON = 1;
-  			if(modo_modificacao == 1){
-  				modo_modificacao = 0;
-  				sai_modificacao = 1;
-  				cursor_pos = 0;
-  			}
-  			seconds_alarme_TSOM = seconds;
-  			up_L = 1;
-  			//CCP1CON = 0x0F; // turn the buzzer on
-				update_EEPROM_external(9);
-
-				SetDDRamAddr(0x47);
-				while( BusyXLCD() );
-				putrsXLCD("O");
-  		}
-
-			if(((int)temperatura) > alarme_temp && up_T == 1){
-  			alarme_OFF = 0;
-  			alarme_temp_ON = 1;
-  			if(modo_modificacao == 1){
-  				modo_modificacao = 0;
-  				sai_modificacao = 1;
-  				cursor_pos = 0;
-  			}
-  			seconds_alarme_TSOM = seconds;
-  			up_T = 0;
-  			//CCP1CON = 0x0F; // turn the buzzer on
-				update_EEPROM_external(8);
-
-				SetDDRamAddr(0x47);
-				while( BusyXLCD() );
-				putrsXLCD("O");
-  		}
-
-			if(((int)temperatura) < alarme_temp && up_T == 0){
-				alarme_OFF = 0;
-  			alarme_temp_ON = 1;
-  			if(modo_modificacao == 1){
-  				modo_modificacao = 0;
-  				sai_modificacao = 1;
-  				cursor_pos = 0;
-  			}
-  			seconds_alarme_TSOM = seconds;
-  			up_T = 1;
-  			//CCP1CON = 0x0F; // turn the buzzer on
-				update_EEPROM_external(8);
-
-				SetDDRamAddr(0x47);
-				while( BusyXLCD() );
-				putrsXLCD("O");
-  		}
-
-			if(alarme_hours == hours && alarme_minutes == minutes && alarme_seconds == seconds && disp_ahoras==1){
-				disp_ahoras = 0;
-				alarme_OFF = 0;
-				alarme_clock_ON = 1;
-				if(modo_modificacao == 1){
-  				modo_modificacao = 0;
-  				sai_modificacao = 1;
-  				cursor_pos = 0;
-  			}
-  			seconds_alarme_TSOM = seconds;
-  			//CCP1CON = 0x0F; // turn the buzzer on
-				update_EEPROM_external(7);
-
-				SetDDRamAddr(0x47);
-				while( BusyXLCD() );
-				putrsXLCD("O");
-			}
-
-			if(seconds == seconds_alarme_TSOM + TSOM){
-				//CCP1CON = 0x00;
-
-				SetDDRamAddr(0x47);
-				while( BusyXLCD() );
-				putrsXLCD("J");
-				SetDDRamAddr(0x46);
-				while( BusyXLCD() );
-				putrsXLCD(" ");
-			}
-  	}
 
   	if(sai_modificacao == 1){
 			mudei_horas = 0;
@@ -1159,7 +1175,7 @@ void main (void)
 			Delay10TCYx(5);
 			ConvertADC();
 			while(BusyADC());
-			lum_2=ReadADC();
+			lum_2 = ReadADC();
 			if(lum_2 >= 0 && lum_2 <= 171){
 				n_lum = 0;
 			}
@@ -1193,8 +1209,10 @@ void main (void)
 			if(inicio == 1){
 				inicio = 0;
 				codigoev = 1;
-				update_EEPROM_external(codigoev);
+				//update_EEPROM_external(codigoev);
 			}
 		}
+		//modo_sleep = 1;
+		//Sleep();
  	}
 }
