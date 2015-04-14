@@ -1,7 +1,7 @@
 #include "main.h"
 #include "memorias.h"
 
-int NREG = 0;
+int NREG = 30;
 int hours_interna = 0;
 int minutes_interna = 0;
 int seconds_interna = 0;
@@ -24,6 +24,9 @@ char dataEEPROMext [8];
 
 void escrita_EEPROM_interna(char endereco, char dados)
 {
+	char palavra_magica = 0;
+	int i = 0;
+
 	EEADR = endereco;
 	EEDATA = dados;
 	EECON1 &= 0x3F;
@@ -35,7 +38,24 @@ void escrita_EEPROM_interna(char endereco, char dados)
 	INTCON |= 0x80; // enable interrupts
 	EECON1 &= 0xFB;
 
-	Delay1KTCYx(200);
+	Delay1KTCYx(50);
+
+	for(i = 0; i <= 10; i++){
+		palavra_magica += ler_EEPROM_interna(0x00+i);
+	}
+
+	EEADR = 0x0B;
+	EEDATA = palavra_magica;
+	EECON1 &= 0x3F;
+	EECON1 |= 0x04;
+	INTCON &= 0x7F; // disable interrupts
+	EECON2 = 0x55;
+	EECON2 = 0xAA;
+	EECON1 |= 0x02;
+	INTCON |= 0x80; // enable interrupts
+	EECON1 &= 0xFB;
+
+	Delay1KTCYx(50);
 }
 
 char ler_EEPROM_interna(char endereco)
@@ -48,6 +68,25 @@ char ler_EEPROM_interna(char endereco)
 	dados = EEDATA;
 
 	return dados;
+}
+
+unsigned char verificar_checksum(void)
+{
+	char checksum = 0;
+	int i = 0;
+
+	char palavra_magica = ler_EEPROM_interna(0x0B);
+
+	for(i = 0; i <= 10; i++){
+		checksum += ler_EEPROM_interna(0x00+i);
+	}
+
+	if(checksum == palavra_magica){
+		return 1;
+	}
+	else{
+		return 0;
+	}
 }
 
 void update_EEPROM_interna_relogio_alarme (void)
@@ -201,7 +240,7 @@ void update_EEPROM_external(char codigoev)
 	dataEEPROMext[2] = seconds;
 	dataEEPROMext[3] = codigoev;
 
-	SetDDRamAddr(0x46);
+	//SetDDRamAddr(0x46);
 
 	switch(codigoev){
 		case 1:

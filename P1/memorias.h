@@ -5,6 +5,8 @@ void escrita_EEPROM_interna(char endereco, char dados);
 
 char ler_EEPROM_interna(char endereco);
 
+unsigned char verificar_checksum(void);
+
 void update_EEPROM_interna_relogio_alarme (void);
 
 void ler_EEPROM_interna_relogio_alarme (void);

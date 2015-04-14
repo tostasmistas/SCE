@@ -9,8 +9,8 @@ volatile int minutes = 0;
 volatile int seconds = 0;
 volatile int cursor_pos = 0;
 
-int PMON = 0;
-int TSOM = 0;
+int PMON = 5;
+int TSOM = 2;
 int alarme_hours = 0;
 int alarme_minutes = 0;
 int alarme_seconds = 0;
@@ -228,7 +228,7 @@ void init_LVD (void)
 	LVDCON |= 0x10;
 
 	/* step 4 */
-	//while(!((LVDCON & 0x20) >> 5)); // so avanca quando IRVST estiver a high
+	while(!((LVDCON & 0x20) >> 5)); // so avanca quando IRVST estiver a high
 
 	/* step 5 */
 	PIR2 &= 0xFB; // clear LVDIF bit
@@ -271,7 +271,7 @@ void main (void)
 
 	InitializeBuzzer();
 
-	//init_LVD();
+	init_LVD();
 
 	EnableHighInterrupts();
 
@@ -280,14 +280,14 @@ void main (void)
 	alarmes_prev[0] = 'a';
 	alarmes_prev[1] = 0;
 
-	//update_EEPROM_interna_parametros();
-	//ler_EEPROM_interna_parametros();
+	update_EEPROM_interna_parametros();
 
-	// verificar checksum da memoria interna
-
-	//ler_EEPROM_interna_relogio_alarme(); // carregar da EEPROM interna o valor do alarme do relogio
-	//ler_EEPROM_interna_temp_alarme(); // carregar da EEPROM interna o valor do alarme da temperatura
-	//ler_EEPROM_interna_lum_alarme(); // carregar da EEPROM interna o valor do alarme da luminosidade
+	if(verificar_checksum() == 1){
+		ler_EEPROM_interna_parametros();
+		ler_EEPROM_interna_relogio_alarme(); // carregar da EEPROM interna o valor do alarme do relogio
+		ler_EEPROM_interna_temp_alarme(); // carregar da EEPROM interna o valor do alarme da temperatura
+		ler_EEPROM_interna_lum_alarme(); // carregar da EEPROM interna o valor do alarme da luminosidade
+	}
 
  	WriteTimer1( 0x8000 ); // load timer: 1 second
 
@@ -318,9 +318,9 @@ void main (void)
 		hd = hours/10;
 		hu = hours%10;
 
-		//if(isLVD()){
-			//update_EEPROM_interna_relogio();
-		//}
+		if(isLVD()){
+			update_EEPROM_interna_relogio();
+		}
 
 		SetDDRamAddr(0x0D);
 		putsXLCD(alarmes);

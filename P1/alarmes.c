@@ -1,4 +1,5 @@
 #include "main.h"
+#include "memorias.h"
 #include "alarmes.h"
 
 int seconds_alarme_TSOM = 0;
@@ -8,7 +9,8 @@ unsigned char up_T = 0;
 
 char spaces_alarmes[4] = {0};
 
-void rotina_verificacao_alarmes(void){
+void rotina_verificacao_alarmes(void)
+{
 
   if(segundos_mudou	== 1){
     /* verificacao de alarmes */
@@ -26,7 +28,7 @@ void rotina_verificacao_alarmes(void){
         seconds_alarme_TSOM = seconds;
         up_L = 0;
         CCP1CON = 0x0F; // turn the buzzer on
-        //update_EEPROM_external(9);
+        update_EEPROM_external(9);
 
         //SetDDRamAddr(0x47);
         //while( BusyXLCD() );
@@ -45,7 +47,7 @@ void rotina_verificacao_alarmes(void){
         seconds_alarme_TSOM = seconds;
         up_L = 1;
         CCP1CON = 0x0F; // turn the buzzer on
-      //	update_EEPROM_external(9);
+        update_EEPROM_external(9);
 
         //SetDDRamAddr(0x47);
         //while( BusyXLCD() );
@@ -64,7 +66,7 @@ void rotina_verificacao_alarmes(void){
         seconds_alarme_TSOM = seconds;
         up_T = 0;
         CCP1CON = 0x0F; // turn the buzzer on
-        //update_EEPROM_external(8);
+        update_EEPROM_external(8);
 
         //SetDDRamAddr(0x47);
         //while( BusyXLCD() );
@@ -83,7 +85,7 @@ void rotina_verificacao_alarmes(void){
         seconds_alarme_TSOM = seconds;
         up_T = 1;
         CCP1CON = 0x0F; // turn the buzzer on
-        //update_EEPROM_external(8);
+        update_EEPROM_external(8);
 
         //SetDDRamAddr(0x47);
         //while( BusyXLCD() );
@@ -103,7 +105,7 @@ void rotina_verificacao_alarmes(void){
         }
         seconds_alarme_TSOM = seconds;
         CCP1CON = 0x0F; // turn the buzzer on
-        //update_EEPROM_external(7);
+        update_EEPROM_external(7);
 
         //SetDDRamAddr(0x47);
         //while( BusyXLCD() );
@@ -125,7 +127,8 @@ void rotina_verificacao_alarmes(void){
   }
 }
 
-void avisa_alarmes(void){
+void avisa_alarmes(void)
+{
 
   if(desliga_alarmes == 1){
       SetDDRamAddr(0x09);

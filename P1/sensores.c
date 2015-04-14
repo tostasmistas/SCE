@@ -1,4 +1,5 @@
 #include "main.h"
+#include "memorias.h"
 #include "sensores.h"
 
 int lum_2 = 0;
@@ -74,7 +75,7 @@ void rotina_sensores_PMON(void){
     if(inicio == 1){
       inicio = 0;
       codigoev = 1;
-      //update_EEPROM_external(codigoev);
+      update_EEPROM_external(codigoev);
     }
   }
 }

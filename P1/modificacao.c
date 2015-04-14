@@ -1,4 +1,5 @@
 #include "main.h"
+#include "memorias.h"
 #include "modificacao.h"
 
 int Td = 0;
@@ -26,7 +27,8 @@ char nova_T[3] = {0};
 //************************** Modo de Modificação ****************************//
 ///////////////////////////////////////////////////////////////////////////////
 
-void rotina_modo_modificacao(void){
+void rotina_modo_modificacao(void)
+{
 
 	if(modo_modificacao == 1){ // estamos em modo modificacao
 
@@ -100,7 +102,7 @@ void rotina_modo_modificacao(void){
 			while(PORTAbits.RA4 && cursor_pos == 3);
 			if(cursor_pos == 4 && mudei_horas == 1){
 				mudei_horas == 0;
-				//update_EEPROM_external(2);
+				update_EEPROM_external(2);
 			}
 			if(cursor_pos == 3){
 				seconds++;
@@ -144,7 +146,7 @@ void rotina_modo_modificacao(void){
 				while(PORTAbits.RA4 && change_A == 1); // carregar em S2 uma vez para incrementar as horas
 				if(mudei_ahoras == 1 && (alarme_hours_prev != alarme_hours || alarme_minutes_prev != alarme_minutes || alarme_seconds_prev != alarme_seconds )){
 					mudei_ahoras = 0;
-					//update_EEPROM_external(3);
+					update_EEPROM_external(3);
 				}
 				if(change_A == 1){
 					if(change_AH == 1){
@@ -188,7 +190,7 @@ void rotina_modo_modificacao(void){
 					}
 				}
 			}
-			//update_EEPROM_interna_relogio_alarme();
+			update_EEPROM_interna_relogio_alarme();
 		}
 
 		else if(cursor_pos == 5){ // acertar alarme da temperatura
@@ -201,7 +203,7 @@ void rotina_modo_modificacao(void){
 			while(PORTAbits.RA4 && cursor_pos == 5); // carregar em S2 para indicar que se quer definir alarme
 			if(mudei_atemp == 1 && alarme_temp_prev != alarme_temp){
 				mudei_atemp = 0;
-				//update_EEPROM_external(4);
+				update_EEPROM_external(4);
 			}
 			if(cursor_pos == 5){
 				SetDDRamAddr(0x40); // levar o cursor ate ao sitio onde aparece o nivel da temperatura
@@ -221,7 +223,7 @@ void rotina_modo_modificacao(void){
 	  			putsXLCD(nova_T);
 				}
 			}
-			//update_EEPROM_interna_temp_alarme();
+			update_EEPROM_interna_temp_alarme();
 		}
 
 		else if(cursor_pos == 6){ // acertar alarme da luminosidade
@@ -234,7 +236,7 @@ void rotina_modo_modificacao(void){
 			while(PORTAbits.RA4 && cursor_pos == 6); // carregar em S2 para indicar que se quer definir alarme
 			if(mudei_alum == 1 && alarme_lum_prev != alarme_lum){
 				mudei_alum = 0;
-				//update_EEPROM_external(5);
+				update_EEPROM_external(5);
 			}
 			if(cursor_pos == 6){
 				SetDDRamAddr(0x4F); // levar o cursor ate ao sitio onde aparece o nivel da luminosidade
@@ -254,7 +256,7 @@ void rotina_modo_modificacao(void){
 	  			putsXLCD(nova_L);
 				}
 			}
-			//update_EEPROM_interna_lum_alarme();
+			update_EEPROM_interna_lum_alarme();
 		}
 
 		else if(cursor_pos == 7){ // activar/desactivar alarmes
@@ -262,7 +264,7 @@ void rotina_modo_modificacao(void){
 			while(PORTAbits.RA4 && cursor_pos == 7 && alarme_OFF == 1);
 			if(d_a_alarmes == 1 && alarmes_prev[0] != alarmes[0]){
 				d_a_alarmes = 0;
-				//update_EEPROM_external(6);
+				update_EEPROM_external(6);
 			}
 			if(cursor_pos == 7 && alarme_OFF == 1){
 				Delay1KTCYx(200);
@@ -286,7 +288,7 @@ void rotina_modo_modificacao(void){
 				Delay1KTCYx(200);
 				while( BusyXLCD() );
 				WriteCmdXLCD(DOFF);
-				//Sleep();
+				Sleep();
 			}
 		}
 	}
@@ -299,7 +301,8 @@ void rotina_modo_modificacao(void){
 	}
 }
 
-void rotina_sai_modificacao(void){
+void rotina_sai_modificacao(void)
+{
 
 	if(sai_modificacao == 1){
 		mudei_horas = 0;
