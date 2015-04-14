@@ -18,6 +18,7 @@ void rotina_verificacao_alarmes(void)
 
       if(n_lum > alarme_lum && up_L == 1){
         modo_sleep = 0;
+        cursor_pos = 0;
         alarme_OFF = 0;
         alarme_lum_ON = 1;
         if(modo_modificacao == 1){
@@ -37,6 +38,7 @@ void rotina_verificacao_alarmes(void)
 
       if(n_lum < alarme_lum && up_L == 0){
         modo_sleep = 0;
+        cursor_pos = 0;
         alarme_OFF = 0;
         alarme_lum_ON = 1;
         if(modo_modificacao == 1){
@@ -56,6 +58,7 @@ void rotina_verificacao_alarmes(void)
 
       if(((int)temperatura) > alarme_temp && up_T == 1){
         modo_sleep = 0;
+        cursor_pos = 0;
         alarme_OFF = 0;
         alarme_temp_ON = 1;
         if(modo_modificacao == 1){
@@ -75,6 +78,7 @@ void rotina_verificacao_alarmes(void)
 
       if(((int)temperatura) < alarme_temp && up_T == 0){
         modo_sleep = 0;
+        cursor_pos = 0;
         alarme_OFF = 0;
         alarme_temp_ON = 1;
         if(modo_modificacao == 1){

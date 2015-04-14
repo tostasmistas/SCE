@@ -10,11 +10,19 @@ int alarme_minutes_interna = 0;
 int alarme_seconds_interna = 0;
 int alarme_lum_interna = 0;
 int alarme_temp_interna = 0;
+int a = 0;
 
 unsigned char indwrite = 0;
 unsigned char full = 0;
 
 char endereco = 1;
+char palavra_magica = 0;
+char palavra_magica_relogio_alarme = 0;
+char palavra_magica_temp_alarme = 0;
+char palavra_magica_lum_alarme = 0;
+char palavra_magica_relogio = 0;
+char palavra_magica_parametros = 0;
+char checksum = 0;
 
 char dataEEPROMext [8];
 
@@ -24,9 +32,6 @@ char dataEEPROMext [8];
 
 void escrita_EEPROM_interna(char endereco, char dados)
 {
-	char palavra_magica = 0;
-	int i = 0;
-
 	EEADR = endereco;
 	EEDATA = dados;
 	EECON1 &= 0x3F;
@@ -38,24 +43,7 @@ void escrita_EEPROM_interna(char endereco, char dados)
 	INTCON |= 0x80; // enable interrupts
 	EECON1 &= 0xFB;
 
-	Delay1KTCYx(50);
-
-	for(i = 0; i <= 10; i++){
-		palavra_magica += ler_EEPROM_interna(0x00+i);
-	}
-
-	EEADR = 0x0B;
-	EEDATA = palavra_magica;
-	EECON1 &= 0x3F;
-	EECON1 |= 0x04;
-	INTCON &= 0x7F; // disable interrupts
-	EECON2 = 0x55;
-	EECON2 = 0xAA;
-	EECON1 |= 0x02;
-	INTCON |= 0x80; // enable interrupts
-	EECON1 &= 0xFB;
-
-	Delay1KTCYx(50);
+	while((EECON1 & 0x02) == 2); // testar se a escrita esta concluida
 }
 
 char ler_EEPROM_interna(char endereco)
@@ -70,15 +58,25 @@ char ler_EEPROM_interna(char endereco)
 	return dados;
 }
 
+void calcular_palavra_magica(void){
+
+	palavra_magica = 0;
+
+	palavra_magica = palavra_magica_relogio_alarme + palavra_magica_temp_alarme + palavra_magica_lum_alarme + palavra_magica_relogio + palavra_magica_parametros;
+
+	escrita_EEPROM_interna(0x0B, palavra_magica);
+}
+
+
 unsigned char verificar_checksum(void)
 {
-	char checksum = 0;
-	int i = 0;
+	checksum = 0;
+	a = 0;
 
-	char palavra_magica = ler_EEPROM_interna(0x0B);
+	palavra_magica = ler_EEPROM_interna(0x0B);
 
-	for(i = 0; i <= 10; i++){
-		checksum += ler_EEPROM_interna(0x00+i);
+	for(a = 0; a <= 10; a++){
+		checksum += ler_EEPROM_interna(0x00+a);
 	}
 
 	if(checksum == palavra_magica){
@@ -91,6 +89,8 @@ unsigned char verificar_checksum(void)
 
 void update_EEPROM_interna_relogio_alarme (void)
 {
+	a = 0;
+
 	alarme_hours_interna = ler_EEPROM_interna(0x00);
 
 	if(alarme_hours != alarme_hours_interna){
@@ -108,6 +108,13 @@ void update_EEPROM_interna_relogio_alarme (void)
 	if(alarme_seconds != alarme_seconds_interna){
 		escrita_EEPROM_interna(0x02, alarme_seconds);
 	}
+
+	for(a = 0; a <= 2; a++){
+		palavra_magica_relogio_alarme += ler_EEPROM_interna(0x00+a);
+	}
+
+	calcular_palavra_magica();
+
 }
 
 void ler_EEPROM_interna_relogio_alarme (void)
@@ -132,6 +139,10 @@ void update_EEPROM_interna_temp_alarme (void)
 	if(alarme_temp != alarme_temp_interna){
 		escrita_EEPROM_interna(0x03, alarme_temp);
 	}
+
+	palavra_magica_temp_alarme = ler_EEPROM_interna(0x03);
+
+	calcular_palavra_magica();
 }
 
 void ler_EEPROM_interna_temp_alarme (void)
@@ -146,6 +157,10 @@ void update_EEPROM_interna_lum_alarme (void)
 	if(alarme_lum != alarme_lum_interna){
 		escrita_EEPROM_interna(0x04, alarme_lum);
 	}
+
+	palavra_magica_lum_alarme = ler_EEPROM_interna(0x04);
+
+	calcular_palavra_magica();
 }
 
 void ler_EEPROM_interna_lum_alarme (void)
@@ -155,32 +170,48 @@ void ler_EEPROM_interna_lum_alarme (void)
 
 void update_EEPROM_interna_relogio (void)
 {
-	hours_interna = ler_EEPROM_interna(0x05);
-	if(hours != hours_interna){
+	a = 0;
+
+	//hours_interna = ler_EEPROM_interna(0x05);
+	//if(hours != hours_interna){
 		escrita_EEPROM_interna(0x05, hours);
-	}
+	//}
 
-	minutes_interna = ler_EEPROM_interna(0x06);
-	if(minutes != minutes_interna){
+	//minutes_interna = ler_EEPROM_interna(0x06);
+	//if(minutes != minutes_interna){
 		escrita_EEPROM_interna(0x06, minutes);
+	//}
+
+	//seconds_interna = ler_EEPROM_interna(0x05);
+	//if(seconds != seconds_interna){
+		escrita_EEPROM_interna(0x07, seconds);
+	//}
+
+	for(a = 0; a <= 2; a++){
+		palavra_magica_relogio += ler_EEPROM_interna(0x05+a);
 	}
 
-	seconds_interna = ler_EEPROM_interna(0x05);
-	if(seconds != seconds_interna){
-		escrita_EEPROM_interna(0x07, seconds);
-	}
+	calcular_palavra_magica();
 }
 
 void update_EEPROM_interna_parametros (void)
 {
-		/* update valor de NREG */
-		escrita_EEPROM_interna(0x08, 30);
+	a = 0;
 
-		/* update valor de PMON */
-		escrita_EEPROM_interna(0x09, 5);
+	/* update valor de NREG */
+	escrita_EEPROM_interna(0x08, 30);
 
-		/* update valor de TSOM */
-		escrita_EEPROM_interna(0x0A, 2);
+	/* update valor de PMON */
+	escrita_EEPROM_interna(0x09, 5);
+
+	/* update valor de TSOM */
+	escrita_EEPROM_interna(0x0A, 2);
+
+	for(a = 0; a <= 2; a++){
+		palavra_magica_parametros += ler_EEPROM_interna(0x08+a);
+	}
+
+	calcular_palavra_magica();
 }
 
 void ler_EEPROM_interna_parametros (void)
@@ -215,15 +246,14 @@ void init_EEPROM_externa(void){
 
 void writeEEPROMexterna (char endereco, char data[8])
 {
-
 	char ind = 0;
 	char i = 0;
 		IdleI2C();
 		StartI2C(); IdleI2C();
 
-			WriteI2C(0xA0); IdleI2C();
-			WriteI2C(0x00); IdleI2C();   //HB
-			WriteI2C(endereco); IdleI2C();   //LB
+		WriteI2C(0xA0); IdleI2C();
+		WriteI2C(0x00); IdleI2C();   //HB
+		WriteI2C(endereco); IdleI2C();   //LB
 		for (ind = 0; ind < 8; ind++){
 			WriteI2C(data[ind]); IdleI2C(); //Dados
 		}
