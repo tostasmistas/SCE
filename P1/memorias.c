@@ -91,6 +91,8 @@ void update_EEPROM_interna_relogio_alarme (void)
 {
 	a = 0;
 
+	palavra_magica_relogio_alarme = 0;
+	
 	alarme_hours_interna = ler_EEPROM_interna(0x00);
 
 	if(alarme_hours != alarme_hours_interna){
@@ -114,7 +116,6 @@ void update_EEPROM_interna_relogio_alarme (void)
 	}
 
 	calcular_palavra_magica();
-
 }
 
 void ler_EEPROM_interna_relogio_alarme (void)
@@ -171,6 +172,7 @@ void ler_EEPROM_interna_lum_alarme (void)
 void update_EEPROM_interna_relogio (void)
 {
 	a = 0;
+	palavra_magica_relogio = 0;
 
 	//hours_interna = ler_EEPROM_interna(0x05);
 	//if(hours != hours_interna){
@@ -179,24 +181,26 @@ void update_EEPROM_interna_relogio (void)
 
 	//minutes_interna = ler_EEPROM_interna(0x06);
 	//if(minutes != minutes_interna){
-		//escrita_EEPROM_interna(0x06, minutes);
+		escrita_EEPROM_interna(0x06, minutes);
 	//}
 
 	//seconds_interna = ler_EEPROM_interna(0x05);
 	//if(seconds != seconds_interna){
-		//escrita_EEPROM_interna(0x07, seconds);
+		escrita_EEPROM_interna(0x07, seconds);
 	//}
 
-	//for(a = 0; a <= 2; a++){
-		//palavra_magica_relogio += ler_EEPROM_interna(0x05+a);
-	//}
+	for(a = 0; a <= 2; a++){
+		palavra_magica_relogio += ler_EEPROM_interna(0x05+a);
+	}
 
-	//calcular_palavra_magica();
+	calcular_palavra_magica();
 }
 
 void update_EEPROM_interna_parametros (void)
 {
 	a = 0;
+
+	palavra_magica_parametros = 0;
 
 	/* update valor de NREG */
 	escrita_EEPROM_interna(0x08, 30);

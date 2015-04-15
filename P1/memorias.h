@@ -5,6 +5,8 @@ void escrita_EEPROM_interna(char endereco, char dados);
 
 char ler_EEPROM_interna(char endereco);
 
+void calcular_palavra_magica(void);
+
 unsigned char verificar_checksum(void);
 
 void update_EEPROM_interna_relogio_alarme (void);

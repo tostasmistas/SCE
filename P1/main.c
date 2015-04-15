@@ -297,20 +297,20 @@ void main (void)
 	alarmes_prev[1] = 0;
 
 	checksumIsRight = verificar_checksum();
+	//checksumIsRight = 1;
 
-	if(checksumIsRight ==  1){
+	if(checksumIsRight == 1){
 		ler_EEPROM_interna_parametros();
 		ler_EEPROM_interna_relogio_alarme(); // carregar da EEPROM interna o valor do alarme do relogio
 		ler_EEPROM_interna_temp_alarme(); // carregar da EEPROM interna o valor do alarme da temperatura
 		ler_EEPROM_interna_lum_alarme(); // carregar da EEPROM interna o valor do alarme da luminosidade
 	}
-	else{
-		update_EEPROM_interna_parametros();
-		update_EEPROM_interna_relogio_alarme();
-		update_EEPROM_interna_temp_alarme();
-		update_EEPROM_interna_lum_alarme();
-		update_EEPROM_interna_relogio();
-	}
+
+	update_EEPROM_interna_parametros();
+	update_EEPROM_interna_relogio_alarme();
+	update_EEPROM_interna_temp_alarme();
+	update_EEPROM_interna_lum_alarme();
+	update_EEPROM_interna_relogio();
 
 	init_EEPROM_externa();
 
@@ -354,9 +354,9 @@ void main (void)
 
 		rotina_sensores_PMON();
 
-		if(CCP1CON == 0x00 && modo_modificacao == 0){
+		/*if(CCP1CON == 0x00 && modo_modificacao == 0){
 			modo_sleep = 1;
 			Sleep();
-		}
+		}*/
  	}
 }
