@@ -145,20 +145,20 @@ void avisa_alarmes(void)
 
     SetDDRamAddr(0x09);
     while( BusyXLCD() );
-    putrsXLCD("A"); // imprimir A no LCD
+    putrsXLCD((const far rom char*)"A"); // imprimir A no LCD
   }
 
   if(alarme_temp_ON == 1){
 
     SetDDRamAddr(0x0A);
     while( BusyXLCD() );
-    putrsXLCD("T"); // imprimir T no LCD
+    putrsXLCD((const far rom char*)"T"); // imprimir T no LCD
   }
 
   if(alarme_lum_ON == 1){
     SetDDRamAddr(0x0B);
     while( BusyXLCD() );
-    putrsXLCD("L"); // imprimir L no LCD
+    putrsXLCD((const far rom char*)"L"); // imprimir L no LCD
   }
 
   if(n_lum > alarme_lum){

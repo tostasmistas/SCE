@@ -120,10 +120,10 @@ void isr (void)
 ///////////////////////////////////////////////////////////////////////////////
 //******************************** Relógio **********************************//
 ///////////////////////////////////////////////////////////////////////////////
-	/*if(PIR2bits.LVDIF==1){
+	if(PIR2bits.LVDIF == 1){
 		update_EEPROM_interna_relogio();
 		while(1);
-	}*/
+	}
 
 	if(PIR1bits.TMR1IF == 1){ // timer interrupt
 		WriteTimer1( 0x8000 ); // reload timer: 1 second
@@ -161,7 +161,8 @@ void isr (void)
 			alarme_temp_ON = 0;
 			alarme_clock_ON = 0;
 			desliga_alarmes = 1;
-		}else{
+		}
+		else{
 			if(cursor_pos == 4 && change_A == 1){
 				if(change_AH == 1){ // acabei de mudar as horas do alarme
 					change_AM = 1;
@@ -196,7 +197,8 @@ void isr (void)
 						change_T = 0;
 						mudei_atemp = 1;
 					}
-				}else{
+				}
+				else{
 					modo_modificacao = 0; //sair do modo de modificacaoo
 					sai_modificacao = 1; //acabei de sair do modo de modificacao
 					cursor_pos = 0;
@@ -296,12 +298,13 @@ void main (void)
 
 	checksumIsRight = verificar_checksum();
 
-	if(checksumIsRight ==  0x01){
+	if(checksumIsRight ==  1){
 		ler_EEPROM_interna_parametros();
 		ler_EEPROM_interna_relogio_alarme(); // carregar da EEPROM interna o valor do alarme do relogio
 		ler_EEPROM_interna_temp_alarme(); // carregar da EEPROM interna o valor do alarme da temperatura
 		ler_EEPROM_interna_lum_alarme(); // carregar da EEPROM interna o valor do alarme da luminosidade
-	}else{
+	}
+	else{
 		update_EEPROM_interna_parametros();
 		update_EEPROM_interna_relogio_alarme();
 		update_EEPROM_interna_temp_alarme();
@@ -319,7 +322,7 @@ void main (void)
 
 	while (1){
 
-		if(modo_sleep == 1){
+		if(modo_sleep == 1 && cursor_pos == 8){
     	WriteCmdXLCD( DOFF );      // Turn display off
 		}
 
@@ -351,7 +354,9 @@ void main (void)
 
 		rotina_sensores_PMON();
 
-		//modo_sleep = 1;
-		//Sleep();
+		if(CCP1CON == 0x00 && modo_modificacao == 0){
+			modo_sleep = 1;
+			Sleep();
+		}
  	}
 }

@@ -51,11 +51,11 @@ void rotina_modo_modificacao(void)
 
 		SetDDRamAddr(0x0F);
 		while( BusyXLCD() );
-		putrsXLCD("P"); // letra P que so aparece quando em modo modificacaoo
+		putrsXLCD((const far rom char*)"P"); // letra P que so aparece quando em modo modificacaoo
 
 		SetDDRamAddr(0x09);
 		while( BusyXLCD() );
-		putrsXLCD("ATL"); // letras ATL que aparecem quando em modo modificaoo	para se definir os alarmes
+		putrsXLCD((const far rom char*)"ATL"); // letras ATL que aparecem quando em modo modificaoo	para se definir os alarmes
 
 		SetDDRamAddr(0x0D);
 		while( BusyXLCD() );
@@ -200,7 +200,9 @@ void rotina_modo_modificacao(void)
 			else{
 				SetDDRamAddr(0x40);
 			}
-			while(PORTAbits.RA4 && cursor_pos == 5); // carregar em S2 para indicar que se quer definir alarme
+			if(change_T == 0){
+				while(PORTAbits.RA4 && cursor_pos == 5); // carregar em S2 para indicar que se quer definir alarme
+			}
 			if(mudei_atemp == 1 && alarme_temp_prev != alarme_temp){
 				mudei_atemp = 0;
 				update_EEPROM_external(4);
@@ -209,7 +211,7 @@ void rotina_modo_modificacao(void)
 				SetDDRamAddr(0x40); // levar o cursor ate ao sitio onde aparece o nivel da temperatura
 				Delay1KTCYx(200);
 				change_T = 1;
-			//	while(PORTAbits.RA4 && change_T == 1);
+				while(PORTAbits.RA4 && change_T == 1);
 				if(change_T == 1){
 					alarme_temp++;
 					if (alarme_temp == 50){
@@ -233,7 +235,9 @@ void rotina_modo_modificacao(void)
 			else{
 				SetDDRamAddr(0x4F);
 			}
-			while(PORTAbits.RA4 && cursor_pos == 6); // carregar em S2 para indicar que se quer definir alarme
+			if(change_L == 0){
+				while(PORTAbits.RA4 && cursor_pos == 6); // carregar em S2 para indicar que se quer definir alarme
+			}
 			if(mudei_alum == 1 && alarme_lum_prev != alarme_lum){
 				mudei_alum = 0;
 				update_EEPROM_external(5);
@@ -242,7 +246,7 @@ void rotina_modo_modificacao(void)
 				SetDDRamAddr(0x4F); // levar o cursor ate ao sitio onde aparece o nivel da luminosidade
 				Delay1KTCYx(200);
 				change_L = 1;
-			//	while(PORTAbits.RA4 && change_L == 1); // carregar novamente em S2 para incrementar "n" e definir o valor de luminosidade pretendido
+				while(PORTAbits.RA4 && change_L == 1); // carregar novamente em S2 para incrementar "n" e definir o valor de luminosidade pretendido
 				if(change_L == 1){
 					if(alarme_lum < 5){
 						alarme_lum++;

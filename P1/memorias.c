@@ -179,19 +179,19 @@ void update_EEPROM_interna_relogio (void)
 
 	//minutes_interna = ler_EEPROM_interna(0x06);
 	//if(minutes != minutes_interna){
-		escrita_EEPROM_interna(0x06, minutes);
+		//escrita_EEPROM_interna(0x06, minutes);
 	//}
 
 	//seconds_interna = ler_EEPROM_interna(0x05);
 	//if(seconds != seconds_interna){
-		escrita_EEPROM_interna(0x07, seconds);
+		//escrita_EEPROM_interna(0x07, seconds);
 	//}
 
-	for(a = 0; a <= 2; a++){
-		palavra_magica_relogio += ler_EEPROM_interna(0x05+a);
-	}
+	//for(a = 0; a <= 2; a++){
+		//palavra_magica_relogio += ler_EEPROM_interna(0x05+a);
+	//}
 
-	calcular_palavra_magica();
+	//calcular_palavra_magica();
 }
 
 void update_EEPROM_interna_parametros (void)
@@ -392,6 +392,6 @@ void update_EEPROM_external(char codigoev)
 		full = 1;
 		SetDDRamAddr(0x48);
 		while( BusyXLCD() );
-		putrsXLCD("M");
+		putrsXLCD((const far rom char*)"M");
 	}
 }
