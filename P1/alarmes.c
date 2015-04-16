@@ -9,6 +9,10 @@ unsigned char up_T = 0;
 
 char spaces_alarmes[4] = {0};
 
+void change_buzzer_freq(int freq){
+  OpenPWM1((char)(freq_CPU*1000./(freq*64)-1));
+}
+
 void rotina_verificacao_alarmes(void)
 {
 
@@ -28,12 +32,13 @@ void rotina_verificacao_alarmes(void)
         }
         seconds_alarme_TSOM = seconds;
         up_L = 0;
-        CCP1CON = 0x0F; // turn the buzzer on
+        //CCP1CON = 0x0F; // turn the buzzer on
+        change_buzzer_freq(300);
         update_EEPROM_external(9);
 
-        //SetDDRamAddr(0x47);
-        //while( BusyXLCD() );
-        //putrsXLCD("O");
+        SetDDRamAddr(0x47);
+        while( BusyXLCD() );
+        putrsXLCD("O");
       }
 
       if(n_lum < alarme_lum && up_L == 0){
@@ -48,12 +53,13 @@ void rotina_verificacao_alarmes(void)
         }
         seconds_alarme_TSOM = seconds;
         up_L = 1;
-        CCP1CON = 0x0F; // turn the buzzer on
+        //CCP1CON = 0x0F; // turn the buzzer on
+        change_buzzer_freq(300);
         update_EEPROM_external(9);
 
-        //SetDDRamAddr(0x47);
-        //while( BusyXLCD() );
-        //putrsXLCD("O");
+        SetDDRamAddr(0x47);
+        while( BusyXLCD() );
+        putrsXLCD("O");
       }
 
       if(((int)temperatura) > alarme_temp && up_T == 1){
@@ -68,7 +74,8 @@ void rotina_verificacao_alarmes(void)
         }
         seconds_alarme_TSOM = seconds;
         up_T = 0;
-        CCP1CON = 0x0F; // turn the buzzer on
+        //CCP1CON = 0x0F; // turn the buzzer on
+        change_buzzer_freq(600);
         update_EEPROM_external(8);
 
         //SetDDRamAddr(0x47);
@@ -88,7 +95,8 @@ void rotina_verificacao_alarmes(void)
         }
         seconds_alarme_TSOM = seconds;
         up_T = 1;
-        CCP1CON = 0x0F; // turn the buzzer on
+        //CCP1CON = 0x0F; // turn the buzzer on
+        change_buzzer_freq(600);
         update_EEPROM_external(8);
 
         //SetDDRamAddr(0x47);
@@ -108,7 +116,8 @@ void rotina_verificacao_alarmes(void)
           cursor_pos = 0;
         }
         seconds_alarme_TSOM = seconds;
-        CCP1CON = 0x0F; // turn the buzzer on
+        //CCP1CON = 0x0F; // turn the buzzer on
+        change_buzzer_freq(900);
         update_EEPROM_external(7);
 
         //SetDDRamAddr(0x47);
@@ -119,9 +128,9 @@ void rotina_verificacao_alarmes(void)
       if(seconds == seconds_alarme_TSOM + TSOM){
         CCP1CON = 0x00;
 
-        //SetDDRamAddr(0x47);
-        //while( BusyXLCD() );
-        //putrsXLCD("J");
+        SetDDRamAddr(0x47);
+        while( BusyXLCD() );
+        putrsXLCD("J");
         //SetDDRamAddr(0x46);
         //while( BusyXLCD() );
         //putrsXLCD(" ");

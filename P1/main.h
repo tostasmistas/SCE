@@ -11,6 +11,9 @@
 #include <i2c.h>
 #include <stdlib.h>
 #include <reset.h>
+#include <pwm.h>
+
+#define freq_CPU 4000 // 4 kHz
 
 extern volatile int hours; //compiler users guide page vinte e oito
 extern volatile int minutes;

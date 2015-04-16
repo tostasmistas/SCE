@@ -226,7 +226,7 @@ void EnableHighInterrupts (void)
 void init_LVD (void)
 {
 	PIE2bits.LVDIE = 0;         /* disable LVD interrupt */
-	LVDCON = 0b1101;            /* 4.2V - 4.45V */
+	LVDCON = 0b1110;            /* 4.2V - 4.45V */
 	LVDCONbits.LVDEN = 1;       /* enable LVD */
 	while (!LVDCONbits.IRVST);  /* wait initialization */
 	PIR2bits.LVDIF = 0;         /* clear interrupt flag */

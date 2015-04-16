@@ -92,7 +92,7 @@ void update_EEPROM_interna_relogio_alarme (void)
 	a = 0;
 
 	palavra_magica_relogio_alarme = 0;
-	
+
 	alarme_hours_interna = ler_EEPROM_interna(0x00);
 
 	if(alarme_hours != alarme_hours_interna){
@@ -171,9 +171,6 @@ void ler_EEPROM_interna_lum_alarme (void)
 
 void update_EEPROM_interna_relogio (void)
 {
-	a = 0;
-	palavra_magica_relogio = 0;
-
 	//hours_interna = ler_EEPROM_interna(0x05);
 	//if(hours != hours_interna){
 		escrita_EEPROM_interna(0x05, hours);
@@ -188,6 +185,9 @@ void update_EEPROM_interna_relogio (void)
 	//if(seconds != seconds_interna){
 		escrita_EEPROM_interna(0x07, seconds);
 	//}
+
+	a = 0;
+	palavra_magica_relogio = 0;
 
 	for(a = 0; a <= 2; a++){
 		palavra_magica_relogio += ler_EEPROM_interna(0x05+a);

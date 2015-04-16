@@ -200,19 +200,19 @@ void rotina_modo_modificacao(void)
 			else{
 				SetDDRamAddr(0x40);
 			}
-			//if(change_T == 0){
+			if(change_T == 0){
 				while(PORTAbits.RA4 && cursor_pos == 5); // carregar em S2 para indicar que se quer definir alarme
-			//}
-			if(mudei_atemp == 1 && alarme_temp_prev != alarme_temp){
-				mudei_atemp = 0;
-				update_EEPROM_interna_temp_alarme();
-				update_EEPROM_external(4);
 			}
 			if(cursor_pos == 5){
 				SetDDRamAddr(0x40); // levar o cursor ate ao sitio onde aparece o nivel da temperatura
 				Delay1KTCYx(200);
 				change_T = 1;
-				//while(PORTAbits.RA4 && change_T == 1);
+				while(PORTAbits.RA4 && change_T == 1);
+				if(mudei_atemp == 1 && alarme_temp_prev != alarme_temp){
+					mudei_atemp = 0;
+					update_EEPROM_interna_temp_alarme();
+					update_EEPROM_external(4);
+				}
 				if(change_T == 1){
 					alarme_temp++;
 					if (alarme_temp == 50){
@@ -238,16 +238,16 @@ void rotina_modo_modificacao(void)
 			if(change_L == 0){
 				while(PORTAbits.RA4 && cursor_pos == 6); // carregar em S2 para indicar que se quer definir alarme
 			}
-			if(mudei_alum == 1 && alarme_lum_prev != alarme_lum){
-				mudei_alum = 0;
-				update_EEPROM_interna_lum_alarme();
-				update_EEPROM_external(5);
-			}
 			if(cursor_pos == 6){
 				SetDDRamAddr(0x4F); // levar o cursor ate ao sitio onde aparece o nivel da luminosidade
 				Delay1KTCYx(200);
 				change_L = 1;
 				while(PORTAbits.RA4 && change_L == 1); // carregar novamente em S2 para incrementar "n" e definir o valor de luminosidade pretendido
+				if(mudei_alum == 1 && alarme_lum_prev != alarme_lum){
+					mudei_alum = 0;
+					update_EEPROM_interna_lum_alarme();
+					update_EEPROM_external(5);
+				}
 				if(change_L == 1){
 					if(alarme_lum < 5){
 						alarme_lum++;
@@ -280,7 +280,6 @@ void rotina_modo_modificacao(void)
 				}
 				while( BusyXLCD() );
 	  		putsXLCD(alarmes);
-
 			}
 		}
 
@@ -320,7 +319,6 @@ void rotina_sai_modificacao(void)
 		alarme_minutes_prev = alarme_minutes;
 		alarme_seconds_prev = alarme_seconds;
 		alarmes_prev[0] = alarmes[0];
-
 		change_AH = 1;
 
 		SetDDRamAddr(0x46);
