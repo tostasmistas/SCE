@@ -50,6 +50,7 @@ volatile unsigned char alarme_clock_ON = 0;
 volatile unsigned char desliga_alarmes = 0;
 volatile unsigned char segundos_mudou = 0;
 volatile unsigned char disp_ahoras = 1;
+volatile unsigned char ler_sensores=1;
 
 unsigned char checksumIsRight = 0;
 
@@ -129,6 +130,7 @@ void isr (void)
 		WriteTimer1( 0x8000 ); // reload timer: 1 second
 		PIR1bits.TMR1IF = 0; /* clear flag to avoid another interrupt */
 		segundos_mudou = 1;
+		ler_sensores=1;
 		seconds++;
 		if(disp_ahoras == 0){
 			disp_ahoras = 1;
@@ -287,7 +289,7 @@ void main (void)
 
 	InitializeBuzzer();
 
-	init_LVD();
+	//init_LVD();
 
 	EnableHighInterrupts();
 

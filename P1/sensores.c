@@ -36,7 +36,8 @@ unsigned char tsttc (void)
 
 void rotina_sensores_PMON(void){
 
-  if (PMON != 0 && seconds%PMON == 0){
+  if (PMON != 0 && seconds%PMON == 0 && ler_sensores==1){
+		ler_sensores=0;
     temperatura = tsttc();
     Delay10TCYx(5);
     ConvertADC();
@@ -63,13 +64,13 @@ void rotina_sensores_PMON(void){
     SetDDRamAddr(0x4D);
     while( BusyXLCD() );
     if (modo_modificacao == 0){
-      sprintf(luminosidade, "L %d", n_lum);
+      sprintf((char*)luminosidade, (const rom far char*)"L %d", n_lum);
       putsXLCD(luminosidade);
     }
     SetDDRamAddr(0x40);
     while( BusyXLCD() );
     if (modo_modificacao == 0){
-      sprintf(temperatura_s, "%d C", (int)temperatura);
+      sprintf((char*)temperatura_s, (const rom far char*)"%d C", (int)temperatura);
       putsXLCD(temperatura_s);
     }
     if(inicio == 1){

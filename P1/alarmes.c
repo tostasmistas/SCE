@@ -38,7 +38,7 @@ void rotina_verificacao_alarmes(void)
 
         SetDDRamAddr(0x47);
         while( BusyXLCD() );
-        putrsXLCD("O");
+        putrsXLCD((const rom far char*)"O");
       }
 
       if(n_lum < alarme_lum && up_L == 0){
@@ -59,7 +59,7 @@ void rotina_verificacao_alarmes(void)
 
         SetDDRamAddr(0x47);
         while( BusyXLCD() );
-        putrsXLCD("O");
+        putrsXLCD((const rom far char*)"O");
       }
 
       if(((int)temperatura) > alarme_temp && up_T == 1){
@@ -78,9 +78,9 @@ void rotina_verificacao_alarmes(void)
         change_buzzer_freq(450);
         update_EEPROM_external(8);
 
-        //SetDDRamAddr(0x47);
-        //while( BusyXLCD() );
-        //putrsXLCD("O");
+        SetDDRamAddr(0x47);
+        while( BusyXLCD() );
+        putrsXLCD("O");
       }
 
       if(((int)temperatura) < alarme_temp && up_T == 0){
@@ -99,9 +99,9 @@ void rotina_verificacao_alarmes(void)
         change_buzzer_freq(450);
         update_EEPROM_external(8);
 
-        //SetDDRamAddr(0x47);
-        //while( BusyXLCD() );
-        //putrsXLCD("O");
+        SetDDRamAddr(0x47);
+        while( BusyXLCD() );
+        putrsXLCD("O");
       }
 
       if(alarme_hours == hours && alarme_minutes == minutes && alarme_seconds == seconds && disp_ahoras == 1){
@@ -130,10 +130,10 @@ void rotina_verificacao_alarmes(void)
 
         SetDDRamAddr(0x47);
         while( BusyXLCD() );
-        putrsXLCD("J");
-        //SetDDRamAddr(0x46);
-        //while( BusyXLCD() );
-        //putrsXLCD(" ");
+        putrsXLCD((const rom far char*)"J");
+        SetDDRamAddr(0x46);
+        while( BusyXLCD() );
+        putrsXLCD(" ");
       }
     }
     segundos_mudou = 0;
@@ -146,7 +146,7 @@ void avisa_alarmes(void)
   if(desliga_alarmes == 1){
       SetDDRamAddr(0x09);
       while( BusyXLCD() );
-      sprintf(spaces_alarmes, "   ");
+      sprintf(spaces_alarmes, (const rom far char*)"   ");
       putsXLCD(spaces_alarmes);
   }
 

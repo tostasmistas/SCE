@@ -35,13 +35,13 @@ void rotina_modo_modificacao(void)
 		if(cursor_pos  >= 4){
 			SetDDRamAddr(0x00);        // First line, first column
 			while( BusyXLCD() );
-			sprintf(time_s, "%d%d:%d%d:%d%d", alarme_hd, alarme_hu, alarme_md, alarme_mu, alarme_sd, alarme_su);
+			sprintf((char*)time_s, (const rom far char*)"%d%d:%d%d:%d%d", alarme_hd, alarme_hu, alarme_md, alarme_mu, alarme_sd, alarme_su);
 			putsXLCD(time_s);
 		}
 
 		SetDDRamAddr(0x4D);
 		while( BusyXLCD() );
-		sprintf(luminosidade, "L %d", alarme_lum);
+		sprintf((char*)luminosidade, (const rom far char*)"L %d", alarme_lum);
 		putsXLCD(luminosidade);
 
 		SetDDRamAddr(0x40);
@@ -74,7 +74,7 @@ void rotina_modo_modificacao(void)
 				hd = hours/10;
 				hu = hours%10;
 				while( BusyXLCD() );
-				sprintf(change_hours, "%d%d", hd, hu);
+				sprintf((char*)change_hours, (const rom far char*)"%d%d", hd, hu);
 	  		putsXLCD(change_hours);
 			}
 		}
@@ -92,7 +92,7 @@ void rotina_modo_modificacao(void)
 				md = minutes/10;
 				mu = minutes%10;
 				while( BusyXLCD() );
-				sprintf(change_minutes, "%d%d", md, mu);
+				sprintf((char*)change_minutes, (const rom far char*)"%d%d", md, mu);
 	  		putsXLCD(change_minutes);
 			}
 		}
@@ -114,7 +114,7 @@ void rotina_modo_modificacao(void)
 				sd = seconds/10;
 				su = seconds%10;
 				while( BusyXLCD() );
-				sprintf(change_seconds, "%d%d", sd, su);
+				sprintf((char*)change_seconds, (const rom far char*)"%d%d", sd, su);
 	  		putsXLCD(change_seconds);
 			}
 		}
@@ -160,7 +160,7 @@ void rotina_modo_modificacao(void)
 						alarme_hd = alarme_hours/10;
 						alarme_hu = alarme_hours%10;
 						while( BusyXLCD() );
-						sprintf(change_hours_alarme, "%d%d", alarme_hd, alarme_hu);
+						sprintf((char*)change_hours_alarme, (const rom far char*)"%d%d", alarme_hd, alarme_hu);
 			  		putsXLCD(change_hours_alarme);
 					}
 					else if(change_AM == 1){
@@ -173,7 +173,7 @@ void rotina_modo_modificacao(void)
 						alarme_md = alarme_minutes/10;
 						alarme_mu = alarme_minutes%10;
 						while( BusyXLCD() );
-						sprintf(change_minutes_alarme, "%d%d", alarme_md, alarme_mu);
+						sprintf((char*)change_minutes_alarme, (const rom far char*)"%d%d", alarme_md, alarme_mu);
 			  		putsXLCD(change_minutes_alarme);
 					}
 					else if(change_AS == 1){
@@ -186,7 +186,7 @@ void rotina_modo_modificacao(void)
 						alarme_sd = alarme_seconds/10;
 						alarme_su = alarme_seconds%10;
 						while( BusyXLCD() );
-						sprintf(change_seconds_alarme, "%d%d", alarme_sd, alarme_su);
+						sprintf((char*)change_seconds_alarme, (const rom far char*)"%d%d", alarme_sd, alarme_su);
 			  		putsXLCD(change_seconds_alarme);
 					}
 				}
@@ -222,7 +222,7 @@ void rotina_modo_modificacao(void)
 					Td = alarme_temp/10;
 					Tu = alarme_temp%10;
 					while( BusyXLCD() );
-					sprintf(nova_T, "%d%d", Td, Tu);
+					sprintf((char*)nova_T, (const rom far char*)"%d%d", Td, Tu);
 	  			putsXLCD(nova_T);
 				}
 			}
@@ -257,7 +257,7 @@ void rotina_modo_modificacao(void)
 					}
 					Delay1KTCYx(200);
 					while( BusyXLCD() );
-					sprintf(nova_L, "%d", alarme_lum);
+					sprintf((char*)nova_L, (const rom far char*)"%d", alarme_lum);
 	  			putsXLCD(nova_L);
 				}
 			}
@@ -299,7 +299,7 @@ void rotina_modo_modificacao(void)
 	else{ // nao esta no modo modificao
 		SetDDRamAddr(0x00);        // First line, first column
 		while( BusyXLCD() );
-		sprintf(time_s, "%d%d:%d%d:%d%d", hd, hu, md, mu, sd, su);
+		sprintf((char*)time_s, (const rom far char*)"%d%d:%d%d:%d%d", hd, hu, md, mu, sd, su);
 		putsXLCD(time_s);
 	}
 }
@@ -323,21 +323,21 @@ void rotina_sai_modificacao(void)
 
 		SetDDRamAddr(0x46);
 		while( BusyXLCD() );
-		putrsXLCD(" ");
+		putrsXLCD((const rom far char*)" ");
 
 		SetDDRamAddr(0x09);
 		while( BusyXLCD() );
-		sprintf(spaces, "       ");
+		sprintf((char*)spaces, (const rom far char*)"       ");
 		putsXLCD(spaces);
 
 		SetDDRamAddr(0x4D);
 		while( BusyXLCD() );
-		sprintf(luminosidade, "L %d", n_lum);
+		sprintf((char*)luminosidade, (const rom far char*)"L %d", n_lum);
 		putsXLCD(luminosidade);
 
 		SetDDRamAddr(0x40);
 		while( BusyXLCD() );
-		sprintf(temperatura_s, "%d C", (int)temperatura);
+		sprintf((char*)temperatura_s, (const rom far char*)"%d C", (int)temperatura);
 		putsXLCD(temperatura_s);
 
 		sai_modificacao = 0;
