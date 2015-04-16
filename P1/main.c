@@ -289,9 +289,15 @@ void main (void)
 
 	InitializeBuzzer();
 
-	//init_LVD();
+	init_LVD();
 
 	EnableHighInterrupts();
+
+	if(isLVD()){
+		SetDDRamAddr(0x49);
+		while( BusyXLCD() );
+		putrsXLCD("R");
+	}
 
 	alarmes[0] = 'a';
 	alarmes[1] = 0;
