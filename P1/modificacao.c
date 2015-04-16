@@ -46,7 +46,7 @@ void rotina_modo_modificacao(void)
 
 		SetDDRamAddr(0x40);
 		while( BusyXLCD() );
-		sprintf(temperatura_s, "%d C", alarme_temp);
+		sprintf(temperatura_s, "%d%d C", alarme_temp/10, alarme_temp%10);
 		putsXLCD(temperatura_s);
 
 		SetDDRamAddr(0x0F);
@@ -215,8 +215,8 @@ void rotina_modo_modificacao(void)
 				}
 				if(change_T == 1){
 					alarme_temp++;
-					if (alarme_temp == 50){
-						alarme_temp = 0;
+					if (alarme_temp == 40){
+						alarme_temp = 10;
 					}
 					Delay1KTCYx(200);
 					Td = alarme_temp/10;
