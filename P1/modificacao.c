@@ -46,16 +46,16 @@ void rotina_modo_modificacao(void)
 
 		SetDDRamAddr(0x40);
 		while( BusyXLCD() );
-		sprintf(temperatura_s, "%d%d C", alarme_temp/10, alarme_temp%10);
+		sprintf((char*)temperatura_s, (const rom far char*)"%d%d C", alarme_temp/10, alarme_temp%10);
 		putsXLCD(temperatura_s);
 
 		SetDDRamAddr(0x0F);
 		while( BusyXLCD() );
-		putrsXLCD((const far rom char*)"P"); // letra P que so aparece quando em modo modificacaoo
+		putrsXLCD((const rom far char*)"P"); // letra P que so aparece quando em modo modificacaoo
 
 		SetDDRamAddr(0x09);
 		while( BusyXLCD() );
-		putrsXLCD((const far rom char*)"ATL"); // letras ATL que aparecem quando em modo modificaoo	para se definir os alarmes
+		putrsXLCD((const rom far char*)"ATL"); // letras ATL que aparecem quando em modo modificaoo	para se definir os alarmes
 
 		SetDDRamAddr(0x0D);
 		while( BusyXLCD() );

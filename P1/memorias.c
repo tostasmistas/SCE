@@ -196,6 +196,21 @@ void update_EEPROM_interna_relogio (void)
 	calcular_palavra_magica();
 }
 
+void ler_EEPROM_interna_relogio (void)
+{
+	hours = ler_EEPROM_interna(0x05);
+	hd = hours/10;
+	hu = hours%10;
+
+	minutes = ler_EEPROM_interna(0x06);
+	md = minutes/10;
+	mu = minutes%10;
+
+	seconds = ler_EEPROM_interna(0x07);
+	sd = seconds/10;
+	su = seconds%10;
+}
+
 void update_EEPROM_interna_parametros (void)
 {
 	a = 0;

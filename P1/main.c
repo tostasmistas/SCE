@@ -121,7 +121,7 @@ void isr (void)
 //******************************** Relógio **********************************//
 ///////////////////////////////////////////////////////////////////////////////
 	if(PIR2bits.LVDIF == 1){
-		update_EEPROM_interna_relogio();
+		escrita_EEPROM_interna(0x05, "A");
 		while(1);
 	}
 
@@ -287,7 +287,7 @@ void main (void)
 
 	InitializeBuzzer();
 
-	//init_LVD();
+	init_LVD();
 
 	EnableHighInterrupts();
 
@@ -301,6 +301,7 @@ void main (void)
 
 	if(checksumIsRight == 1){
 		ler_EEPROM_interna_parametros();
+		ler_EEPROM_interna_relogio();
 		ler_EEPROM_interna_relogio_alarme(); // carregar da EEPROM interna o valor do alarme do relogio
 		ler_EEPROM_interna_temp_alarme(); // carregar da EEPROM interna o valor do alarme da temperatura
 		ler_EEPROM_interna_lum_alarme(); // carregar da EEPROM interna o valor do alarme da luminosidade
