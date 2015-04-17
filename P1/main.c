@@ -282,7 +282,6 @@ void main (void)
 	alarmes_prev[1] = 0;
 
 	checksumIsRight = verificar_checksum();
-	//checksumIsRight = 1;
 
 	if(checksumIsRight == 1){
 		ler_EEPROM_interna_parametros();

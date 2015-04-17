@@ -16,7 +16,7 @@ void change_buzzer_freq(int freq){
 void rotina_verificacao_alarmes(void)
 {
 
-  if(segundos_mudou	== 1 && modo_modificacao == 0){
+  if(segundos_mudou	== 1){
     if(minutos_mudou==1){
   	   update_EEPROM_interna_relogio_minutes();
       minutos_mudou=0;
@@ -26,7 +26,7 @@ void rotina_verificacao_alarmes(void)
       horas_mudou=0;
     }
     /* verificacao de alarmes */
-    if(alarmes[0] == 'A'){
+    if(alarmes[0] == 'A' && modo_modificacao == 0){
 
       if(n_lum > alarme_lum && up_L == 1){
         modo_sleep = 0;
@@ -40,7 +40,6 @@ void rotina_verificacao_alarmes(void)
         }
         seconds_alarme_TSOM = seconds;
         up_L = 0;
-        //CCP1CON = 0x0F; // turn the buzzer on
         change_buzzer_freq(900);
         update_EEPROM_external(9);
       }
@@ -57,7 +56,6 @@ void rotina_verificacao_alarmes(void)
         }
         seconds_alarme_TSOM = seconds;
         up_L = 1;
-        //CCP1CON = 0x0F; // turn the buzzer on
         change_buzzer_freq(900);
         update_EEPROM_external(9);
       }
@@ -74,7 +72,6 @@ void rotina_verificacao_alarmes(void)
         }
         seconds_alarme_TSOM = seconds;
         up_T = 0;
-        //CCP1CON = 0x0F; // turn the buzzer on
         change_buzzer_freq(450);
         update_EEPROM_external(8);
       }
@@ -91,7 +88,6 @@ void rotina_verificacao_alarmes(void)
         }
         seconds_alarme_TSOM = seconds;
         up_T = 1;
-        //CCP1CON = 0x0F; // turn the buzzer on
         change_buzzer_freq(450);
         update_EEPROM_external(8);
       }
@@ -108,7 +104,6 @@ void rotina_verificacao_alarmes(void)
           cursor_pos = 0;
         }
         seconds_alarme_TSOM = seconds;
-        //CCP1CON = 0x0F; // turn the buzzer on
         change_buzzer_freq(300);
         update_EEPROM_external(7);
       }
