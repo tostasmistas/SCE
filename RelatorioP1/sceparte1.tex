@@ -74,7 +74,7 @@
 			\includegraphics[width=0.15\textwidth]{scereport_03}
 		\end{center}
 		\subsubsection{Memória EEPROM Interna}
-		Na EEPROM interna são mantidos atualizados os parâmetros relevantes ao correto funcionamento do sistema (alarmes, PMON, TSOM, NREG), para que possam ser recuperados em situações em que se interrompa a alimentação.
+		Na EEPROM interna são mantidos atualizados os parâmetros relevantes ao correto funcionamento do sistema (alarmes, PMON, TSOM, NREG e relógio), para que possam ser recuperados em situações em que se interrompa a alimentação ou seja feito um \textit{reset}.
 		
 	
 		\begin{center}
@@ -96,9 +96,12 @@
 		\item Para cada tipo de alarme, o sinal sonoro emitido pelo besouro tem uma frequência diferente; 
 		\item No modo de modificação, o utilizador pode pressionar de forma continuada o botão S2, se preferir, para alterar os valores dos parâmetros;
 		\item Sempre que possível o sistema entra em modo \textit{sleep} e sai desse modo quando ocorre uma interrupção do \textit{timer} ou do botão S3;
-		\item A verificação dos alarmes é feita segundo a segundo ;
+		\item A verificação dos alarmes é feita segundo a segundo;
+		\item Memória Interna:
+			\subitem 
 		\item LVD:
-			\subitem Verificou-se que só existe tempo para escrever 1 byte na memória interna a partir do momento em que existe uma falha de alimentação. Assim, tomou-se a decisão de guardar os minutos e as horas sempre que são atualizados e os segundos apenas quando há uma falha de alimentação. Ao ocorrer um \textit{reset} o sistema acede aos segundos guardados antes do último \textit{power down}. Ao ocorrer uma falha de alimentação, o utilizador tem acesso às horas, minutos e segundos tal e qual como estavam imediatamente antes da falha.
+			\subitem Verificou-se que só existe tempo para escrever um \textit{byte} na memória interna a partir do momento em que existe uma falha de alimentação. Assim, tomou-se a decisão de guardar os minutos e as horas sempre que são atualizados e os segundos apenas quando há uma falha de alimentação. Como só se tem tempo para escrever um \textit{byte}, não se pode guardar a palavra-mágica actualizada 
+			Ao ocorrer um \textit{reset} o sistema acede aos segundos guardados antes do último \textit{power down}. Ao ocorrer uma falha de alimentação, o utilizador tem acesso às horas, minutos e segundos tal e qual como estavam imediatamente antes da falha, se os valores estiverem coerentes.
 		
 		\end{itemize}
 		
