@@ -173,14 +173,14 @@ void avisa_alarmes(void)
   if(n_lum > alarme_lum){
     up_L = 0;
   }
-  else{
+  else if(n_lum< alarme_lum){
     up_L = 1;
   }
 
   if((int)temperatura > alarme_temp){
     up_T = 0;
   }
-  else{
+  else if ((int)temperatura < alarme_temp){
     up_T = 1;
   }
 }
