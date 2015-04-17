@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.1415926-2.5-1.40.14 (MiKTeX 2.9) (preloaded format=pdflatex 2015.3.26)  17 APR 2015 19:51
+This is pdfTeX, Version 3.1415926-2.5-1.40.14 (MiKTeX 2.9) (preloaded format=pdflatex 2015.3.26)  17 APR 2015 20:48
 entering extended mode
 **sceparte1.tex
 (C:\Users\margarida\Downloads\git\SCE\RelatorioP1\sceparte1.tex
@@ -414,73 +414,94 @@ LaTeX Font Info:    External font `cmex10' loaded for size
 (Font)              <8> on input line 24.
 LaTeX Font Info:    External font `cmex10' loaded for size
 (Font)              <6> on input line 24.
+<scereport_01.png, id=1, 248.93pt x 286.06876pt>
+File: scereport_01.png Graphic file (type png)
+ <use scereport_01.png>
+Package pdftex.def Info: scereport_01.png used on input line 36.
+(pdftex.def)             Requested size: 51.31487pt x 58.96748pt.
 
-! LaTeX Error: File `scereport_01' not found.
+<scereport_05.png, id=2, 437.635pt x 357.335pt>
+File: scereport_05.png Graphic file (type png)
+ <use scereport_05.png>
+Package pdftex.def Info: scereport_05.png used on input line 47.
+(pdftex.def)             Requested size: 76.96448pt x 62.83989pt.
 
-See the LaTeX manual or LaTeX Companion for explanation.
-Type  H <return>  for immediate help.
- ...                                              
-                                                  
-l.36 ...aphics[width=0.10\textwidth]{scereport_01}
-                                                  
-I could not locate the file with any of these extensions:
-.png,.pdf,.jpg,.mps,.jpeg,.jbig2,.jb2,.PNG,.PDF,.JPG,.JPEG,.JBIG2,.JB2
-Try typing  <return>  to proceed.
-If that doesn't work, type  X <return>  to quit.
+<scereport_06.png, id=3, 441.65pt x 270.00874pt>
+File: scereport_06.png Graphic file (type png)
+ <use scereport_06.png>
+Package pdftex.def Info: scereport_06.png used on input line 59.
+(pdftex.def)             Requested size: 76.96448pt x 47.05035pt.
 
+<scereport1_03.png, id=4, 912.40875pt x 265.99374pt>
+File: scereport1_03.png Graphic file (type png)
+ <use scereport1_03.png>
+Package pdftex.def Info: scereport1_03.png used on input line 66.
+(pdftex.def)             Requested size: 153.9368pt x 44.87334pt.
 
-! LaTeX Error: File `scereport_05' not found.
+[1
 
-See the LaTeX manual or LaTeX Companion for explanation.
-Type  H <return>  for immediate help.
- ...                                              
-                                                  
-l.47 ...aphics[width=0.15\textwidth]{scereport_05}
-                                                  
-I could not locate the file with any of these extensions:
-.png,.pdf,.jpg,.mps,.jpeg,.jbig2,.jb2,.PNG,.PDF,.JPG,.JPEG,.JBIG2,.JB2
-Try typing  <return>  to proceed.
-If that doesn't work, type  X <return>  to quit.
+{C:/ProgramData/MiKTeX/2.9/pdftex/config/pdftex.map} <C:/Users/margarida/Downlo
+ads/git/SCE/RelatorioP1/scereport_01.png (PNG copy)> <C:/Users/margarida/Downlo
+ads/git/SCE/RelatorioP1/scereport_05.png (PNG copy)> <C:/Users/margarida/Downlo
+ads/git/SCE/RelatorioP1/scereport_06.png (PNG copy)>]
+<scereport_03.png, id=15, 441.65pt x 195.73125pt>
+File: scereport_03.png Graphic file (type png)
+ <use scereport_03.png>
+Package pdftex.def Info: scereport_03.png used on input line 74.
+(pdftex.def)             Requested size: 76.96448pt x 34.10713pt.
 
+<scereport_14.png, id=16, 479.7925pt x 196.735pt>
+File: scereport_14.png Graphic file (type png)
+ <use scereport_14.png>
+Package pdftex.def Info: scereport_14.png used on input line 81.
+(pdftex.def)             Requested size: 76.96448pt x 31.55629pt.
+LaTeX Font Info:    Try loading font information for OMS+cmr on input line 88.
 
-! LaTeX Error: File `scereport_06' not found.
+("C:\Program Files (x86)\MiKTeX 2.9\tex\latex\base\omscmr.fd"
+File: omscmr.fd 1999/05/25 v2.5h Standard LaTeX font definitions
+)
+LaTeX Font Info:    Font shape `OMS/cmr/m/n' in size <10> not available
+(Font)              Font shape `OMS/cmsy/m/n' tried instead on input line 88.
+LaTeX Font Info:    External font `cmex10' loaded for size
+(Font)              <7> on input line 103.
+LaTeX Font Info:    External font `cmex10' loaded for size
+(Font)              <5> on input line 103.
+ [2 <C:/Users/margarida/Downloads/git/SCE/RelatorioP1/scereport1_03.png (PNG co
+py)> <C:/Users/margarida/Downloads/git/SCE/RelatorioP1/scereport_03.png (PNG co
+py)> <C:/Users/margarida/Downloads/git/SCE/RelatorioP1/scereport_14.png (PNG co
+py)>]
+<scemaqestados.png, id=24, 2905.85625pt x 2173.11874pt>
+File: scemaqestados.png Graphic file (type png)
 
-See the LaTeX manual or LaTeX Companion for explanation.
-Type  H <return>  for immediate help.
- ...                                              
-                                                  
-l.59 ...aphics[width=0.15\textwidth]{scereport_06}
-                                                  
-I could not locate the file with any of these extensions:
-.png,.pdf,.jpg,.mps,.jpeg,.jbig2,.jb2,.PNG,.PDF,.JPG,.JPEG,.JBIG2,.JB2
-Try typing  <return>  to proceed.
-If that doesn't work, type  X <return>  to quit.
-
-
-! LaTeX Error: File `scereport1_03' not found.
-
-See the LaTeX manual or LaTeX Companion for explanation.
-Type  H <return>  for immediate help.
- ...                                              
-                                                  
-l.66 ...aphics[width=0.3\textwidth]{scereport1_03}
-                                                  
-I could not locate the file with any of these extensions:
-.png,.pdf,.jpg,.mps,.jpeg,.jbig2,.jb2,.PNG,.PDF,.JPG,.JPEG,.JBIG2,.JB2
-Try typing  <return>  to proceed.
-If that doesn't work, type  X <return>  to quit.
-
-
-! LaTeX Error: File `scereport_03' not found.
-
-See the LaTeX manual or LaTeX Companion for explanation.
-Type  H <return>  for immediate help.
- ...                                              
-                                                  
-l.74 ...aphics[width=0.15\textwidth]{scereport_03}
-                                                  
-I could not locate the file with any of these extensions:
-.png,.pdf,.jpg,.mps,.jpeg,.jbig2,.jb2,.PNG,.PDF,.JPG,.JPEG,.JBIG2,.JB2
-Try typing  <return>  to proceed.
-If that doesn't work, type  X <return>  to quit.
+<use scemaqestados.png>
+Package pdftex.def Info: scemaqestados.png used on input line 114.
+(pdftex.def)             Requested size: 513.11745pt x 383.71687pt.
+ [3] [4 <C:/Users/margarida/Downloads/git/SCE/RelatorioP1/scemaqestados.png>]
+(C:\Users\margarida\Downloads\git\SCE\RelatorioP1\sceparte1.aux) ) 
+Here is how much of TeX's memory you used:
+ 2576 strings out of 493921
+ 32793 string characters out of 3144864
+ 96593 words of memory out of 3000000
+ 5839 multiletter control sequences out of 15000+200000
+ 15675 words of font info for 37 fonts, out of 3000000 for 9000
+ 841 hyphenation exceptions out of 8191
+ 32i,14n,43p,692b,328s stack positions out of 5000i,500n,10000p,200000b,50000s
+ <C:\Users\ma
+rgarida\AppData\Local\MiKTeX\2.9\fonts\pk\ljfour\jknappen\ec\dpi600\ecti1000.pk
+> <C:\Users\margarida\AppData\Local\MiKTeX\2.9\fonts\pk\ljfour\jknappen\ec\dpi6
+00\ecbx1000.pk> <C:\Users\margarida\AppData\Local\MiKTeX\2.9\fonts\pk\ljfour\jk
+nappen\ec\dpi600\ecrm0700.pk> <C:\Users\margarida\AppData\Local\MiKTeX\2.9\font
+s\pk\ljfour\jknappen\ec\dpi600\ecrm1000.pk> <C:\Users\margarida\AppData\Local\M
+iKTeX\2.9\fonts\pk\ljfour\jknappen\ec\dpi600\ecbx1440.pk> <C:\Users\margarida\A
+ppData\Local\MiKTeX\2.9\fonts\pk\ljfour\jknappen\ec\dpi600\ecrm0800.pk> <C:\Use
+rs\margarida\AppData\Local\MiKTeX\2.9\fonts\pk\ljfour\jknappen\ec\dpi600\ecrm12
+00.pk> <C:\Users\margarida\AppData\Local\MiKTeX\2.9\fonts\pk\ljfour\jknappen\ec
+\dpi600\ecbx1200.pk> <C:\Users\margarida\AppData\Local\MiKTeX\2.9\fonts\pk\ljfo
+ur\jknappen\ec\dpi600\ecbx1728.pk><C:/Program Files (x86)/MiKTeX 2.9/fonts/type
+1/public/amsfonts/cm/cmsy10.pfb>
+Output written on sceparte1.pdf (4 pages, 441667 bytes).
+PDF statistics:
+ 295 PDF objects out of 1000 (max. 8388607)
+ 0 named destinations out of 1000 (max. 500000)
+ 36 words of extra memory for PDF output out of 10000 (max. 10000000)
 

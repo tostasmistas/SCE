@@ -12,14 +12,14 @@
 \fancyhf{}
 \rhead{Sistemas Computacionais Embebidos}
 \lhead{Sistema de Monitorização e Alarme (1ªParte)}
-\rfoot{Page \thepage}
+\rfoot{Página \thepage}
 
 \begin{document}
 
 	\title{\textbf{Sistema de Monitorização e Alarme (1ªParte)} \\ \large Sistemas Computacionais Embebidos - 1º Trabalho de Laboratório \\ \large 2º Semestre 2014/2015}
 	%\title{\textbf{Sistema de Monitorização e Alarme (1ªParte)}}
-	\author{Margarida Reis, nº73099}
-	\author{Margarida Reis(73099) - Sofia Silva(73483) - Tiago Ricardo(73649)}
+	
+	\author{Grupo n.º 3: Margarida Reis(73099) - Sofia Silva(73483) - Tiago Ricardo(73649)}
 	
 	\maketitle	
 	
@@ -86,6 +86,7 @@
 		
 		\begin{itemize}
 		\item Não disparam alarmes durante o modo de modificação;
+		\item Se disparar um alarme a letra correspondente a esse alarme (A, T ou L) fica escrita no LCD até haver interacção do utilizador, ou seja, quando é pressionado o botão S3.
 		\item No modo de modificação, o valor do alarme das horas só é apresentado a partir do momento em que o cursor se encontra sobre a letra A;
 		\item Na rotina principal, considerou-se a seguinte sequência de operações:
 		
@@ -98,11 +99,14 @@
 		\item Sempre que possível o sistema entra em modo \textit{sleep} e sai desse modo quando ocorre uma interrupção do \textit{timer} ou do botão S3;
 		\item A verificação dos alarmes é feita segundo a segundo;
 		\item Memória Interna:
-			\subitem 
+			\subitem Os valores da memória interna são recuperados se forem coerentes. Para verificar a coerência dos valores recorre-se a um valor armazenado na posição de memória 0x0B, a "palavra-mágica". Este valor é calculado através da leitura de todas as posições de memória anteriores, excepto a dos segundos. Este valor não é lido porque só se escreve na posição de memória alocada para os segundos quando há uma falha de alimentação e quando isso ocorre verificou-se que não há tempo para calcular a ``palavra-mágica'' correspondente, sendo a verificação da coerência dos segundos feita à parte. 
+			
+			Assim, quando é escrito um bloco na memória interna, calcula-se a ``palavra-mágica'' desse bloco e actualiza-se depois o valor da ``palavra-mágica'' global que corresponde à soma das ``palavra-mágicas'' de todos os blocos - bloco da hora do alarme (3 \textit{bytes}), bloco dos parâmetros (PMON, TSOM e NREG - 3 \textit{bytes}), bloco da luminosidade (1 \textit{byte}), bloco da temperatura (1 \textit{byte}), bloco das horas (1 \textit{byte}) e bloco dos minutos (1 \textit{byte}.)
+			
+			Quando o programa inicia lê-se a posição de memória que armazena a ``palavra-mágica'' e compara-se esse valor com o \textit{checksum}. O \textit{checksum} é calculado somando o valor armazenado em todas as posições de memória antes de 0x0B, excluindo a dos segundos. Se os valores forem iguais significa que os dados armazenados na memória interna são coerentes e podem ser carregados para o programa. Se os valores não estiverem coerentes são carregados os valores por omissão.
 		\item LVD:
-			\subitem Verificou-se que só existe tempo para escrever um \textit{byte} na memória interna a partir do momento em que existe uma falha de alimentação. Assim, tomou-se a decisão de guardar os minutos e as horas sempre que são atualizados e os segundos apenas quando há uma falha de alimentação. Como só se tem tempo para escrever um \textit{byte}, não se pode guardar a palavra-mágica actualizada 
-			Ao ocorrer um \textit{reset} o sistema acede aos segundos guardados antes do último \textit{power down}. Ao ocorrer uma falha de alimentação, o utilizador tem acesso às horas, minutos e segundos tal e qual como estavam imediatamente antes da falha, se os valores estiverem coerentes.
-		
+			\subitem Verificou-se que só existe tempo para escrever um \textit{byte} na memória interna a partir do momento em que existe uma falha de alimentação. Assim, tomou-se a decisão de guardar os minutos e as horas sempre que são atualizados e os segundos apenas quando há uma falha de alimentação. Como só se tem tempo para escrever um \textit{byte}, não se pode guardar a ``palavra-mágica'' actualizada deste bloco, motivo pelo qual a verificação da coerência deste valor é feita à parte. No início do programa, lê-se a posição de memória que contém os segundos e se o valor lá armazenado estiver entre 0 e 59 assume-se que é coerente.
+			Relativamente ao ocorrer um \textit{reset} o sistema acede aos segundos guardados antes do último \textit{power down}.
 		\end{itemize}
 		
 		\section{Fluxograma do Projeto}
