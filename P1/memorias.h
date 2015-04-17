@@ -21,9 +21,13 @@ void update_EEPROM_interna_lum_alarme (void);
 
 void ler_EEPROM_interna_lum_alarme (void);
 
-void update_EEPROM_interna_relogio (void);
+void update_EEPROM_interna_relogio_hours (void);
+
+void update_EEPROM_interna_relogio_minutes (void);
 
 void ler_EEPROM_interna_relogio (void);
+
+void ler_EEPROM_interna_relogio_seconds (void);
 
 void update_EEPROM_interna_parametros (void);
 

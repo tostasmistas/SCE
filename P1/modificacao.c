@@ -76,6 +76,8 @@ void rotina_modo_modificacao(void)
 				while( BusyXLCD() );
 				sprintf((char*)change_hours, (const rom far char*)"%d%d", hd, hu);
 	  		putsXLCD(change_hours);
+
+				update_EEPROM_interna_relogio_hours();
 			}
 		}
 
@@ -94,6 +96,8 @@ void rotina_modo_modificacao(void)
 				while( BusyXLCD() );
 				sprintf((char*)change_minutes, (const rom far char*)"%d%d", md, mu);
 	  		putsXLCD(change_minutes);
+
+				update_EEPROM_interna_relogio_minutes();
 			}
 		}
 

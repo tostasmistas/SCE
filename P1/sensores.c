@@ -36,7 +36,7 @@ unsigned char tsttc (void)
 
 void rotina_sensores_PMON(void){
 
-  if (PMON != 0 && seconds%PMON == 0 && ler_sensores==1){
+  if ((PMON != 0 && seconds%PMON == 0 && ler_sensores==1)|| inicio==1){
 		ler_sensores=0;
     temperatura = tsttc();
     Delay10TCYx(5);

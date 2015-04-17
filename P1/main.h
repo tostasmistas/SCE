@@ -61,6 +61,8 @@ extern volatile unsigned char alarme_temp_ON;
 extern volatile unsigned char alarme_clock_ON;
 extern volatile unsigned char desliga_alarmes;
 extern volatile unsigned char segundos_mudou;
+extern volatile unsigned char minutos_mudou;
+extern volatile unsigned char horas_mudou;
 extern volatile unsigned char disp_ahoras;
 extern volatile unsigned char ler_sensores;
 

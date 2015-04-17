@@ -16,7 +16,15 @@ void change_buzzer_freq(int freq){
 void rotina_verificacao_alarmes(void)
 {
 
-  if(segundos_mudou	== 1){
+  if(segundos_mudou	== 1 && modo_modificacao == 0){
+    if(minutos_mudou==1){
+  	   update_EEPROM_interna_relogio_minutes();
+      minutos_mudou=0;
+    }
+    if(horas_mudou==1){
+  	   update_EEPROM_interna_relogio_hours();
+      horas_mudou=0;
+    }
     /* verificacao de alarmes */
     if(alarmes[0] == 'A'){
 
@@ -35,10 +43,6 @@ void rotina_verificacao_alarmes(void)
         //CCP1CON = 0x0F; // turn the buzzer on
         change_buzzer_freq(900);
         update_EEPROM_external(9);
-
-        SetDDRamAddr(0x47);
-        while( BusyXLCD() );
-        putrsXLCD((const rom far char*)"O");
       }
 
       if(n_lum < alarme_lum && up_L == 0){
@@ -56,10 +60,6 @@ void rotina_verificacao_alarmes(void)
         //CCP1CON = 0x0F; // turn the buzzer on
         change_buzzer_freq(900);
         update_EEPROM_external(9);
-
-        SetDDRamAddr(0x47);
-        while( BusyXLCD() );
-        putrsXLCD((const rom far char*)"O");
       }
 
       if(((int)temperatura) > alarme_temp && up_T == 1){
@@ -77,10 +77,6 @@ void rotina_verificacao_alarmes(void)
         //CCP1CON = 0x0F; // turn the buzzer on
         change_buzzer_freq(450);
         update_EEPROM_external(8);
-
-        SetDDRamAddr(0x47);
-        while( BusyXLCD() );
-        putrsXLCD("O");
       }
 
       if(((int)temperatura) < alarme_temp && up_T == 0){
@@ -98,10 +94,6 @@ void rotina_verificacao_alarmes(void)
         //CCP1CON = 0x0F; // turn the buzzer on
         change_buzzer_freq(450);
         update_EEPROM_external(8);
-
-        SetDDRamAddr(0x47);
-        while( BusyXLCD() );
-        putrsXLCD("O");
       }
 
       if(alarme_hours == hours && alarme_minutes == minutes && alarme_seconds == seconds && disp_ahoras == 1){
@@ -119,21 +111,10 @@ void rotina_verificacao_alarmes(void)
         //CCP1CON = 0x0F; // turn the buzzer on
         change_buzzer_freq(300);
         update_EEPROM_external(7);
-
-        //SetDDRamAddr(0x47);
-        //while( BusyXLCD() );
-        //putrsXLCD("O");
       }
 
       if(seconds == seconds_alarme_TSOM + TSOM){
         CCP1CON = 0x00;
-
-        SetDDRamAddr(0x47);
-        while( BusyXLCD() );
-        putrsXLCD((const rom far char*)"J");
-        SetDDRamAddr(0x46);
-        while( BusyXLCD() );
-        putrsXLCD(" ");
       }
     }
     segundos_mudou = 0;

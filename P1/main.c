@@ -49,6 +49,8 @@ volatile unsigned char alarme_temp_ON = 0;
 volatile unsigned char alarme_clock_ON = 0;
 volatile unsigned char desliga_alarmes = 0;
 volatile unsigned char segundos_mudou = 0;
+volatile unsigned char minutos_mudou = 0;
+volatile unsigned char horas_mudou = 0;
 volatile unsigned char disp_ahoras = 1;
 volatile unsigned char ler_sensores=1;
 
@@ -118,14 +120,14 @@ void high_ISR (void)
 #pragma interrupt isr
 void isr (void)
 {
-///////////////////////////////////////////////////////////////////////////////
-//******************************** Relógio **********************************//
-///////////////////////////////////////////////////////////////////////////////
 	if(PIR2bits.LVDIF == 1){
-		escrita_EEPROM_interna(0x05, "A");
+		escrita_EEPROM_interna(0x07, seconds);
 		while(1);
 	}
 
+	///////////////////////////////////////////////////////////////////////////////
+	//******************************** Relógio **********************************//
+	///////////////////////////////////////////////////////////////////////////////
 	if(PIR1bits.TMR1IF == 1){ // timer interrupt
 		WriteTimer1( 0x8000 ); // reload timer: 1 second
 		PIR1bits.TMR1IF = 0; /* clear flag to avoid another interrupt */
@@ -137,9 +139,11 @@ void isr (void)
 		}
 		if(seconds == 60){
 			seconds = 0;
+			minutos_mudou=1;
 			minutes++;
 			if(minutes == 60){
 				minutes = 0;
+				horas_mudou=1;
 				hours++;
 				if(hours == 24){
 					hours = 0;
@@ -233,27 +237,6 @@ void init_LVD (void)
 	while (!LVDCONbits.IRVST);  /* wait initialization */
 	PIR2bits.LVDIF = 0;         /* clear interrupt flag */
 	PIE2bits.LVDIE = 1;         /* enable LVD interrupt */
-
-	/* step 1 */
-/*	LVDCON &= 0xFE;
-	LVDCON |= 0x0E;
-/*
-	/* step 2 */
-/*	PIE2 &= 0xFB; // clear LVDIE bit
-	INTCON &= 0x7F; // clear GIE bit
-*/
-	/* step 3 */
-//	LVDCON |= 0x10;
-
-	/* step 4 */
-//	while(!((LVDCON & 0x20) >> 5)); // so avanca quando IRVST estiver a high
-
-	/* step 5 */
-//	PIR2 &= 0xFB; // clear LVDIF bit
-
-	/* step 6 */
-//	PIE2 |= 0x04; // set LVDIE bit
-//	INTCON |= 0x80; // set GIE bit
 }
 
 
@@ -289,15 +272,9 @@ void main (void)
 
 	InitializeBuzzer();
 
-	//init_LVD();
+	init_LVD();
 
 	EnableHighInterrupts();
-
-	/*if(isLVD()){
-		SetDDRamAddr(0x49);
-		while( BusyXLCD() );
-		putrsXLCD("R");
-	}*/
 
 	alarmes[0] = 'a';
 	alarmes[1] = 0;
@@ -315,11 +292,14 @@ void main (void)
 		ler_EEPROM_interna_lum_alarme(); // carregar da EEPROM interna o valor do alarme da luminosidade
 	}
 
+	ler_EEPROM_interna_relogio_seconds();
+
 	update_EEPROM_interna_parametros();
 	update_EEPROM_interna_relogio_alarme();
 	update_EEPROM_interna_temp_alarme();
 	update_EEPROM_interna_lum_alarme();
-	update_EEPROM_interna_relogio();
+	update_EEPROM_interna_relogio_hours();
+	update_EEPROM_interna_relogio_minutes();
 
 	init_EEPROM_externa();
 
@@ -363,9 +343,9 @@ void main (void)
 
 		rotina_sensores_PMON();
 
-		/*if(CCP1CON == 0x00 && modo_modificacao == 0){
+		if(CCP1CON == 0x00 && modo_modificacao == 0){
 			modo_sleep = 1;
 			Sleep();
-		}*/
+		}
  	}
 }
