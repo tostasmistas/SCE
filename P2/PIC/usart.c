@@ -1,4 +1,5 @@
 #include "main.h"
+#include "memorias.h"
 #include "usart.h"
 
 void escrever_USART(char send_byte){
@@ -6,7 +7,7 @@ void escrever_USART(char send_byte){
   putcUSART(send_byte);
 }
 
-void check_USART_protocolo_OK(char msg_rec[4]){
+void USART_protocolo_OK(char msg_rec[4]){
     switch(msg_rec[0]){
       case CRLG: // consultar relogio
         escrever_USART(SOM);
@@ -28,7 +29,6 @@ void check_USART_protocolo_OK(char msg_rec[4]){
         seconds = msg_rec[3];
         sd = seconds/10;
         su = seconds%10;
-        update_EEPROM_interna_relogio_seconds();
         update_EEPROM_external(2);
         escrever_USART(SOM);
         escrever_USART(ARLG);
@@ -82,7 +82,7 @@ void check_USART_protocolo_OK(char msg_rec[4]){
         update_EEPROM_interna_relogio_alarme();
         update_EEPROM_external(2);
         escrever_USART(SOM);
-        escrever_USART(DARL);
+        escrever_USART(DALR);
         escrever_USART(CMD_OK);
         escrever_USART(EOM);
         break;

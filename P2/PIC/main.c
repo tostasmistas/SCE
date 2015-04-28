@@ -31,6 +31,7 @@ int alarme_md = 0;
 int alarme_mu = 0;
 int alarme_hd = 0;
 int alarme_hu = 0;
+int i = 0;
 
 volatile unsigned char modo_sleep = 0;
 volatile unsigned char modo_modificacao = 0;
@@ -55,6 +56,8 @@ volatile unsigned char minutos_mudou = 0;
 volatile unsigned char horas_mudou = 0;
 volatile unsigned char disp_ahoras = 1;
 volatile unsigned char ler_sensores = 1;
+volatile unsigned char SOM_int = 0;
+volatile unsigned char EOM_int = 0;
 volatile unsigned char protocolo_OK = 0;
 
 unsigned char checksumIsRight = 0;
@@ -62,6 +65,7 @@ unsigned char checksumIsRight = 0;
 char temperatura = 0;
 char codigoev = 0;
 char index = 0;
+char byte_USART = 0;
 
 char temperatura_s[5] = {0};
 char luminosidade[4] = {0};
@@ -144,7 +148,9 @@ void isr (void)
 		if(byte_USART == SOM){ // verifica se SOM
 			SOM_int = 1;
 			index = 0;
-			msg_rec = {0};
+			for(i = 0; i < 4; i++){
+				msg_rec[i] = 0;
+			}
 		}
 		if(EOM_int == 1){
 			EOM_int = 0;
@@ -174,11 +180,11 @@ void isr (void)
 		}
 		if(seconds == 60){
 			seconds = 0;
-			minutos_mudou=1;
+			minutos_mudou = 1;
 			minutes++;
 			if(minutes == 60){
 				minutes = 0;
-				horas_mudou=1;
+				horas_mudou = 1;
 				hours++;
 				if(hours == 24){
 					hours = 0;
@@ -286,7 +292,7 @@ void main (void)
       				T1_SOURCE_EXT  &
       				T1_PS_1_1      &
       				T1_OSC1EN_ON   &
-      				T1_SYNC_EXT_OFF );// tem que estar off para correr na placa, mas on para correr no proteus
+      				T1_SYNC_EXT_ON );// tem que estar off para correr na placa, mas on para correr no proteus
 
 	ADCON1 = 0x0E; // Port A: A0 - analog; A1-A7 - digital
 
@@ -313,7 +319,7 @@ void main (void)
 
 	InitializeBuzzer();
 
-	init_LVD();
+	//init_LVD();
 
 	EnableHighInterrupts();
 
