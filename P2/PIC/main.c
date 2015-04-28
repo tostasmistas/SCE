@@ -306,7 +306,7 @@ void main (void)
 	OpenXLCD( FOUR_BIT & LINES_5X7 ); // 4-bit data interface; 2 x 16 characters
 
 	OpenUSART(	USART_TX_INT_OFF  &
-             	USART_RX_INT_OFF  &
+             	USART_RX_INT_ON  &
              	USART_ASYNCH_MODE &
              	USART_EIGHT_BIT   &
              	USART_CONT_RX     &
