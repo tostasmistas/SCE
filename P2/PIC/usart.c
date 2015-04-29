@@ -7,14 +7,14 @@ void escrever_USART(char send_byte){
   putcUSART(send_byte);
 }
 
-void USART_protocolo_OK(char msg_rec[4]){
+void USART_protocolo_OK(char msg_rec[]){
     switch(msg_rec[0]){
       case CRLG: // consultar relogio
         escrever_USART(SOM);
         escrever_USART(CRLG);
-        escrever_USART(hours);
-        escrever_USART(minutes);
-        escrever_USART(seconds);
+        escrever_USART(hours+'0');
+        escrever_USART(minutes+'0');
+        escrever_USART(seconds+'0');
         escrever_USART(EOM);
         break;
       case ARLG: // acertar relogio
@@ -38,16 +38,16 @@ void USART_protocolo_OK(char msg_rec[4]){
       case CTEL: // consultar temperatura e luminosidade
         escrever_USART(SOM);
         escrever_USART(CTEL);
-        escrever_USART(temperatura);
-        escrever_USART(n_lum);
+        escrever_USART(temperatura+'0');
+        escrever_USART(n_lum+'0');
         escrever_USART(EOM);
         break;
       case CPAR: // consultar parametros
         escrever_USART(SOM);
         escrever_USART(CPAR);
-        escrever_USART(NREG);
-        escrever_USART(PMON);
-        escrever_USART(TSOM);
+        escrever_USART(NREG+'0');
+        escrever_USART(PMON+'0');
+        escrever_USART(TSOM+'0');
         escrever_USART(EOM);
         break;
       case MPMN: // modificar PMON
@@ -61,11 +61,11 @@ void USART_protocolo_OK(char msg_rec[4]){
       case CALA: // consultar alarmes
         escrever_USART(SOM);
         escrever_USART(CALA);
-        escrever_USART(alarme_hours);
-        escrever_USART(alarme_minutes);
-        escrever_USART(alarme_seconds);
-        escrever_USART(alarme_temp);
-        escrever_USART(alarme_lum);
+        escrever_USART(alarme_hours+'0');
+        escrever_USART(alarme_minutes+'0');
+        escrever_USART(alarme_seconds+'0');
+        escrever_USART(alarme_temp+'0');
+        escrever_USART(alarme_lum+'0');
         escrever_USART(alarmes[0]);
         escrever_USART(EOM);
         break;
@@ -80,35 +80,56 @@ void USART_protocolo_OK(char msg_rec[4]){
         alarme_sd = alarme_seconds/10;
       	alarme_su = alarme_seconds%10;
         update_EEPROM_interna_relogio_alarme();
-        update_EEPROM_external(2);
+        update_EEPROM_external(3);
         escrever_USART(SOM);
         escrever_USART(DALR);
         escrever_USART(CMD_OK);
         escrever_USART(EOM);
         break;
-      case DALT:
+      case DALT: // definir alarme temperatura
+        alarme_temp = msg_rec[1];
+        update_EEPROM_interna_temp_alarme();
+        update_EEPROM_external(4);
+        escrever_USART(SOM);
+        escrever_USART(DALT);
+        escrever_USART(CMD_OK);
+        escrever_USART(EOM);
+        break;
+      case DALL: // definir alarme luminosidade
+        alarme_lum = msg_rec[1];
+        update_EEPROM_interna_lum_alarme();
+        update_EEPROM_external(5);
+        escrever_USART(SOM);
+        escrever_USART(DALL);
+        escrever_USART(CMD_OK);
+        escrever_USART(EOM);
+        break;
+      case AALA: // activar/desactivar alarmes
+        if(alarmes[0] == 'a'){
+          alarmes[0] = 'A';
+        }
+        else{
+          alarmes[0] = 'a';
+        }
+        update_EEPROM_external(6);
+        escrever_USART(SOM);
+        escrever_USART(AALA);
+        escrever_USART(CMD_OK);
+        escrever_USART(EOM);
+        break;
+      case IREG: // informação sobre registos (NREG, nr, iescrita, ileitura)
 
-      break;
-      case DALL:
+        break;
+      case TRGC: // transferir n registos a partir da posição corrente
 
-      break;
-      case AALA:
+        break;
+      case TRGI: // transferir n registos a partir do indice i
 
-      break;
-      case IREG:
+        break;
+      case NMCH: // notificação memoria cheia
 
-      break;
-      case TRGC:
-
-      break;
-      case TRGI:
-
-      break;
-      case NMCH:
-
-      break;
-
-
-
+        break;
+      default:
+        break;
   }
 }

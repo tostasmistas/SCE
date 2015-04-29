@@ -390,6 +390,7 @@ void main (void)
 		rotina_sensores_PMON();
 
 		if(protocolo_OK == 1){
+			protocolo_OK  = 0;
 			USART_protocolo_OK(msg_rec);
 		}
 

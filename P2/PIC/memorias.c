@@ -308,7 +308,7 @@ void update_EEPROM_external(char codigoev)
 			dataEEPROMext[7] = 0;
 			writeEEPROMexterna(indwrite,dataEEPROMext);
 			EEAckPolling(0xA0);
-		break;
+			break;
 		case 2:
 			//while( BusyXLCD() );
 			//putrsXLCD("N");
@@ -318,8 +318,7 @@ void update_EEPROM_external(char codigoev)
 			dataEEPROMext[7] = 0;
 			writeEEPROMexterna(indwrite,dataEEPROMext); //Temperatura
 			EEAckPolling(0xA0);
-
-		break;
+			break;
 		case 3:
 			//while( BusyXLCD() );
 			//putrsXLCD("h");
@@ -329,8 +328,7 @@ void update_EEPROM_external(char codigoev)
 			dataEEPROMext[7] = 0;
 			writeEEPROMexterna(indwrite,dataEEPROMext); //Temperatura
 			EEAckPolling(0xA0);
-
-		break;
+			break;
 		case 4:
 			//while( BusyXLCD() );
 			//putrsXLCD("t");
@@ -340,8 +338,7 @@ void update_EEPROM_external(char codigoev)
 			dataEEPROMext[7] = 0;
 			writeEEPROMexterna(indwrite,dataEEPROMext); //Temperatura
 			EEAckPolling(0xA0);
-
-		break;
+			break;
 		case 5:
 			//while( BusyXLCD() );
 			//putrsXLCD("l");
@@ -351,8 +348,7 @@ void update_EEPROM_external(char codigoev)
 			dataEEPROMext[7]=0;
 			writeEEPROMexterna(indwrite,dataEEPROMext); //Temperatura
 			EEAckPolling(0xA0);
-
-		break;
+			break;
 		case 6:
 			//while( BusyXLCD() );
 			//putrsXLCD("A");
@@ -362,8 +358,7 @@ void update_EEPROM_external(char codigoev)
 			dataEEPROMext[7] = 0;
 			writeEEPROMexterna(indwrite,dataEEPROMext); //Temperatura
 			EEAckPolling(0xA0);
-
-		break;
+			break;
 		case 7:
 			//while( BusyXLCD() );
 			//putrsXLCD("H");
@@ -373,8 +368,7 @@ void update_EEPROM_external(char codigoev)
 			dataEEPROMext[7] = 0;
 			writeEEPROMexterna(indwrite,dataEEPROMext); //Temperatura
 			EEAckPolling(0xA0);
-
-		break;
+			break;
 		case 8:
 			//while( BusyXLCD() );
 			//putrsXLCD("T");
@@ -382,10 +376,8 @@ void update_EEPROM_external(char codigoev)
 			dataEEPROMext[5] = n_lum;
 			dataEEPROMext[6] = 0;
 			dataEEPROMext[7] = 0;
-
 			writeEEPROMexterna(indwrite,dataEEPROMext); //Temperatura
 			EEAckPolling(0xA0);
-
 			break;
 		case 9:
 			//while( BusyXLCD() );
@@ -396,8 +388,9 @@ void update_EEPROM_external(char codigoev)
 			dataEEPROMext[7] = 0;
 			writeEEPROMexterna(indwrite,dataEEPROMext); //Temperatura
 			EEAckPolling(0xA0);
-
-		break;
+			break;
+		default:
+			break;
 	}
 
 	endereco++;
@@ -409,8 +402,10 @@ void update_EEPROM_external(char codigoev)
 	dataEEPROMext[5] = 0;
 	dataEEPROMext[6] = 0;
 	dataEEPROMext[7] = 0;
+
 	writeEEPROMexterna(0x00,dataEEPROMext); //Cabeçalho NREG
 	EEAckPolling(0xA0);
+
 	if(endereco == NREG + 1){
 		endereco = 1;
 	}

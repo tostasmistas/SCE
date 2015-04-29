@@ -16,24 +16,45 @@
 
 #define freq_CPU 4000 // 4 kHz
 
-#define SOM 0xFD /* inicio mensagem */
-#define EOM 0xFE /* fim mensagem */
-#define CRLG 0xC0 /* consultar relogio */
-#define ARLG 0xC1 /* acertar relogio */
-#define CTEL 0xC2 /* consultar temperatura e luminosidade */
-#define CPAR 0xC3 /* consultar parametros */
-#define MPMN 0xC4 /* modificar periodo monitorizacao */
-#define CALA 0xC5 /* consultar alarmes */
-#define DALR 0xC6 /* definir alarme relogio */
-#define DALT 0xC7 /* definir alarme temperatura */
-#define DALL 0xC8 /* definir alarme luminosidade */
-#define AALA 0xC9 /* activar/desactivar alarmes */
-#define IREG 0xCA /* informacao sobre registos */
-#define TRGC 0xCB /* transferir registos a partir da posicao corrente */
-#define TRGI 0xCC /* transferir registos a partir do indice especificado */
-#define NMCH 0xCD /* notificacao memoria cheia */
-#define CMD_OK 0 /* comando realizado com sucesso */
-#define CMD_ERRO 0xFF /* erro no comando */
+/*
+#define SOM 0xFD      // inicio mensagem
+#define EOM 0xFE      // fim mensagem
+#define CRLG 0xC0     // consultar relogio
+#define ARLG 0xC1     // acertar relogio
+#define CTEL 0xC2     // consultar temperatura e luminosidade
+#define CPAR 0xC3     // consultar parametros
+#define MPMN 0xC4     // modificar periodo monitorizacao
+#define CALA 0xC5     // consultar alarmes
+#define DALR 0xC6     // definir alarme relogio
+#define DALT 0xC7     // definir alarme temperatura
+#define DALL 0xC8     // definir alarme luminosidade
+#define AALA 0xC9     // activar/desactivar alarmes
+#define IREG 0xCA     // informacao sobre registos
+#define TRGC 0xCB     // transferir registos a partir da posicao corrente
+#define TRGI 0xCC     // transferir registos a partir do indice especificado/
+#define NMCH 0xCD     // notificacao memoria cheia
+#define CMD_OK 0      // comando realizado com sucesso
+#define CMD_ERRO 0xFF // erro no comando
+*/
+
+#define SOM 0x41      // inicio mensagem                                            (A)
+#define EOM 0x42      // fim mensagem                                               (B)
+#define CRLG 0x43     // consultar relogio                                          (C)
+#define ARLG 0x44     // acertar relogio                                            (D)
+#define CTEL 0x45     // consultar temperatura e luminosidade                       (E)
+#define CPAR 0x46     // consultar parametros                                       (F)
+#define MPMN 0x47     // modificar periodo monitorizacao                            (G)
+#define CALA 0x48     // consultar alarmes                                          (H)
+#define DALR 0x49     // definir alarme relogio                                     (I)
+#define DALT 0x4A     // definir alarme temperatura                                 (J)
+#define DALL 0x4B     // definir alarme luminosidade                                (K)
+#define AALA 0x4C     // activar/desactivar alarmes                                 (L)
+#define IREG 0x4D     // informacao sobre registos                                  (M)
+#define TRGC 0x4E     // transferir registos a partir da posicao corrente           (N)
+#define TRGI 0x4F     // transferir registos a partir do indice especificado        (O)
+#define NMCH 0x50     // notificacao memoria cheia                                  (P)
+#define CMD_OK 0x51      // comando realizado com sucesso                           (Q)
+#define CMD_ERRO 0x52 // erro no comando                                            (R)
 
 extern volatile int hours; //compiler users guide page vinte e oito
 extern volatile int minutes;
