@@ -51,8 +51,10 @@ void USART_protocolo_OK(char msg_rec[]){
         escrever_USART(EOM);
         break;
       case MPMN: // modificar PMON
+        old_PMON=PMON;
         PMON = msg_rec[1];
         update_EEPROM_interna_parametros();
+        update_EEPROM_external(10);
         escrever_USART(SOM);
         escrever_USART(MPMN);
         escrever_USART(CMD_OK);
@@ -118,7 +120,13 @@ void USART_protocolo_OK(char msg_rec[]){
         escrever_USART(EOM);
         break;
       case IREG: // informação sobre registos (NREG, nr, iescrita, ileitura)
-
+        escrever_USART(SOM);
+        escrever_USART(IREG);
+        escrever_USART(NREG+'0');
+        escrever_USART(nr+'0');
+        escrever_USART(ie+'0');
+        escrever_USART(il+'0');
+        escrever_USART(EOM);
         break;
       case TRGC: // transferir n registos a partir da posição corrente
 
@@ -126,8 +134,14 @@ void USART_protocolo_OK(char msg_rec[]){
       case TRGI: // transferir n registos a partir do indice i
 
         break;
-      case NMCH: // notificação memoria cheia
-
+      case NMCH: // notificação memoria cheia - a thread de interface é que pede isto??????
+        escrever_USART(SOM);
+        escrever_USART(IREG);
+        escrever_USART(NREG+'0');
+        escrever_USART(nr+'0');
+        escrever_USART(ie+'0');
+        escrever_USART(il+'0');
+        escrever_USART(EOM);
         break;
       default:
         break;

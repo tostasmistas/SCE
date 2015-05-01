@@ -1,5 +1,6 @@
 #include "main.h"
 #include "memorias.h"
+#include "usart.h"
 
 int aux_seconds = 0;
 int hours_interna = 0;
@@ -259,14 +260,14 @@ void ler_EEPROM_interna_parametros (void)
 void init_EEPROM_externa(void){
 
   dataEEPROMext[0] = NREG;
-  dataEEPROMext[1] = 0;
-  dataEEPROMext[2] = 0;
-  dataEEPROMext[3] = 0;
+  dataEEPROMext[1] = nr;
+  dataEEPROMext[2] = ie;
+  dataEEPROMext[3] = il;
   dataEEPROMext[4] = 0;
   dataEEPROMext[5] = 0;
   dataEEPROMext[6] = 0;
   dataEEPROMext[7] = 0;
-  writeEEPROMexterna(0x00,dataEEPROMext); //Cabeçalho NREG
+  writeEEPROMexterna(0x00,dataEEPROMext); //Cabeçalho NREG, nr, ie, il
   EEAckPolling(0xA0);
 }
 
@@ -389,30 +390,64 @@ void update_EEPROM_external(char codigoev)
 			writeEEPROMexterna(indwrite,dataEEPROMext); //Temperatura
 			EEAckPolling(0xA0);
 			break;
+		case 10:
+			//while( BusyXLCD() );
+			//putrsXLCD("L");
+			dataEEPROMext[4] = old_PMON;
+			dataEEPROMext[5] = PMON;
+			dataEEPROMext[6] = 0;
+			dataEEPROMext[7] = 0;
+			writeEEPROMexterna(indwrite,dataEEPROMext); //Mudança PMON
+			EEAckPolling(0xA0);
+			break;
+		case 11:
+			//while( BusyXLCD() );
+			//putrsXLCD("L");
+			dataEEPROMext[4] = NREG;
+			dataEEPROMext[5] = nr;
+			dataEEPROMext[6] = ie;
+			dataEEPROMext[7] = il;
+			writeEEPROMexterna(indwrite,dataEEPROMext); //Memória Cheia
+			EEAckPolling(0xA0);
+			break;
 		default:
 			break;
 	}
 
 	endereco++;
+	if(nr<NREG){ //nr não pode ser maior que o nº máx de registos
+		nr++;
+	}
+
+	if(endereco == NREG + 1){ //buffer está cheio
+		endereco = 1;
+	}
+
+	ie=endereco*8; //índice de escrita é o seguinte ao que foi escrito agora
+
 	dataEEPROMext[0] = NREG;
-	dataEEPROMext[1] = endereco;
-	dataEEPROMext[2] = 0;
-	dataEEPROMext[3] = 0;
+	dataEEPROMext[1] = nr;
+	dataEEPROMext[2] = ie;
+	dataEEPROMext[3] = il;
 	dataEEPROMext[4] = 0;
 	dataEEPROMext[5] = 0;
 	dataEEPROMext[6] = 0;
 	dataEEPROMext[7] = 0;
-
 	writeEEPROMexterna(0x00,dataEEPROMext); //Cabeçalho NREG
 	EEAckPolling(0xA0);
 
-	if(endereco == NREG + 1){
-		endereco = 1;
-	}
-	if(endereco > NREG/2 && full == 0){
+	if(nr >= NREG/2 && full == 0){ //memória está meio cheia
 		full = 1;
 		SetDDRamAddr(0x48);
 		while( BusyXLCD() );
 		putrsXLCD((const far rom char*)"M");
+		update_EEPROM_external(11);
+		escrever_USART(SOM);
+		escrever_USART(NMCH);
+		escrever_USART((char)NREG+'0');
+		escrever_USART((char)nr+'0');
+		escrever_USART((char)ie+'0');
+		escrever_USART((char)il+'0');
+		escrever_USART(EOM);
 	}
 }

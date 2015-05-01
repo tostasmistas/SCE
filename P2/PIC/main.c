@@ -11,8 +11,8 @@ volatile int seconds = 0;
 volatile int cursor_pos = 0;
 
 int PMON = 5;
+int old_PMON = 0;
 int TSOM = 2;
-int NREG = 30;
 int alarme_hours = 0;
 int alarme_minutes = 0;
 int alarme_seconds = 0;
@@ -61,6 +61,10 @@ volatile unsigned char EOM_int = 0;
 volatile unsigned char protocolo_OK = 0;
 
 unsigned char checksumIsRight = 0;
+unsigned char NREG = 30;
+unsigned char nr = 0;
+unsigned char ie = 0x08;
+unsigned char il = 0x08;
 
 char temperatura = 0;
 char codigoev = 0;

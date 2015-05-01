@@ -62,8 +62,8 @@ extern volatile int seconds;
 extern volatile int cursor_pos;
 
 extern int PMON;
+extern int old_PMON;
 extern int TSOM;
-extern int NREG;
 extern int alarme_hours;
 extern int alarme_minutes;
 extern int alarme_seconds;
@@ -108,6 +108,12 @@ extern volatile unsigned char horas_mudou;
 extern volatile unsigned char disp_ahoras;
 extern volatile unsigned char ler_sensores;
 extern volatile unsigned char protocolo_OK;
+
+extern unsigned char checksumIsRight;
+extern unsigned char NREG;
+extern unsigned char nr;
+extern unsigned char ie;
+extern unsigned char il;
 
 extern char temperatura;
 extern char codigoev;
