@@ -8,7 +8,8 @@
 
 /*-------------------------------------------------------------------------+
 | Cabeçalhos das Funções de Comando
-+--------------------------------------------------------------------------*/ 
+! Faltam funções de Processamento e de Informação sobre os Registos
++--------------------------------------------------------------------------*/
 extern void cmd_cr (int, char** );
 extern void cmd_ar (int, char** );
 extern void cmd_ctl (int, char** );
@@ -26,7 +27,7 @@ extern void cmd_tri (int, char** );
 
 /*-------------------------------------------------------------------------+
 | Definição das Constantes de Comando
-+--------------------------------------------------------------------------*/ 
++--------------------------------------------------------------------------*/
 const char TitleMsg[] = "\n Application Control Monitor\n";
 const char InvalMsg[] = "\nInvalid command!";
 
@@ -36,7 +37,7 @@ struct 	command_d {
   char*	cmd_help;
 } const commands[] = {
 //Interação com tarefa de comunicação
-  {cmd_sos,  "sos","                 					help"},	
+  {cmd_sos,  "sos","                 					help"},
   {cmd_cr,  "cr","                 	 					consultar relógio"},
   {cmd_ar, 	"ar","<h> <m> <s>        					acertar relógio"},
   {cmd_ctl,  "ctl","             	 					consultar temperatura e luminosidade"},
@@ -72,7 +73,7 @@ struct 	command_d {
 
 /*-------------------------------------------------------------------------+
 | Function: cmd_sos - provides a rudimentary help
-+--------------------------------------------------------------------------*/ 
++--------------------------------------------------------------------------*/
 void cmd_sos (int argc, char **argv)
 {
   int i;
@@ -83,8 +84,8 @@ void cmd_sos (int argc, char **argv)
 }
 
 /*-------------------------------------------------------------------------+
-| Function: getline        (called from monitor) 
-+--------------------------------------------------------------------------*/ 
+| Function: getline        (called from monitor)
++--------------------------------------------------------------------------*/
 int my_getline (char** argv, int argvsize)
 {
   static char line[MAX_LINE];
@@ -106,12 +107,13 @@ int my_getline (char** argv, int argvsize)
 }
 
 /*-------------------------------------------------------------------------+
-| Function: monitor        (called from main) 
-+--------------------------------------------------------------------------*/ 
+| Function: monitor        (called from main)
++--------------------------------------------------------------------------*/
 void monitor (void)
 {
   static char *argv[ARGVECSIZE+1], *p;
   int argc, i;
+  char *m;
 
   printf("%s Type sos for help\n", TitleMsg);
   for (;;) {
@@ -119,15 +121,45 @@ void monitor (void)
     /* Reading and parsing command line  ----------------------------------*/
     if ((argc = my_getline(argv, ARGVECSIZE)) > 0) {
       for (p=argv[0]; *p != '\0'; *p=tolower(*p), p++);
-      for (i = 0; i < NCOMMANDS; i++) 
-	if (strcmp(argv[0], commands[i].cmd_name) == 0) 
+      for (i = 0; i < NCOMMANDS; i++)
+	if (strcmp(argv[0], commands[i].cmd_name) == 0)
 	  break;
       /* Executing commands -----------------------------------------------*/
       if (i < NCOMMANDS)
 	commands[i].cmd_fnct (argc, argv);
-      else  
+      else
 	printf("%s", InvalMsg);
     } /* if my_getline */
   } /* forever */
-}
 
+  //Como fazer com que esteja sempre a verificar se chegou uma mensagem?  Prioridades??
+  //Mensagens Placa que retornaram Dados/Notificação de Memória Cheia
+  m=cyg_mbox_get(pictopc);
+  codigo=m[indicecodigo]
+    switch(codigo){
+      case('CRLG')
+        //Imprimir horas, minutos, segundos;
+      break;
+      case('CTEL')
+        //Imprimir T e L
+      break;
+      case('CPAR')
+        //Imprimir Parâmetros
+      break;
+      case('CALA')
+        //Imprir Alarmes
+      break;
+      case('IREG')
+        //Imprimir informação sobre registos
+      break;
+      case('TRGC')
+        //Imprimir Conteúdo Registos
+      break;
+      case('TRGI')
+        //Imprimir Conteúdo Registos
+      break;
+      case('NMCH')
+      printf("Memória Cheia");
+      break;
+    }
+}

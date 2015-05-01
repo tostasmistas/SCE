@@ -3,7 +3,7 @@
 extern void cmd_ini (int, char** );
 extern void monitor(void);
 
-int main(void)
+int monitorinterface(void)
 {
   cmd_ini(0, NULL);
   monitor();
