@@ -37,6 +37,10 @@ void init_EEPROM_externa(void);
 
 void writeEEPROMexterna (char endereco, char data[8]);
 
+char readEEPROMexterna (char endereco);
+
 void update_EEPROM_external(char codigoev);
+
+char ler_registo(void);
 
 #endif

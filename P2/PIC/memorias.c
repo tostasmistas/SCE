@@ -15,6 +15,7 @@ int a = 0;
 
 unsigned char indwrite = 0;
 unsigned char full = 0;
+unsigned char value = 0;
 
 char endereco = 1;
 char palavra_magica = 0;
@@ -25,7 +26,7 @@ char palavra_magica_relogio_hours = 0;
 char palavra_magica_relogio_minutes = 0;
 char palavra_magica_parametros = 0;
 char checksum = 0;
-
+char temp = 0;
 char dataEEPROMext [8];
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -288,6 +289,20 @@ void writeEEPROMexterna (char endereco, char data[8])
 		StopI2C();
 
 }
+char readEEPROMexterna (char endereco)
+{
+		IdleI2C();
+		StartI2C(); IdleI2C();
+
+		WriteI2C(0xA1); IdleI2C();
+		WriteI2C(0x00); IdleI2C();   //HB
+		WriteI2C(endereco); IdleI2C();
+		value = ReadI2C(); IdleI2C(); //Dados
+		//NotAckI2C(); IdleI2C();
+		StopI2C();
+		return value;
+}
+
 
 void update_EEPROM_external(char codigoev)
 {
@@ -450,4 +465,25 @@ void update_EEPROM_external(char codigoev)
 		escrever_USART((char)il+'0');
 		escrever_USART(EOM);
 	}
+}
+
+char ler_registo(){
+
+	temp=readEEPROMexterna(il); //lê byte
+	il++; // incrementar índice de leitura
+	if(il==(NREG+1)*8){
+		il=8;
+	}
+	dataEEPROMext[0] = NREG;
+	dataEEPROMext[1] = nr;
+	dataEEPROMext[2] = ie;
+	dataEEPROMext[3] = il;
+	dataEEPROMext[4] = 0;
+	dataEEPROMext[5] = 0;
+	dataEEPROMext[6] = 0;
+	dataEEPROMext[7] = 0;
+	writeEEPROMexterna(0x00,dataEEPROMext); //Cabeçalho NREG
+	EEAckPolling(0xA0);
+	return temp;
+
 }
