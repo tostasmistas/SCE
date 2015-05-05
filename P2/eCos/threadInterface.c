@@ -37,11 +37,11 @@ struct 	command_d {
   char*	cmd_help;
 } const commands[] = {
 //Interação com tarefa de comunicação
-  {cmd_sos,  "sos","                 					help"},
-  {cmd_cr,  "cr","                 	 					consultar relógio"},
-  {cmd_ar, 	"ar","<h> <m> <s>        					acertar relógio"},
-  {cmd_ctl,  "ctl","             	 					consultar temperatura e luminosidade"},
-  {cmd_cp,  "cp","		             					consultar parâmetros (NREG,PMON,TSOM)"},
+  {cmd_sos, "sos", "help"},
+  {cmd_cr, "cr", "consultar relógio"},
+  {cmd_ar, "ar", "<h> <m> <s> acertar relógio"},
+  {cmd_ctl, "ctl","             	 					consultar temperatura e luminosidade"},
+  {cmd_cp, "cp","		             					consultar parâmetros (NREG,PMON,TSOM)"},
   {cmd_mpm,  "mpm","<p>	  			 					modificar período de monitorização(segundos- 0 desactiva)"},
   {cmd_ca,  "ca","			         					consultar alarmes(relógio,temp.,lumi.,activos/inactivos)"},
   {cmd_dar,  "dar","<h> <m> <s>      					definir alarme relógio"},
@@ -131,6 +131,8 @@ void monitor (void)
 	printf("%s", InvalMsg);
     } /* if my_getline */
   } /* forever */
+
+
 
   //Como fazer com que esteja sempre a verificar se chegou uma mensagem?  Prioridades??
   //Mensagens Placa que retornaram Dados/Notificação de Memória Cheia
