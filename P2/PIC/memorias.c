@@ -291,15 +291,18 @@ void writeEEPROMexterna (char endereco, char data[8])
 }
 char readEEPROMexterna (char endereco)
 {
+
+		//while(!DataRdyI2C());
 		IdleI2C();
 		StartI2C(); IdleI2C();
-
-		WriteI2C(0xA1); IdleI2C();
+		WriteI2C(0xA0); IdleI2C();
 		WriteI2C(0x00); IdleI2C();   //HB
 		WriteI2C(endereco); IdleI2C();
+		RestartI2C(); IdleI2C();
+		WriteI2C(0xA1); IdleI2C();
 		value = ReadI2C(); IdleI2C(); //Dados
-		//NotAckI2C(); IdleI2C();
-		StopI2C();
+		NotAckI2C(); IdleI2C();
+		StopI2C();IdleI2C();
 		return value;
 }
 
@@ -440,16 +443,7 @@ void update_EEPROM_external(char codigoev)
 
 	ie=endereco*8; //índice de escrita é o seguinte ao que foi escrito agora
 
-	dataEEPROMext[0] = NREG;
-	dataEEPROMext[1] = nr;
-	dataEEPROMext[2] = ie;
-	dataEEPROMext[3] = il;
-	dataEEPROMext[4] = 0;
-	dataEEPROMext[5] = 0;
-	dataEEPROMext[6] = 0;
-	dataEEPROMext[7] = 0;
-	writeEEPROMexterna(0x00,dataEEPROMext); //Cabeçalho NREG
-	EEAckPolling(0xA0);
+	init_EEPROM_externa();
 
 	if(nr >= NREG/2 && full == 0){ //memória está meio cheia
 		full = 1;
@@ -474,16 +468,7 @@ char ler_registo(){
 	if(il==(NREG+1)*8){
 		il=8;
 	}
-	dataEEPROMext[0] = NREG;
-	dataEEPROMext[1] = nr;
-	dataEEPROMext[2] = ie;
-	dataEEPROMext[3] = il;
-	dataEEPROMext[4] = 0;
-	dataEEPROMext[5] = 0;
-	dataEEPROMext[6] = 0;
-	dataEEPROMext[7] = 0;
-	writeEEPROMexterna(0x00,dataEEPROMext); //Cabeçalho NREG
-	EEAckPolling(0xA0);
+	init_EEPROM_externa();
 	return temp;
 
 }
