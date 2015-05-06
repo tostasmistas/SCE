@@ -296,7 +296,7 @@ void main (void)
       				T1_SOURCE_EXT  &
       				T1_PS_1_1      &
       				T1_OSC1EN_ON   &
-      				T1_SYNC_EXT_ON );// tem que estar off para correr na placa, mas on para correr no proteus
+      				T1_SYNC_EXT_OFF );// tem que estar off para correr na placa, mas on para correr no proteus
 
 	ADCON1 = 0x0E; // Port A: A0 - analog; A1-A7 - digital
 
@@ -323,7 +323,7 @@ void main (void)
 
 	InitializeBuzzer();
 
-	//init_LVD();
+	init_LVD();
 
 	EnableHighInterrupts();
 
@@ -398,9 +398,9 @@ void main (void)
 			USART_protocolo_OK(msg_rec);
 		}
 
-		if(CCP1CON == 0x00 && modo_modificacao == 0){
+		/*if(CCP1CON == 0x00 && modo_modificacao == 0){
 			modo_sleep = 1;
 			Sleep();
-		}
+		}*/
  	}
 }

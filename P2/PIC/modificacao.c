@@ -295,7 +295,7 @@ void rotina_modo_modificacao(void)
 				Delay1KTCYx(200);
 				while( BusyXLCD() );
 				WriteCmdXLCD(DOFF);
-				Sleep();
+				//Sleep();
 			}
 		}
 	}

@@ -16,7 +16,6 @@
 
 #define freq_CPU 4000 // 4 kHz
 
-/*
 #define SOM 0xFD      // inicio mensagem
 #define EOM 0xFE      // fim mensagem
 #define CRLG 0xC0     // consultar relogio
@@ -35,8 +34,8 @@
 #define NMCH 0xCD     // notificacao memoria cheia
 #define CMD_OK 0      // comando realizado com sucesso
 #define CMD_ERRO 0xFF // erro no comando
-*/
 
+/*
 #define SOM 0x41      // inicio mensagem                                            (A)
 #define EOM 0x42      // fim mensagem                                               (B)
 #define CRLG 0x43     // consultar relogio                                          (C)
@@ -55,6 +54,7 @@
 #define NMCH 0x50     // notificacao memoria cheia                                  (P)
 #define CMD_OK 0x51      // comando realizado com sucesso                           (Q)
 #define CMD_ERRO 0x52 // erro no comando                                            (R)
+*/
 
 extern volatile int hours; //compiler users guide page vinte e oito
 extern volatile int minutes;

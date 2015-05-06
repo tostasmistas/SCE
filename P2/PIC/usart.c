@@ -16,9 +16,9 @@ void USART_protocolo_OK(char msg_rec[]){
       case CRLG: // consultar relogio
         escrever_USART(SOM);
         escrever_USART(CRLG);
-        escrever_USART(hours+'0');
-        escrever_USART(minutes+'0');
-        escrever_USART(seconds+'0');
+        escrever_USART(hours);
+        escrever_USART(minutes);
+        escrever_USART(seconds);
         escrever_USART(EOM);
         break;
       case ARLG: // acertar relogio
@@ -42,16 +42,16 @@ void USART_protocolo_OK(char msg_rec[]){
       case CTEL: // consultar temperatura e luminosidade
         escrever_USART(SOM);
         escrever_USART(CTEL);
-        escrever_USART(temperatura+'0');
-        escrever_USART(n_lum+'0');
+        escrever_USART(temperatura);
+        escrever_USART(n_lum);
         escrever_USART(EOM);
         break;
       case CPAR: // consultar parametros
         escrever_USART(SOM);
         escrever_USART(CPAR);
-        escrever_USART(NREG+'0');
-        escrever_USART(PMON+'0');
-        escrever_USART(TSOM+'0');
+        escrever_USART(NREG);
+        escrever_USART(PMON);
+        escrever_USART(TSOM);
         escrever_USART(EOM);
         break;
       case MPMN: // modificar PMON
@@ -67,11 +67,11 @@ void USART_protocolo_OK(char msg_rec[]){
       case CALA: // consultar alarmes
         escrever_USART(SOM);
         escrever_USART(CALA);
-        escrever_USART(alarme_hours+'0');
-        escrever_USART(alarme_minutes+'0');
-        escrever_USART(alarme_seconds+'0');
-        escrever_USART(alarme_temp+'0');
-        escrever_USART(alarme_lum+'0');
+        escrever_USART(alarme_hours);
+        escrever_USART(alarme_minutes);
+        escrever_USART(alarme_seconds);
+        escrever_USART(alarme_temp);
+        escrever_USART(alarme_lum);
         escrever_USART(alarmes[0]);
         escrever_USART(EOM);
         break;
@@ -126,17 +126,17 @@ void USART_protocolo_OK(char msg_rec[]){
       case IREG: // informação sobre registos (NREG, nr, iescrita, ileitura)
         escrever_USART(SOM);
         escrever_USART(IREG);
-        escrever_USART(NREG+'0');
-        escrever_USART(nr+'0');
-        escrever_USART(ie+'0');
-        escrever_USART(il+'0');
+        escrever_USART(NREG);
+        escrever_USART(nr);
+        escrever_USART(ie);
+        escrever_USART(il);
         escrever_USART(EOM);
         break;
       case TRGC: // transferir n registos a partir da posição corrente
         escrever_USART(SOM);
         escrever_USART(TRGC);
-        aux=8*((int)msg_rec[1]-'0');
-        for (k=0; k<aux; k++){
+        aux = 8*((int)msg_rec[1]-'0');
+        for(k=0; k<aux; k++){
           escrever_USART(ler_registo()+'0');
         }
         escrever_USART(EOM);
@@ -144,14 +144,15 @@ void USART_protocolo_OK(char msg_rec[]){
       case TRGI: // transferir n registos a partir do indice i
         escrever_USART(SOM);
         escrever_USART(TRGI);
-        aux=((int)msg_rec[2]-'0');
+        aux = ((int)msg_rec[2]-'0');
         if (aux>=1 && aux<=NREG){
-          il=aux*8;
-          aux=8*((int)msg_rec[1]-'0');
-          for (j=0; j<aux; j++){
+          il = aux*8;
+          aux = 8*((int)msg_rec[1]-'0');
+          for(j=0; j<aux; j++){
             escrever_USART(ler_registo()+'0');
           }
-        }else{
+        }
+        else{
           escrever_USART(CMD_ERRO);
         }
         escrever_USART(EOM);
@@ -159,10 +160,10 @@ void USART_protocolo_OK(char msg_rec[]){
       case NMCH: // notificação memoria cheia - a thread de interface é que pede isto??????
         escrever_USART(SOM);
         escrever_USART(IREG);
-        escrever_USART(NREG+'0');
-        escrever_USART(nr+'0');
-        escrever_USART(ie+'0');
-        escrever_USART(il+'0');
+        escrever_USART(NREG);
+        escrever_USART(nr);
+        escrever_USART(ie);
+        escrever_USART(il);
         escrever_USART(EOM);
         break;
       default:
