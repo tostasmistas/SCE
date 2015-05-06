@@ -1,0 +1,6 @@
+1. make-pc
+
+2. i386-elf-objcopy -O binary <apl> <apl>.bin
+// substituir <apl> pelo nome da aplicacao
+
+3. dd conv=sync if=<apl>.bin of=/dev/fd0 
