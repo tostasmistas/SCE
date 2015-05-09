@@ -1,17 +1,8 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <ctype.h>
-#include <cyg/io/io.h>
-
+#include "main.h"
+#include "threads.h"
 #include "commandFunctions.h"
+#include "threadInterface.h"
 
-Cyg_ErrNo err;
-cyg_io_handle_t serH;
-
-/*-------------------------------------------------------------------------+
-| Variable and constants definition
-+--------------------------------------------------------------------------*/
 const char TitleMsg[] = "\n interface PIC<->PC\n";
 const char InvalMsg[] = "\n invalid command!";
 
@@ -53,7 +44,18 @@ struct 	command_d {
 };
 
 /*-------------------------------------------------------------------------+
-| Function: getline        (called from monitor)
+| function: cmd_sos - listar todos os comandos
++--------------------------------------------------------------------------*/
+void cmd_sos(void) {
+  int i;
+
+  printf("%s\n", TitleMsg);
+  for (i=0; i<NCOMMANDS; i++)
+    printf("%s %s\n", commands[i].cmd_name, commands[i].cmd_help);
+}
+
+/*-------------------------------------------------------------------------+
+| Function: getline (called from monitor)
 +--------------------------------------------------------------------------*/
 int my_getline (char** argv, int argvsize) {
   static char line[MAX_LINE];
@@ -75,7 +77,7 @@ int my_getline (char** argv, int argvsize) {
 }
 
 /*-------------------------------------------------------------------------+
-| function: monitor        (called from main)
+| function: monitor (called from threadInterface_func()
 +--------------------------------------------------------------------------*/
 void monitor (void) {
 	static char *argv[ARGVECSIZE+1], *p;
@@ -100,59 +102,10 @@ void monitor (void) {
 }
 
 /*-------------------------------------------------------------------------+
-| function: cmd_ini - inicializar dispositivo
+| function: rotina associada a thread da interface com utilizador
 +--------------------------------------------------------------------------*/
-void cmd_ini(int argc, char **argv) {
-	printf("io_lookup\n");
-	if ((argc > 1) && (argv[1][0] = '1'))
-	err = cyg_io_lookup("/dev/ser1", &serH);
-	else err = cyg_io_lookup("/dev/ser0", &serH);
-	printf("lookup err=%x\n", err);
-}
+void threadInterface_func(cyg_addrword_t data) {
 
-/*-------------------------------------------------------------------------+
-| function: enviar mensagem (hexadecimal)
-+--------------------------------------------------------------------------*/
-void send_hex (unsigned char hex_code, unsigned int lenght) {
-	err = cyg_io_write(serH, &hex_code, &lenght);
-}
-
-/*-------------------------------------------------------------------------+
-| function: receber mensagem (hexadecimal)
-+--------------------------------------------------------------------------*/
-void recv_hex (unsigned char buf_read[], unsigned int lenght) {
-	err = cyg_io_read(serH, buf_read, &lenght);
-}
-
-/*-------------------------------------------------------------------------+
-| function: cmd_sos - listar todos os comandos
-+--------------------------------------------------------------------------*/
-void cmd_sos(void) {
-  int i;
-
-  printf("%s\n", TitleMsg);
-  for (i=0; i<NCOMMANDS; i++)
-    printf("%s %s\n", commands[i].cmd_name, commands[i].cmd_help);
-}
-
-/*-------------------------------------------------------------------------+
-| Function: cmd_sair - termina a aplicacao
-+--------------------------------------------------------------------------*/
-void cmd_sair(void) {
-	exit(0);
-}
-
-/*-------------------------------------------------------------------------+
-| function: cmd_cr - consultar relogio
-+--------------------------------------------------------------------------*/
-void cmd_cr(void) {
-	unsigned char buf_read[6] = {0};
-
-	send_hex(SOM, 1);
-	send_hex(CRLG, 1);
-	send_hex(EOM, 1);
-	recv_hex(buf_read, 6); // receber 6 bytes
-	printf("horas: %d\n", (int)buf_read[2]);
-	printf("minutos: %d\n", (int)buf_read[3]);
-	printf("segundos: %d\n", (int)buf_read[4]);
+	cmd_ini(0, NULL);
+	monitor();
 }

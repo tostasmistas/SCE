@@ -1,9 +1,9 @@
-#ifndef __COMANDFUNCTIONS_H
-#define __COMANDFUNCTIONS_H
-
-#define NCOMMANDS  (sizeof(commands)/sizeof(struct command_d))
-#define ARGVECSIZE 10
-#define MAX_LINE   50
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <ctype.h>
+#include <cyg/io/io.h>
+#include <cyg/kernel/kapi.h>
 
 #define SOM 0xFD      // inicio mensagem
 #define EOM 0xFE      // fim mensagem
@@ -24,20 +24,5 @@
 #define CMD_OK 0      // comando realizado com sucesso
 #define CMD_ERRO 0xFF // erro no comando
 
-int my_getline (char** argv, int argvsize);
-
-void monitor (void);
-
-void cmd_ini(int argc, char **argv);
-
-void send_hex (unsigned char hex_code, unsigned int lenght);
-
-void recv_hex (unsigned char buf_read[], unsigned int lenght) ;
-
-void cmd_sos(void);
-
-void cmd_sair(void);
-
-void cmd_cr(void);
-
-#endif
+extern cyg_handle_t 	threadInterface, threadCommunication; // handles for the threads
+extern cyg_handle_t 	mbInter, mbCom; // handles for the mailboxs
