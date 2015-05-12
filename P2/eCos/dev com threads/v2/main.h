@@ -23,6 +23,14 @@
 #define NMCH 0xCD     // notificacao memoria cheia
 #define CMD_OK 0      // comando realizado com sucesso
 #define CMD_ERRO 0xFF // erro no comando
+#define NRBUF 150     // numero máximo de eventos registados na memória local
 
-extern cyg_handle_t 	threadInterface, threadCommunication; // handles for the threads
-extern cyg_handle_t 	mbInter, mbCom; // handles for the mailboxs
+extern cyg_handle_t 	threadInterface, threadCommunication, threadProcessing; // handles for the threads
+extern cyg_handle_t 	mbInter, mbCom, mbProcInt,mbLoc, mbProc, mbIntProc; // handles for the mailboxs
+extern cyg_mutex_t 		mem_lock;
+
+//Memória Local
+char **localmemory; //memória local
+int nr; //numero de registos
+int indescrita; //indice de escrita
+int indleitura; //indíce de leitura

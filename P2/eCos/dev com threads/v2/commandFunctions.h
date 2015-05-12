@@ -37,4 +37,23 @@ void cmd_trc(int argc, char** argv);
 
 void cmd_tri(int argc, char** argv);
 
+void cmd_irl(int argc, char** argv);
+
+void cmd_lr(int argc, char** argv);
+
+void cmd_er(int argc, char** argv);
+
+void cmd_cpt(int argc, char** argv);
+
+void cmd_mpt(int argc, char** argv);
+
+void cmd_lar(int argc, char** argv);
+
+void cmd_lal(int argc, char** argv);
+
+void cmd_lat(int argc, char** argv);
+
+void cmd_iga(int argc, char** argv);
+
+void cmd_ig(int argc, char** argv);
 #endif
