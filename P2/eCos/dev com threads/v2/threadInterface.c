@@ -7,14 +7,14 @@ const char TitleMsg[] = "\n interface PIC<->PC\n";
 const char InvalMsg[] = "\n invalid command!";
 
 struct 	command_d {
-	void  (*cmd_fnct)(void);
+	void  (*cmd_fnct)(int argc, char** argv);
 	char*	cmd_name;
 	char*	cmd_help;
 } const commands[] = {
 //interação com tarefa de comunicação
 	{cmd_sos, "sos", "	: help"},
 	{cmd_cr, "cr", "	: consultar relogio"},
-	/*{cmd_ar, "ar", "<h> <m> <s> acertar relógio"},
+	{cmd_ar, "ar", "<h> <m> <s> acertar relógio"},
 	{cmd_ctl, "ctl","consultar temperatura e luminosidade"},
 	{cmd_cp, "cp","consultar parâmetros (NREG,PMON,TSOM)"},
 	{cmd_mpm,  "mpm","<p> modificar período de monitorização(segundos- 0 desactiva)"},
@@ -26,7 +26,7 @@ struct 	command_d {
 	{cmd_ir, "ir","informação sobre registos (NREG, nr, iescrita, ileitura)"},
 	{cmd_trc, "trc","<n> transferir n registos (ind. leit. corrente)"},
 	{cmd_tri, "tri","<n> <i> transferir n registos a partir do índice i"},
-
+/*
 //informação, listagem e eliminação de registos existentes na memória local
 	{cmd_irl, "irl","informação registos locais (NRBUF, nr, iescrita, ileitura)"},
 	{cmd_lr, "lr","<n> <i> listar n registos (mem. local) a partir do índice i"},
@@ -46,7 +46,7 @@ struct 	command_d {
 /*-------------------------------------------------------------------------+
 | function: cmd_sos - listar todos os comandos
 +--------------------------------------------------------------------------*/
-void cmd_sos(void) {
+void cmd_sos(int argc, char **argv) {
   int i;
 
   printf("%s\n", TitleMsg);
@@ -94,7 +94,7 @@ void monitor (void) {
 	  				break;
 	  /* Executing commands -----------------------------------------------*/
 			if (i < NCOMMANDS)
-				commands[i].cmd_fnct();
+				commands[i].cmd_fnct(argc, argv);
 	  		else
 				printf("%s", InvalMsg);
 		} /* if my_getline */
