@@ -11,6 +11,8 @@ int indescrita; //indice de escrita
 int indleitura; //indíce de leitura
 
 int main(void) {
+	cyg_mutex_init(&mem_lock);
+	
 	localmemory = (char *)malloc(NRBUF * sizeof(char *)); 
   //ponteiro para um array de [NRBUF] ponteiros
 
@@ -21,6 +23,7 @@ int main(void) {
 	indescrita=0;
 	indleitura=0;
 	nr=0;
+	
 	
 	cyg_threads_init(); // criar threads, definir o seu estado inicial e criar mboxs
 
