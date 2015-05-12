@@ -7,10 +7,34 @@
 
 void cmd_ini(int argc, char **argv);
 
-void cmd_sos(void);
+void cmd_sos(int argc, char **argv);
 
-void cmd_sair(void);
+void cmd_sair(int argc, char **argv);
 
-void cmd_cr(void);
+void cmd_cr(int argc, char** argv); 
+
+void cmd_ar(int argc, char** argv);
+
+void cmd_ctl(int argc, char** argv);
+
+void cmd_cp(int argc, char** argv);
+
+void cmd_mpm(int argc, char** argv);
+
+void cmd_ca(int argc, char** argv); 
+
+void cmd_dar(int argc, char** argv);
+
+void cmd_dat(int argc, char** argv);
+
+void cmd_dal(int argc, char** argv);
+
+void cmd_aa(int argc, char** argv); 
+
+void cmd_ir(int argc, char** argv);
+
+void cmd_trc(int argc, char** argv);
+
+void cmd_tri(int argc, char** argv);
 
 #endif
