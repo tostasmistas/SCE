@@ -16,7 +16,7 @@
 
 #define freq_CPU 4000 // 4 kHz
 
-/*#define SOM 0xFD      // inicio mensagem
+#define SOM 0xFD      // inicio mensagem
 #define EOM 0xFE      // fim mensagem
 #define CRLG 0xC0     // consultar relogio
 #define ARLG 0xC1     // acertar relogio
@@ -33,7 +33,7 @@
 #define TRGI 0xCC     // transferir registos a partir do indice especificado/
 #define NMCH 0xCD     // notificacao memoria cheia
 #define CMD_OK 0      // comando realizado com sucesso
-#define CMD_ERRO 0xFF // erro no comando*/
+#define CMD_ERRO 0xFF // erro no comando
 
 /*
 #define SOM 0x41      // inicio mensagem                                            (A)
