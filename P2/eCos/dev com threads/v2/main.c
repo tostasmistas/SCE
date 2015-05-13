@@ -3,7 +3,7 @@
 
 cyg_handle_t 	threadInterface, threadCommunication, threadProcessing; // handles for the threads
 cyg_handle_t 	mbInter, mbCom, mbProcInt,mbLoc, mbProc, mbIntProc; // handles for the mailboxs
-
+cyg_mutex_t 	mem_lock;
 //Memória Local
 char **localmemory; //memória local
 int nr; //numero de registos
@@ -12,7 +12,7 @@ int indleitura; //indíce de leitura
 
 int main(void) {
 	cyg_mutex_init(&mem_lock);
-	
+	int i;
 	localmemory = (char *)malloc(NRBUF * sizeof(char *)); 
   //ponteiro para um array de [NRBUF] ponteiros
 

@@ -2,6 +2,7 @@
 #include "threads.h"
 #include "threadInterface.h"
 #include "threadCommunication.h"
+#include "threadProcessing.h"
 
 char stack[NTHREADS][STKSIZE]; // space for two 4K stacks
 cyg_thread 			thread_space[NTHREADS]; // space for two thread objects

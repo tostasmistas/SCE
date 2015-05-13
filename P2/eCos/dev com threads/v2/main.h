@@ -24,6 +24,14 @@
 #define CMD_OK 0      // comando realizado com sucesso
 #define CMD_ERRO 0xFF // erro no comando
 #define NRBUF 150     // numero máximo de eventos registados na memória local
+#define CPT  0xCE     // consultar periodo de transferencia
+#define MPT  0xCF     // modificar periodo de transferencia
+#define LAR  0xD0     // listar alarmes relógio
+#define LAT  0xD1     // listar alarmes temperatura
+#define LAL  0xD2     // listar alarmes luinosidade
+#define IGA  0xD3     // listar informacao gestao alarmes
+#define IG   0xD4     // listar informacao geral
+#define TR   0xD5     // transferencia periódica de registos
 
 extern cyg_handle_t 	threadInterface, threadCommunication, threadProcessing; // handles for the threads
 extern cyg_handle_t 	mbInter, mbCom, mbProcInt,mbLoc, mbProc, mbIntProc; // handles for the mailboxs

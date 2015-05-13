@@ -7,8 +7,6 @@
 
 void cmd_ini(int argc, char **argv);
 
-void cmd_sos(int argc, char **argv);
-
 void cmd_sair(int argc, char **argv);
 
 void cmd_cr(int argc, char** argv); 

@@ -406,7 +406,9 @@ void cmd_lr(int argc, char** argv) {
 	char horas[4];
 	char parametros[6];
 	char codigoev;
-
+	int i;
+	int j;
+	
 	if(argc>1){
 		if(argc<3){
 			printf("Não introduziu todos os parâmetros.\n");
@@ -414,7 +416,7 @@ void cmd_lr(int argc, char** argv) {
 				if(cyg_mutex_lock(&mem_lock)==true){
 				//numreg=argc[1];
 				//indice=argc[2];
-				for(i=argc[2];i<argc[1];i++){
+				for(i=(int)argv[2];i<(int)argv[1];i++){
 					for(j=0; j<3;j++){
 						horas[j]=localmemory[i][j];
 					}
@@ -422,7 +424,7 @@ void cmd_lr(int argc, char** argv) {
 					for(j=4;j<8;j++){
 						parametros[j-4]=localmemory[i][j];
 					}
-					printf("Registo[%d]: Horas-%c:%c:%c Código-%c Parâmetros-%c\n",i,horas[0],horas[1],horas[2],codigoev,parametros);
+					printf("Registo[%d]: Horas-%c:%c:%c Código-%c Parâmetros-%c,%c,%c,%c\n",i,horas[0],horas[1],horas[2],codigoev,parametros[4],parametros[5],parametros[6],parametros[7]);
 				}
 				cyg_mutex_unlock(&mem_lock);
 				}
@@ -482,8 +484,8 @@ void cmd_mpt(int argc, char** argv) {
 	msg_send[0]=MPT;
 
 	if(argc>1){
-		msg_send[1]=argc[1];
-
+		msg_send[1]=(int)argv[1];
+		
 		//Enviar mensagem para tarefa de Processamento
 			cyg_mbox_put(mbIntProc, &msg_send);
 			printf("enviei mensagem para a thread Processing e acordei-a\n");
@@ -499,12 +501,15 @@ void cmd_mpt(int argc, char** argv) {
 void cmd_lar(int argc, char** argv) {
 	char msg_send[8];
 	msg_send[0]=LAR;
-		for(i=1; i<8; i++){
-			if(argc[i]==null){
-			msg_send[i]=0;
-			}else{
-			msg_send[i]=argc[i];
-			}
+	int i;
+	int j;
+		for(i=1; i<argc; i++){
+			msg_send[i]=(int)argv[i];
+			j=i;
+		}
+		while(j<argc){
+			msg_send[j]=0;
+			j++;
 		}
 
 		//Enviar mensagem para tarefa de Processamento
@@ -527,14 +532,16 @@ void cmd_lar(int argc, char** argv) {
 void cmd_lat(int argc, char** argv) {
 	char msg_send[8];
 	msg_send[0]=LAT;
-		for(i=1; i<8; i++){
-			if(argc[i]==null){
-			msg_send[i]=0;
-			}else{
-			msg_send[i]=argc[i];
-			}
+	int i;
+	int j;
+		for(i=1; i<argc; i++){
+			msg_send[i]=(int)argv[i];
+			j=i;
 		}
-
+		while(j<argc){
+			msg_send[j]=0;
+			j++;
+		}
 		//Enviar mensagem para tarefa de Processamento
 			cyg_mbox_put(mbIntProc, &msg_send);
 			printf("enviei mensagem para a thread Processing e acordei-a\n");
@@ -555,15 +562,16 @@ void cmd_lat(int argc, char** argv) {
 void cmd_lal(int argc, char** argv) {
 	char msg_send[8];
 	msg_send[0]=LAL;
-
-		for(i=1; i<8; i++){
-			if(argc[i]==null){
-			msg_send[i]=0;
-			}else{
-			msg_send[i]=argc[i];
-			}
+	int i;
+	int j;
+		for(i=1; i<argc; i++){
+			msg_send[i]=(int)argv[i];
+			j=i;
 		}
-
+		while(j<argc){
+			msg_send[j]=0;
+			j++;
+		}
 		//Enviar mensagem para tarefa de Processamento
 			cyg_mbox_put(mbIntProc, &msg_send);
 			printf("enviei mensagem para a thread Processing e acordei-a\n");

@@ -14,7 +14,7 @@ struct 	command_d {
 //interação com tarefa de comunicação
 	{cmd_sos, "sos", "	: help"},
 	{cmd_cr, "cr", "	: consultar relogio"},
-	/*{cmd_ar, "ar", "<h> <m> <s> acertar relógio"},
+	{cmd_ar, "ar", "<h> <m> <s> acertar relógio"},
 	{cmd_ctl, "ctl","consultar temperatura e luminosidade"},
 	{cmd_cp, "cp","consultar parâmetros (NREG,PMON,TSOM)"},
 	{cmd_mpm,  "mpm","<p> modificar período de monitorização(segundos- 0 desactiva)"},
@@ -39,7 +39,7 @@ struct 	command_d {
 	{cmd_lat, "lat","<h1> <m1> <s1> <h2> <m2> <s2> listar alarmes temperatura entre t1 e t2"},
 	{cmd_lal, "lal","<h1> <m1> <s1> <h2> <m2> <s2> listar alarmes luminosidade entre t1 e t2"},
 	{cmd_iga, "iga", "informação gestão alarmes (definição e activação)"},
-	{cmd_ig, "ig","<p>	informação geral (início, relógio, memória, período monit.)"},*/
+	{cmd_ig, "ig","<p>	informação geral (início, relógio, memória, período monit.)"},
 	{cmd_sair, "sair","	: sair"}
 };
 

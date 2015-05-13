@@ -1,6 +1,8 @@
 #ifndef __THREADINTERFACE_H
 #define __THREADINTERFACE_H
 
+void cmd_sos(void);
+
 int my_getline(char** argv, int argvsize);
 
 void monitor(void);
