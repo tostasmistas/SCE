@@ -6,6 +6,7 @@
 
 extern cyg_handle_t processing_clockH, countH;
 extern cyg_alarm alarmH;
+extern cyg_handle_t alarmhandle
 
 void alarmecomunicacao(void){
 	char msg_send[8];
@@ -190,7 +191,7 @@ void threadProcessing_func(cyg_addrword_t data) {
 
 	processing_clockH=cyg_real_time_clock();
 	cyg_clock_to_counter(processing_clockH, &countH);
-	cyg_alarm_create(countH,&alarmecomunicacao, 0,0,&alarmH);
+	cyg_alarm_create(countH,&alarmecomunicacao, 0,&alarmhandle,&alarmH);
 	char msg_send;
 	unsigned char *msg_rec;
 	int ptransf=0;
