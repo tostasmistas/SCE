@@ -1,10 +1,8 @@
-#ifndef __THREADCOMMUNICATION_H
-#define __THREADCOMMUNICATION_H
-
-Cyg_ErrNo send_buffer (char msgToSend[]);
+#ifndef __THREADCOMMUNICATIONRX_H
+#define __THREADCOMMUNICATIONRX_H
 
 Cyg_ErrNo recv_hex (char *byteToRead, unsigned int lenght);
 
-void threadCommunication_func(cyg_addrword_t data);
+void threadCommunicationRX_func(cyg_addrword_t data);
 
 #endif

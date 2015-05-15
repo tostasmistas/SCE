@@ -13,21 +13,21 @@ int indescrita; //indice de escrita
 int indleitura; //indíce de leitura
 
 int main(void) {
-	
+
 	int i;
-	localmemory = (char **)malloc(NRBUF * sizeof(char **)); 
+	localmemory = (char **)malloc(NRBUF * sizeof(char **));
   	//ponteiro para um array de [NRBUF] ponteiros
 
 	for (i = 0; i < NRBUF; ++i){
-      localmemory[i] = (char *)malloc(8 * sizeof(char*)); 
+      localmemory[i] = (char *)malloc(8 * sizeof(char*));
       //pointer to a single array with 8 chars
 	}
 	indescrita = 0;
 	indleitura = 0;
 	nr = 0;
-	
+
 	cyg_mutex_init(&mem_lock); // criar mutex
 	cyg_threads_init(); // criar threads, definir o seu estado inicial e criar mboxs
-	
+
 	return 0;
 }

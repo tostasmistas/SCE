@@ -14,7 +14,7 @@ Cyg_ErrNo send_buffer (char msgToSend[]) {
 	return err;
 }
 
-void threadCommunicationTX(cyg_addrword_t data) {
+void threadCommunicationTX_func(cyg_addrword_t data) {
 
 	unsigned char *msg_rec;
 	char msgToSend3[3] = {0};

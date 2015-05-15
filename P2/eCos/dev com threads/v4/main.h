@@ -34,7 +34,7 @@
 #define TR   0xD5     // transferencia periódica de registos
 
 extern cyg_handle_t 	threadInterface, threadCommunicationRX, threadCommunicationTX, threadProcessing; // handles for the threads
-extern cyg_handle_t 	mbInter, mbComTX, mbProc, mbProcInt, mbLoc, mbIntProc; // handles for the mailboxs
+extern cyg_handle_t 	mbInter, mbComTX, mbProc; // handles for the mailboxs
 extern cyg_handle_t 	alarmProc; // handles for the alarms
 extern cyg_mutex_t 		mem_lock;
 

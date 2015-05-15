@@ -13,7 +13,7 @@ Cyg_ErrNo recv_hex (char *byteToRead, unsigned int lenght) {
 	return err;
 }
 
-void threadCommunicationRX(cyg_addrword_t data) {
+void threadCommunicationRX_func(cyg_addrword_t data) {
 
 	unsigned char alreadySOM = 0;
 	unsigned char alreadyEOM = 0;
