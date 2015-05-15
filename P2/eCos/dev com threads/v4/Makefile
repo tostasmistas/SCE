@@ -17,7 +17,7 @@ CXXFLAGS      = $(CFLAGS)
 LDFLAGS       = -nostartfiles -L$(INSTALL_DIR)/lib -Ttarget.ld
 
 #####
-OBJS= main.o threads.o threadInterface.o threadCommunication.o commandFunctions.o threadProcessing.o
+OBJS= main.o threads.o threadInterface.o threadCommunication_RX.o threadCommunication_TX.o commandFunctions.o threadProcessing.o
 
 # RULES
 

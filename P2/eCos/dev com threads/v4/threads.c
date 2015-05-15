@@ -1,7 +1,8 @@
 #include "main.h"
 #include "threads.h"
 #include "threadInterface.h"
-#include "threadCommunication.h"
+#include "threadCommunication_RX.h"
+#include "threadCommunication_TX.h"
 #include "threadProcessing.h"
 
 char stack[NTHREADS][STKSIZE]; // space for two 4K stacks

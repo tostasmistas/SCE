@@ -36,10 +36,10 @@
 extern cyg_handle_t 	threadInterface, threadCommunicationRX, threadCommunicationTX, threadProcessing; // handles for the threads
 extern cyg_handle_t 	mbInter, mbComTX, mbProc; // handles for the mailboxs
 extern cyg_handle_t 	alarmProc; // handles for the alarms
-extern cyg_mutex_t 		mem_lock;
+extern cyg_mutex_t 		memLoc, escritaScreen;
 
-//Memória Local
-extern char **localmemory; //memória local
+// memória Local
+extern char **localMemory; //memória local
 extern int nr; //numero de registos
 extern int indescrita; //indice de escrita
 extern int indleitura; //indíce de leitura

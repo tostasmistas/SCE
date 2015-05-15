@@ -1,6 +1,6 @@
 #include "main.h"
 #include "threads.h"
-#include "threadCommunication.h"
+#include "threadCommunication_TX.h"
 
 Cyg_ErrNo err;
 cyg_io_handle_t serH;

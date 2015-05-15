@@ -1,6 +1,6 @@
 #include "main.h"
 #include "threads.h"
-#include "threadCommunication.h"
+#include "threadCommunication_RX.h"
 
 Cyg_ErrNo err;
 cyg_io_handle_t serH;
@@ -19,8 +19,9 @@ void threadCommunicationRX_func(cyg_addrword_t data) {
 	unsigned char alreadyEOM = 0;
 	unsigned char byteRead = 0;
 	unsigned char protocolo_OK = 1;
-	char index = 0;
-	char msgRecFromPIC[25] = {0};
+	unsigned char index = 0;
+	unsigned char msgRecFromPIC[201] = {0}; //na posicao 0 armazenar o CMD e nas restantes 200 posicoes os registos
+	unsigned int i = 0;
 
 	recv_hex(&byteRead, 1); //esta thread esta sempre bloqueada a ler um byte
 
@@ -30,7 +31,7 @@ void threadCommunicationRX_func(cyg_addrword_t data) {
 		alreadySOM = 0;
 	}
 	if(alreadySOM == 1) { //verifica se ja houve SOM
-		if(index < 200){ //assumir que valor maximo de registos que se pode transferir e 25 (25*8 bytes)
+		if(index < 200){ //assumir que valor maximo de registos que se pode transferir e 25 (25*8 bytes = 200bytes)
 			msgRecFromPIC[index] = byteRead;
 			index++;
 		}
@@ -38,7 +39,7 @@ void threadCommunicationRX_func(cyg_addrword_t data) {
 	if(byteRead == SOM) { //verifica se SOM
 		alreadySOM = 1;
 		index = 0;
-		for(i = 0; i < 25; i++) {
+		for(i = 0; i < 201; i++) {
 			msgRecFromPIC[i] = 0;
 		}
 	}
@@ -49,14 +50,24 @@ void threadCommunicationRX_func(cyg_addrword_t data) {
 
 	if(protocolo_OK == 1) { //ha uma mensagem valida
 		if(msgRecFromPIC[0] == 0xCD) { //verificar se a mensagem foi uma notificacao de memoria cheia
-			//mutex para bloquear o recurso de escrita no ecra
+			while(cyg_mutex_lock(&escritaScreen) != true); //mutex para bloquear o recurso de escrita no ecra
 			printf("aviso de memoria cheia\n"); //se sim entao escrever directamente no ecra o aviso de memoria cheia
-			//desbloquear a escrita no ecra
+			cyg_mutex_unlock(&escritaScreen); //desbloquear a escrita no ecra
 		}
 		else { //o codigo recebido nao foi de memoria cheia mas sim outro comando - agora ha que verificar qual a thread que efectuou um pedido: interface ou processamento
 			if(msgRecFromPIC[0] == 0xCB || msgRecFromPIC[0] == 0xCC) { //pedido feito pelo processamento (transferencia de registos)
-				//escrever registos na memoria local
-				cyg_mbox_put(mbProc, (void*)); //colocar na mbox de processamento o OK de transferencia concluida
+				while(cyg_mutex_lock(&memLoc) != true); //mutex para bloquear o recurso de escrita na memoria local
+				for(i = 1; i < 200; i++) { 
+					localMemory[indescrita][i-1] = msgRecFromPIC[i];
+					if(i%8 == 0) {
+						indescrita++;
+					}
+					if(indescrita == NRBUF) {
+						indescrita = 0; // voltar a primeira "linha" da memoria
+					}
+				}
+				cyg_mutex_unlock(&memLoc); //desbloquear a escrita na memoria local
+				cyg_mbox_put(mbProc, (void*)CMD_OK); //colocar na mbox de processamento o OK de transferencia concluida
 			}
 			else { //pedido feito pela interface
 				cyg_mbox_put(mbInter, (void*)msgRecFromPIC); //colocar pedido na mbox de interface
