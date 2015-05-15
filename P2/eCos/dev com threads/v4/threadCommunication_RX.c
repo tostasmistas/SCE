@@ -50,13 +50,13 @@ void threadCommunicationRX_func(cyg_addrword_t data) {
 
 	if(protocolo_OK == 1) { //ha uma mensagem valida
 		if(msgRecFromPIC[0] == 0xCD) { //verificar se a mensagem foi uma notificacao de memoria cheia
-			while(cyg_mutex_lock(&escritaScreen) != true); //mutex para bloquear o recurso de escrita no ecra
+			while(cyg_mutex_lock(&escritaScreen_mutex) != true); //mutex para bloquear o recurso de escrita no ecra
 			printf("aviso de memoria cheia\n"); //se sim entao escrever directamente no ecra o aviso de memoria cheia
-			cyg_mutex_unlock(&escritaScreen); //desbloquear a escrita no ecra
+			cyg_mutex_unlock(&escritaScreen_mutex); //desbloquear a escrita no ecra
 		}
 		else { //o codigo recebido nao foi de memoria cheia mas sim outro comando - agora ha que verificar qual a thread que efectuou um pedido: interface ou processamento
 			if(msgRecFromPIC[0] == 0xCB || msgRecFromPIC[0] == 0xCC) { //pedido feito pelo processamento (transferencia de registos)
-				while(cyg_mutex_lock(&memLoc) != true); //mutex para bloquear o recurso de escrita na memoria local
+				while(cyg_mutex_lock(&localMemory_mutex) != true); //mutex para bloquear o recurso de escrita na memoria local
 				for(i = 1; i < 200; i++) { 
 					localMemory[indescrita][i-1] = msgRecFromPIC[i];
 					if(i%8 == 0) {
@@ -66,7 +66,7 @@ void threadCommunicationRX_func(cyg_addrword_t data) {
 						indescrita = 0; // voltar a primeira "linha" da memoria
 					}
 				}
-				cyg_mutex_unlock(&memLoc); //desbloquear a escrita na memoria local
+				cyg_mutex_unlock(&localMemory_mutex); //desbloquear a escrita na memoria local
 				cyg_mbox_put(mbProc, (void*)CMD_OK); //colocar na mbox de processamento o OK de transferencia concluida
 			}
 			else { //pedido feito pela interface

@@ -36,7 +36,7 @@
 extern cyg_handle_t 	threadInterface, threadCommunicationRX, threadCommunicationTX, threadProcessing; // handles for the threads
 extern cyg_handle_t 	mbInter, mbComTX, mbProc; // handles for the mailboxs
 extern cyg_handle_t 	alarmProc; // handles for the alarms
-extern cyg_mutex_t 		memLoc, escritaScreen;
+extern cyg_mutex_t 		localMemory_mutex, escritaScreen_mutex;
 
 // memória Local
 extern char **localMemory; //memória local

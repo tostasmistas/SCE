@@ -321,7 +321,7 @@ void cmd_dal(int argc, char** argv) {
 
 			unsigned char *msg_rec;
 			msg_rec = cyg_mbox_get(mbInter);
-			if(msg_rec[0] == -1) {
+			if(msg_rec[0] == CMD_ERRO) {
 				printf("erro na transmissao da mensagem\n");
 			}
 			else {
@@ -479,21 +479,21 @@ void cmd_lr(int argc, char** argv) {
 			printf("erro: nao introduziu todos os parametros\n");
 		}
 		else{
-			if(cyg_mutex_lock(&mem_lock)==true){
+			if(cyg_mutex_lock(&localMemory_mutex)==true){
 			//numreg=argc[1];
 			//indice=argc[2];
 				for(i = (int)argv[2]; i < (int)argv[1]; i++){
 					for(j = 0; j < 3; j++){
-						horas[j] = localmemory[i][j];
+						horas[j] = localMemory[i][j];
 					}
-					codigoev = localmemory[i][3];
+					codigoev = localMemory[i][3];
 					for(j = 4;j < 8; j++){
-						parametros[j-4] = localmemory[i][j];
+						parametros[j-4] = localMemory[i][j];
 					}
 					printf("registo[%d]: horas-%c:%c:%c código-%c parâmetros-%c,%c,%c,%c\n",
 							i,horas[0],horas[1],horas[2],codigoev,parametros[4],parametros[5],parametros[6],parametros[7]);
 				}
-				cyg_mutex_unlock(&mem_lock);
+				cyg_mutex_unlock(&localMemory_mutex);
 			}
 		}
 	}
@@ -505,16 +505,16 @@ void cmd_lr(int argc, char** argv) {
 void cmd_er(int argc, char** argv) {
 	
 	int i;
-	if(cyg_mutex_lock(&mem_lock) == true){
+	if(cyg_mutex_lock(&localMemory_mutex) == true){
 		for(i = 0;i < NRBUF; i++){
-			localmemory[i] = 0;
+			localMemory[i] = 0;
 		}
 		indescrita = 0;
 		indleitura = 0;
 		nr = 0;
 		printf("registos eliminados\n");
 	}
-	cyg_mutex_unlock(&mem_lock);
+	cyg_mutex_unlock(&localMemory_mutex);
 }
 
 /*-------------------------------------------------------------------------+
@@ -525,7 +525,7 @@ void cmd_cpt(int argc, char** argv) {
 	char msg_send[2];
 	msg_send[0] = CPT;
 
-	cyg_mbox_put(mbIntProc, &msg_send);
+	cyg_mbox_put(mbProc, &msg_send);
 	cyg_thread_resume(threadProcessing);
 
 	printf("enviei mensagem para a thread processing e acordei-a\n");
@@ -616,7 +616,7 @@ void cmd_lat(int argc, char** argv) {
 
 	unsigned char *msg_rec;
 	msg_rec = cyg_mbox_get(mbInter);
-	if(msg_rec[0] == -1) {
+	if(msg_rec[0] == CMD_ERRO) {
 		printf("erro transmissão da mensagem\n");
 	}
 	else {

@@ -1,6 +1,7 @@
 #include "main.h"
 #include "threads.h"
-#include "threadCommunication.h"
+#include "threadCommunication_TX.h"
+#include "threadCommunication_RX.h"
 #include "threadProcessing.h"
 #include <cyg/kernel/kapi.h>
 
@@ -14,33 +15,33 @@ void alarmecomunicacao(void){
 			cyg_mbox_put(mbComTX, &msg_send);
 			
 			printf("enviei mensagem para a thread Comunicacao e acordei-a\n");
-			cyg_mbox_resume(threadCommunicationTX);
+			cyg_thread_resume(threadCommunicationTX);
 }
 
 void gestaoalarmes(void){
 	int i;
 	char msg_send[2];
 	msg_send[0]=1;
-		while(cyg_mutex_lock(&mem_lock)!=true);
+		while(cyg_mutex_lock(&localMemory_mutex)!=true);
 		for(i=0; i<nr; i++){
-			switch(localmemory[i][3]){
+			switch(localMemory[i][3]){
 				case 3:
-					printf("Def. Alarme Relógio - %c:%c:%c\n",localmemory[i][4],localmemory[i][5],localmemory[i][6]);
+					printf("Def. Alarme Relógio - %c:%c:%c\n",localMemory[i][4],localMemory[i][5],localMemory[i][6]);
 				break;
 				case 4:
-					printf("Def. Alarme Temperatura - %c\n",localmemory[i][4]);
+					printf("Def. Alarme Temperatura - %c\n",localMemory[i][4]);
 				break;
 				case 5:
-					printf("Def. Alarme Luminosidade - %c\n",localmemory[i][4]);
+					printf("Def. Alarme Luminosidade - %c\n",localMemory[i][4]);
 				break;
 				case 6:
-					printf("Activação/Desactivação de Alarmes - %c:%c:%c\n",localmemory[i][0], localmemory[i][1], localmemory[i][2]);
+					printf("Activação/Desactivação de Alarmes - %c:%c:%c\n",localMemory[i][0], localMemory[i][1], localMemory[i][2]);
 				break;
 			
 			}
 		}
 		//Enviar OK para Interface
-				cyg_mutex_unlock(&mem_lock);
+				cyg_mutex_unlock(&localMemory_mutex);
 				cyg_mbox_put(mbInter, &msg_send);
 				printf("enviei mensagem para a thread Interface e acordei-a\n");
 		
@@ -63,7 +64,7 @@ void listalarmes(unsigned char* msg_rec, int type){
 	char t2[4];
 	msg_send[0]=1;
 	
-	while(cyg_mutex_lock(&mem_lock)!=true);
+	while(cyg_mutex_lock(&localMemory_mutex)!=true);
 		switch(type){
 			case(1):
 				printf("Alarmes Relógio");
@@ -91,18 +92,18 @@ void listalarmes(unsigned char* msg_rec, int type){
 				if(noupbound==2){
 					noupbound=0;
 					for(i=0; i<nr ; i++){
-						if(localmemory[i][3]==7){ //código alarmes relógio
+						if(localMemory[i][3]==7){ //código alarmes relógio
 						lowerbound=0;
 							for(j=0; j<3; j++){
-								alarmesrel[j]=localmemory[i][j];
+								alarmesrel[j]=localMemory[i][j];
 								
 								if(alarmesrel[j]>t1[j]){
 									lowerbound++;
 								}
 							}
 							if(lowerbound>3){ //h,m,s > h1 m1 s1
-								alarmetemp=localmemory[i][4];
-								alarmelum=localmemory[i][5];
+								alarmetemp=localMemory[i][4];
+								alarmelum=localMemory[i][5];
 								printf("Alarme Temperatura- Horas<%c:%c:%c> Temperatura<%c> Luminosidade <%c>\n",alarmesrel[0],alarmesrel[1],alarmesrel[2], alarmetemp, alarmelum);
 							}
 						}
@@ -111,29 +112,29 @@ void listalarmes(unsigned char* msg_rec, int type){
 					if(nolowbound==2){
 						nolowbound=0;
 						for(i=0; i<nr ; i++){
-							if(localmemory[i][3]==7){ //código alarmes relógio
+							if(localMemory[i][3]==7){ //código alarmes relógio
 								for(j=0; j<3; j++){
-									alarmesrel[j]=localmemory[i][j];
+									alarmesrel[j]=localMemory[i][j];
 								}
-										alarmetemp=localmemory[i][4];
-										alarmelum=localmemory[i][5];
+										alarmetemp=localMemory[i][4];
+										alarmelum=localMemory[i][5];
 										printf("Alarme Temperatura- Horas<%c:%c:%c> Temperatura<%c> Luminosidade <%c>\n",alarmesrel[0],alarmesrel[1],alarmesrel[2], alarmetemp, alarmelum);
 
 								}
 							}
 						}else{
 							for(i=0; i<nr ; i++){
-								if(localmemory[i][3]==7){ //código alarmes relógio
+								if(localMemory[i][3]==7){ //código alarmes relógio
 									bound=0;
 									for(j=0; j<3; j++){
-										alarmesrel[j]=localmemory[i][j];
+										alarmesrel[j]=localMemory[i][j];
 										if(alarmesrel[j]>t1[j] && alarmesrel[j]<t2[j]){
 											bound++;
 										}
 									}
 									if(bound>3){ 
-										alarmetemp=localmemory[i][4];
-										alarmelum=localmemory[i][5];
+										alarmetemp=localMemory[i][4];
+										alarmelum=localMemory[i][5];
 										printf("Alarme Temperatura- Horas<%c:%c:%c> Temperatura<%c> Luminosidade <%c>\n",alarmesrel[0],alarmesrel[1],alarmesrel[2], alarmetemp, alarmelum);
 									}
 								}
@@ -142,7 +143,7 @@ void listalarmes(unsigned char* msg_rec, int type){
 				}		
 			
 			//Enviar OK para Interface
-			cyg_mutex_unlock(&mem_lock);
+			cyg_mutex_unlock(&localMemory_mutex);
 			cyg_mbox_put(mbInter, &msg_send);
 			printf("enviei mensagem para a thread Interface e acordei-a\n");
 	
@@ -152,27 +153,27 @@ void informacaogeral(void){
 	char msg_send[2];
 	int i=0;
 	msg_send[0]=1;
-	while(cyg_mutex_lock(&mem_lock)!=true);
+	while(cyg_mutex_lock(&localMemory_mutex)!=true);
 		for(i=0; i<nr; i++){
-			switch(localmemory[i][3]){
+			switch(localMemory[i][3]){
 			case 1:
-				printf("Inicialização: %c:%c:%c - Temp:%c Lum:%c\n", localmemory[i][0],localmemory[i][1],localmemory[i][2],localmemory[i][4],localmemory[i][5]);
+				printf("Inicialização: %c:%c:%c - Temp:%c Lum:%c\n", localMemory[i][0],localMemory[i][1],localMemory[i][2],localMemory[i][4],localMemory[i][5]);
 			break;
 			case 2:
-				printf("Nova Hora: %c:%c:%c\n" ,localmemory[i][0],localmemory[i][1],localmemory[i][2]);
+				printf("Nova Hora: %c:%c:%c\n" ,localMemory[i][0],localMemory[i][1],localMemory[i][2]);
 			break;
 			case 10:
-				printf("Período de Monitorização passou de %c para %c. Hora-%c:%c:%c\n",localmemory[i][4],localmemory[i][5],localmemory[i][0],localmemory[i][1],localmemory[i][2]);
+				printf("Período de Monitorização passou de %c para %c. Hora-%c:%c:%c\n",localMemory[i][4],localMemory[i][5],localMemory[i][0],localMemory[i][1],localMemory[i][2]);
 			break;
 			case 11:
-				printf("Memória Cheia: NREG=%c nr=%c ie=%c il=%c. Hora-%c:%c:%c\n",localmemory[i][4],localmemory[i][5],localmemory[i][6],localmemory[i][7],localmemory[i][0],localmemory[i][1],localmemory[i][2]);
+				printf("Memória Cheia: NREG=%c nr=%c ie=%c il=%c. Hora-%c:%c:%c\n",localMemory[i][4],localMemory[i][5],localMemory[i][6],localMemory[i][7],localMemory[i][0],localMemory[i][1],localMemory[i][2]);
 			break;
 			
 			}
 		}
 		
 		//Enviar OK para Interface
-				cyg_mutex_unlock(&mem_lock);
+				cyg_mutex_unlock(&localMemory_mutex);
 				cyg_mbox_put(mbInter, &msg_send);
 				printf("enviei mensagem para a thread Interface e acordei-a\n");
 	
@@ -197,7 +198,7 @@ void threadProcessing_func(cyg_addrword_t data) {
 	//como contar o tempo?
 		case CPT:
 			msg_send = (char)ptransf;
-			cyg_mbox_put(mbProcInt, &msg_send);
+			//cyg_mbox_put(mbProcInt, &msg_send);
 			break;
 	//modificar período de transferência
 		case MPT:

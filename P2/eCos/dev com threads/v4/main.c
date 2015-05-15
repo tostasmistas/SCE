@@ -2,9 +2,9 @@
 #include "threads.h"
 
 cyg_handle_t 	threadInterface, threadCommunicationRX, threadCommunicationTX, threadProcessing; // handles for the threads
-cyg_handle_t 	mbInter, mbCom, mbProcInt,mbLoc, mbProc, mbIntProc; // handles for the mailboxs
+cyg_handle_t 	mbInter, mbInter, mbComTX, mbProc; // handles for the mailboxs
 cyg_handle_t 	alarmProc; // handles for the alarms
-cyg_mutex_t 	memLoc, escritaScreen;
+cyg_mutex_t 	localMemory_mutex, escritaScreen_mutex;
 
 /* variaveis da memória local */
 char **localMemory; //memória local
@@ -26,8 +26,8 @@ int main(void) {
 	indleitura = 0;
 	nr = 0;
 
-	cyg_mutex_init(&memLoc); // criar mutex de proteccao de escriat na memoria local
-	cyg_mutex_init(&escritaScreen); //criar mutex de proteccao de escrita no ecra
+	cyg_mutex_init(&localMemory_mutex); // criar mutex de proteccao de escriat na memoria local
+	cyg_mutex_init(&escritaScreen_mutex); //criar mutex de proteccao de escrita no ecra
 	cyg_threads_init(); // criar threads, definir o seu estado inicial e criar mboxs
 
 	return 0;

@@ -7,7 +7,7 @@
 
 char stack[NTHREADS][STKSIZE]; // space for two 4K stacks
 cyg_thread 			thread_space[NTHREADS]; // space for two thread objects
-cyg_mbox 				interToComTX, procToComTX, interToProc, comRXToProc, comRXToInter, interToMemLoc;
+cyg_mbox 			interToComTX, procToComTX, interToProc, comRXToProc, comRXToInter, interToMemLoc;
 
 void cyg_threads_init(void) {
 	//primeiro argumento <-> prioridade da thread
