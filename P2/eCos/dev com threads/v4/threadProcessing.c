@@ -10,16 +10,18 @@ cyg_alarm 		alarm;
 void alarmecomunicacao(void){
 	char msg_send[8];
 	msg_send[0]=TR;
-		//Enviar mensagem para tarefa de Processamento
-			cyg_mbox_put(mbLoc, &msg_send);
-			printf("enviei mensagem para a thread Comunicação e acordei-a\n");
+		
+			cyg_mbox_put(mbComTX, &msg_send);
+			
+			printf("enviei mensagem para a thread Comunicacao e acordei-a\n");
+			cyg_mbox_resume(threadCommunicationTX);
 }
 
 void gestaoalarmes(void){
 	int i;
 	char msg_send[2];
 	msg_send[0]=1;
-		if(cyg_mutex_lock(&mem_lock)==true){
+		while(cyg_mutex_lock(&mem_lock)!=true);
 		for(i=0; i<nr; i++){
 			switch(localmemory[i][3]){
 				case 3:
@@ -34,14 +36,14 @@ void gestaoalarmes(void){
 				case 6:
 					printf("Activação/Desactivação de Alarmes - %c:%c:%c\n",localmemory[i][0], localmemory[i][1], localmemory[i][2]);
 				break;
+			
 			}
 		}
-		
 		//Enviar OK para Interface
 				cyg_mutex_unlock(&mem_lock);
-				cyg_mbox_put(mbProcInt, &msg_send);
+				cyg_mbox_put(mbInter, &msg_send);
 				printf("enviei mensagem para a thread Interface e acordei-a\n");
-		}
+		
 }
 
 void listalarmes(unsigned char* msg_rec, int type){
@@ -61,7 +63,7 @@ void listalarmes(unsigned char* msg_rec, int type){
 	char t2[4];
 	msg_send[0]=1;
 	
-	if(cyg_mutex_lock(&mem_lock)==true){
+	while(cyg_mutex_lock(&mem_lock)!=true);
 		switch(type){
 			case(1):
 				printf("Alarmes Relógio");
@@ -141,16 +143,16 @@ void listalarmes(unsigned char* msg_rec, int type){
 			
 			//Enviar OK para Interface
 			cyg_mutex_unlock(&mem_lock);
-			cyg_mbox_put(mbProcInt, &msg_send);
+			cyg_mbox_put(mbInter, &msg_send);
 			printf("enviei mensagem para a thread Interface e acordei-a\n");
-	}
+	
 }
 
 void informacaogeral(void){
 	char msg_send[2];
 	int i=0;
 	msg_send[0]=1;
-	if(cyg_mutex_lock(&mem_lock)==true){
+	while(cyg_mutex_lock(&mem_lock)!=true);
 		for(i=0; i<nr; i++){
 			switch(localmemory[i][3]){
 			case 1:
@@ -171,9 +173,9 @@ void informacaogeral(void){
 		
 		//Enviar OK para Interface
 				cyg_mutex_unlock(&mem_lock);
-				cyg_mbox_put(mbProcInt, &msg_send);
+				cyg_mbox_put(mbInter, &msg_send);
 				printf("enviei mensagem para a thread Interface e acordei-a\n");
-	}
+	
 }
 
 /*-------------------------------------------------------------------------+
@@ -189,7 +191,7 @@ void threadProcessing_func(cyg_addrword_t data) {
 	unsigned char *msg_rec;
 	int ptransf=0;
 	int ptransfnew=0;
-	msg_rec = cyg_mbox_get(mbIntProc);
+	msg_rec = cyg_mbox_get(mbProc);
 	switch(msg_rec[0]){
 	//consultar período de transferência
 	//como contar o tempo?
