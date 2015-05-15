@@ -93,7 +93,7 @@ void USART_protocolo_OK(char msg_rec[]){
         escrever_USART(EOM);
         break;
       case DALT: // definir alarme temperatura
-        alarme_temp = msg_rec[1];
+        alarme_temp = (int)msg_rec[1];
         update_EEPROM_interna_temp_alarme();
         update_EEPROM_external(4);
         escrever_USART(SOM);

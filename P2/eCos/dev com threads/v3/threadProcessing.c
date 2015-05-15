@@ -4,8 +4,8 @@
 #include "threadProcessing.h"
 #include <cyg/kernel/kapi.h>
 
-extern cyg_handle_t processing_clockH, countH;
-extern cyg_alarm alarmH;
+cyg_handle_t	processing_clockH, countH;
+cyg_alarm 		alarm;
 
 void alarmecomunicacao(void){
 	char msg_send[8];
@@ -13,7 +13,6 @@ void alarmecomunicacao(void){
 		//Enviar mensagem para tarefa de Processamento
 			cyg_mbox_put(mbLoc, &msg_send);
 			printf("enviei mensagem para a thread Comunicação e acordei-a\n");
-
 }
 
 void gestaoalarmes(void){
@@ -177,18 +176,15 @@ void informacaogeral(void){
 	}
 }
 
-
-
-
-
 /*-------------------------------------------------------------------------+
 | function: rotina associada a thread de processamento
 +--------------------------------------------------------------------------*/
 void threadProcessing_func(cyg_addrword_t data) {
 
-	processing_clockH=cyg_real_time_clock();
-	cyg_clock_to_counter(processing_clockH, &countH);
-	//cyg_alarm_create(countH, &alarmecomunicacao, 0, 0, &alarmH);
+	processing_clockH = cyg_real_time_clock();
+	cyg_clock_to_counter(processing_clockH, &countH); // contador associado ao alarme
+	cyg_alarm_create(countH, &alarmecomunicacao, 0, &alarmProc, &alarm);
+
 	char msg_send;
 	unsigned char *msg_rec;
 	int ptransf=0;
@@ -210,7 +206,7 @@ void threadProcessing_func(cyg_addrword_t data) {
 				cyg_alarm_initialize(countH,cyg_current_time()+ptransf,ptransf);
 			}
 			if(ptransfnew==0){
-				cyg_alarm_disable(countH);
+				cyg_alarm_disable(alarmProc);
 			}
 			break;
 	//listar alarmes relógio

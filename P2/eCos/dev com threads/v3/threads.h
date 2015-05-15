@@ -1,5 +1,5 @@
-#ifndef __COMANDFUNCTIONS_H
-#define __COMANDFUNCTIONS_H
+#ifndef __THREADS_H
+#define __THREADS_H
 
 #define NTHREADS 3
 #define STKSIZE 4096

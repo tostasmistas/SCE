@@ -3,6 +3,7 @@
 
 cyg_handle_t 	threadInterface, threadCommunication, threadProcessing; // handles for the threads
 cyg_handle_t 	mbInter, mbCom, mbProcInt,mbLoc, mbProc, mbIntProc; // handles for the mailboxs
+cyg_handle_t 	alarmProc; // handles for the alarms
 cyg_mutex_t 	mem_lock;
 
 /* variaveis da memória local */
