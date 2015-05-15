@@ -29,8 +29,8 @@ void cmd_sair(int argc, char** argv) {
 void cmd_cr(int argc, char** argv) {
 
 	char msg_send = CRLG;
-	cyg_mbox_put(mbCom, &msg_send);
-	cyg_thread_resume(threadCommunication);
+	cyg_mbox_put(mbComTX, &msg_send);
+	cyg_thread_resume(threadCommunicationTX);
 
 	printf("enviei mensagem para a thread communication e acordei-a\n");
 
@@ -77,8 +77,8 @@ void cmd_ar(int argc, char** argv){
 				printf("erro: o valor dos segundos deve estar entre 0 e 59\n");
 			}	
 			if(erro != 1) {
-				cyg_mbox_put(mbCom, &msg_send);
-				cyg_thread_resume(threadCommunication);
+				cyg_mbox_put(mbComTX, &msg_send);
+				cyg_thread_resume(threadCommunicationTX);
 				
 				printf("enviei mensagem para a thread communication e acordei-a\n");
 
@@ -105,8 +105,8 @@ void cmd_ar(int argc, char** argv){
 void cmd_ctl(int argc, char** argv) {
 
 	char msg_send = CTEL;
-	cyg_mbox_put(mbCom, &msg_send);
-	cyg_thread_resume(threadCommunication);
+	cyg_mbox_put(mbComTX, &msg_send);
+	cyg_thread_resume(threadCommunicationTX);
 
 	printf("enviei mensagem para a thread communication e acordei-a\n");
 
@@ -127,8 +127,8 @@ void cmd_ctl(int argc, char** argv) {
 void cmd_cp(int argc, char** argv) {
 
 	char msg_send = CPAR;
-	cyg_mbox_put(mbCom, &msg_send);
-	cyg_thread_resume(threadCommunication);
+	cyg_mbox_put(mbComTX, &msg_send);
+	cyg_thread_resume(threadCommunicationTX);
 
 	printf("enviei mensagem para a thread communication e acordei-a\n");
 
@@ -163,8 +163,8 @@ void cmd_mpm(int argc, char** argv) {
 			printf("erro: o valor de PMON deve estar entre 0 e 99\n");		
 		}
 		if(erro != 1) {
-			cyg_mbox_put(mbCom, &msg_send);
-			cyg_thread_resume(threadCommunication);
+			cyg_mbox_put(mbComTX, &msg_send);
+			cyg_thread_resume(threadCommunicationTX);
 
 			printf("enviei mensagem para a thread communication e acordei-a\n");
 			
@@ -187,8 +187,8 @@ void cmd_mpm(int argc, char** argv) {
 void cmd_ca(int argc, char** argv) {
 
 	char msg_send = CALA;
-	cyg_mbox_put(mbCom, &msg_send);
-	cyg_thread_resume(threadCommunication);
+	cyg_mbox_put(mbComTX, &msg_send);
+	cyg_thread_resume(threadCommunicationTX);
 
 	printf("enviei mensagem para a thread communication e acordei-a\n");
 
@@ -238,8 +238,8 @@ void cmd_dar(int argc, char** argv) {
 				printf("erro: o valor do alarme dos segundos deve estar entre 0 e 59\n");
 			}	
 			if(erro != 1) {
-				cyg_mbox_put(mbCom, &msg_send);
-				cyg_thread_resume(threadCommunication);
+				cyg_mbox_put(mbComTX, &msg_send);
+				cyg_thread_resume(threadCommunicationTX);
 				
 				printf("enviei mensagem para a thread communication e acordei-a\n");
 
@@ -278,8 +278,8 @@ void cmd_dat(int argc, char** argv) {
 			printf("erro: o valor do alarme da temperatura deve estar entre 0 e 50\n");		
 		}
 		if(erro != 1) {
-			cyg_mbox_put(mbCom, &msg_send);
-			cyg_thread_resume(threadCommunication);
+			cyg_mbox_put(mbComTX, &msg_send);
+			cyg_thread_resume(threadCommunicationTX);
 
 			printf("enviei mensagem para a thread communication e acordei-a\n");
 
@@ -314,8 +314,8 @@ void cmd_dal(int argc, char** argv) {
 			printf("erro: o valor do alarme da luminosidade deve estar entre 0 e 5\n");		
 		}
 		if(erro == 0) {
-			cyg_mbox_put(mbCom, &msg_send);
-			cyg_thread_resume(threadCommunication);
+			cyg_mbox_put(mbComTX, &msg_send);
+			cyg_thread_resume(threadCommunicationTX);
 
 			printf("enviei mensagem para a thread communication e acordei-a\n");
 
@@ -337,8 +337,8 @@ void cmd_dal(int argc, char** argv) {
 void cmd_aa(int argc, char** argv) {
 
 	char msg_send = AALA;
-	cyg_mbox_put(mbCom, &msg_send);
-	cyg_thread_resume(threadCommunication);
+	cyg_mbox_put(mbComTX, &msg_send);
+	cyg_thread_resume(threadCommunicationTX);
 
 	printf("enviei mensagem para a thread communication e acordei-a\n");
 
@@ -358,8 +358,8 @@ void cmd_aa(int argc, char** argv) {
 void cmd_ir(int argc, char** argv) {
 
 	char msg_send = IREG;
-	cyg_mbox_put(mbCom, &msg_send);
-	cyg_thread_resume(threadCommunication);
+	cyg_mbox_put(mbComTX, &msg_send);
+	cyg_thread_resume(threadCommunicationTX);
 
 	printf("enviei mensagem para a thread communication e acordei-a\n");
 
@@ -393,23 +393,18 @@ void cmd_trc(int argc, char** argv) {
 		  	for (i=0; i<(argc-1); i++) {
 				{unsigned int x; sscanf(argv[i+1], "%d", &x); msg_send[i+1]=(unsigned char)x;}
 			}
-			cyg_mbox_put(mbCom, &msg_send);
-			cyg_thread_resume(threadCommunication);
+			cyg_mbox_put(mbProc, &msg_send);
+			cyg_thread_resume(threadProcessing);
 
 			printf("enviei mensagem para a thread communication e acordei-a\n");
 
 			unsigned char *msg_rec;
 			msg_rec = cyg_mbox_get(mbInter);
-			if(msg_rec[0] == CMD_ERRO) {
-				printf("erro na transmissao da mensagem\n");
+			if(msg_rec[0] == CMD_OK) {
+				printf("transferencia concluida com sucesso\n");
 			}
 			else {
-				for (i = 0; i < strlen(msg_rec); i++){
-					if(i%8 == 0 && i != 0){
-						printf("\n");
-					}
-					printf("%d ", (int)msg_rec[i]);
-				}
+				printf("erro na transmissao da mensagem\n");
 			}
 		}
   	}
@@ -435,23 +430,18 @@ void cmd_tri(int argc, char** argv) {
 		  	for (i = 0; i < (argc-1); i++) {
 				{unsigned int x; sscanf(argv[i+1], "%d", &x); msg_send[i+1]=(unsigned char)x;}
 			}
-			cyg_mbox_put(mbCom, &msg_send);
-			cyg_thread_resume(threadCommunication);
+			cyg_mbox_put(mbProc, &msg_send);
+			cyg_thread_resume(threadProcessing);
 			
 			printf("enviei mensagem para a thread communication e acordei-a\n");
 
 			unsigned char *msg_rec;
 			msg_rec = cyg_mbox_get(mbInter);
-			if(msg_rec[0] == CMD_ERRO) {
-				printf("erro na transmissao da mensagem\n");
+			if(msg_rec[0] == CMD_OK) {
+				printf("transferencia concluida com sucesso\n");
 			}
 			else {
-				for (i = 0; i < strlen(msg_rec); i++){
-					if(i%8 == 0 && i != 0){
-						printf("\n");
-					}
-					printf("%d ", (int)msg_rec[i]);
-				}
+				printf("erro na transmissao da mensagem\n");
 			}
 		}
   	}
@@ -541,7 +531,7 @@ void cmd_cpt(int argc, char** argv) {
 	printf("enviei mensagem para a thread processing e acordei-a\n");
 
 	unsigned char *msg_rec;
-	msg_rec = cyg_mbox_get(mbProcInt);
+	msg_rec = cyg_mbox_get(mbInter);
 	if(msg_rec[0] == CMD_ERRO) {
 		printf("erro na transmissao da mensagem\n");
 	}
@@ -560,7 +550,7 @@ void cmd_mpt(int argc, char** argv) {
 
 	if(argc > 1){
 		msg_send[1] = (int)argv[1];
-		cyg_mbox_put(mbIntProc, &msg_send);
+		cyg_mbox_put(mbProc, &msg_send);
 		cyg_thread_resume(threadProcessing);
 		
 		printf("enviei mensagem para a thread processing e acordei-a\n");
@@ -589,12 +579,12 @@ void cmd_lar(int argc, char** argv) {
 		j++;
 	}
 
-	cyg_mbox_put(mbIntProc, &msg_send);
+	cyg_mbox_put(mbProc, &msg_send);
 	cyg_thread_resume(threadProcessing);
 	printf("enviei mensagem para a thread processing e acordei-a\n");
 
 	unsigned char *msg_rec;
-	msg_rec = cyg_mbox_get(mbProcInt);
+	msg_rec = cyg_mbox_get(mbInter);
 	if(msg_rec[0] == CMD_ERRO) {
 		printf("erro na transmissao da mensagem\n");
 	}
@@ -620,12 +610,12 @@ void cmd_lat(int argc, char** argv) {
 		msg_send[j] = 0;
 		j++;
 	}
-	cyg_mbox_put(mbIntProc, &msg_send);
+	cyg_mbox_put(mbProc, &msg_send);
 	cyg_thread_resume(threadProcessing);
 	printf("enviei mensagem para a thread processing e acordei-a\n");
 
 	unsigned char *msg_rec;
-	msg_rec = cyg_mbox_get(mbProcInt);
+	msg_rec = cyg_mbox_get(mbInter);
 	if(msg_rec[0] == -1) {
 		printf("erro transmissão da mensagem\n");
 	}
@@ -652,12 +642,12 @@ void cmd_lal(int argc, char** argv) {
 		j++;
 	}
 
-	cyg_mbox_put(mbIntProc, &msg_send);
+	cyg_mbox_put(mbProc, &msg_send);
 	cyg_thread_resume(threadProcessing);
 	printf("enviei mensagem para a thread processing e acordei-a\n");
 
 	unsigned char *msg_rec;
-	msg_rec = cyg_mbox_get(mbProcInt);
+	msg_rec = cyg_mbox_get(mbInter);
 	if(msg_rec[0] == CMD_ERRO) {
 		printf("erro na transmissao da mensagem\n");
 	}
@@ -674,12 +664,12 @@ void cmd_iga(int argc, char** argv) {
 	char msg_send[2];
 	msg_send[0] = IGA;
 
-	cyg_mbox_put(mbIntProc, &msg_send);
+	cyg_mbox_put(mbProc, &msg_send);
 	cyg_thread_resume(threadProcessing);
 	printf("enviei mensagem para a thread processing e acordei-a\n");
 
 	unsigned char *msg_rec;
-	msg_rec = cyg_mbox_get(mbProcInt);
+	msg_rec = cyg_mbox_get(mbInter);
 	if(msg_rec[0] == CMD_ERRO) {
 		printf("erro na transmissao da mensagem\n");
 	}
@@ -696,12 +686,12 @@ void cmd_ig(int argc, char** argv) {
 	char msg_send[2];
 	msg_send[0] = IG;
 
-	cyg_mbox_put(mbIntProc, &msg_send);
+	cyg_mbox_put(mbProc, &msg_send);
 	cyg_thread_resume(threadProcessing);
 	printf("enviei mensagem para a thread processing e acordei-a\n");
 
 	unsigned char *msg_rec;
-	msg_rec = cyg_mbox_get(mbProcInt);
+	msg_rec = cyg_mbox_get(mbInter);
 	if(msg_rec[0] == CMD_ERRO) {
 		printf("erro na transmissao da mensagem\n");
 	}

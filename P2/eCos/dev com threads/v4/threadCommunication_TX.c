@@ -92,7 +92,7 @@ void threadCommunicationTX_func(cyg_addrword_t data) {
 			msgToSend6[3] = msg_rec[2];
 			msgToSend6[4] = msg_rec[3];
 			msgToSend6[5] = EOM;
-printf("novo relogio: %d %d %d\n", (int)msg_rec[1], msg_rec[2], msg_rec[3]);
+			printf("novo relogio: %d %d %d\n", (int)msg_rec[1], msg_rec[2], msg_rec[3]);
 			if(send_buffer(msgToSend6) != 0) {
 				erro = 1;
 				printf("erro a enviar mensagem\n");
