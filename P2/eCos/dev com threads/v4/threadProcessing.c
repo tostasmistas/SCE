@@ -9,18 +9,19 @@ cyg_handle_t	processing_clockH, countH;
 cyg_alarm 		alarm;
 
 void alarmecomunicacao(void){
-	char msg_send[8];
+	char msg_send[2];
 	msg_send[0]=TRGC;
+	msg_send[1]=10;
 		
 			cyg_mbox_put(mbComTX, &msg_send);
 			
 			printf("enviei mensagem para a thread Comunicacao e acordei-a\n");
-			cyg_thread_resume(threadCommunicationTX);
+			cyg_thread_resume(threadCommunication_TX);
 }
 
 void gestaoalarmes(void){
 	int i;
-	char msg_send[2];
+	char msg_send[1];
 	msg_send[0]=1;
 		while(cyg_mutex_lock(&localMemory_mutex)!=true);
 		for(i=0; i<nr; i++){
@@ -49,7 +50,7 @@ void gestaoalarmes(void){
 }
 
 void listalarmes(unsigned char* msg_rec, int type){
-	char msg_send[2];
+	char msg_send[1];
 	int i=0;
 	int j=0;
 
@@ -153,14 +154,14 @@ void listalarmes(unsigned char* msg_rec, int type){
 }
 
 void informacaogeral(void){
-	char msg_send[2];
+	char msg_send[1];
 	int i=0;
 	msg_send[0]=1;
 	while(cyg_mutex_lock(&localMemory_mutex)!=true);
 		for(i=0; i<nr; i++){
 			switch(localMemory[i][3]){
 			case 1:
-				printf("Inicialização: %c:%c:%c - Temp:%c Lum:%c\n", localMemory[i][0],localMemory[i][1],localMemory[i][2],localMemory[i][4],localMemory[i][5]);
+				printf("Inicializacaoo: %c:%c:%c - Temp:%c Lum:%c\n", localMemory[i][0],localMemory[i][1],localMemory[i][2],localMemory[i][4],localMemory[i][5]);
 				ileitura=i;
 			break;
 			case 2:
@@ -169,11 +170,11 @@ void informacaogeral(void){
 			break;
 			case 10:
 				ileitura=i;
-				printf("Período de Monitorização passou de %c para %c. Hora-%c:%c:%c\n",localMemory[i][4],localMemory[i][5],localMemory[i][0],localMemory[i][1],localMemory[i][2]);
+				printf("Periodo de Monitorizacao passou de %c para %c. Hora-%c:%c:%c\n",localMemory[i][4],localMemory[i][5],localMemory[i][0],localMemory[i][1],localMemory[i][2]);
 			break;
 			case 11:
 				ileitura=i;
-				printf("Memória Cheia: NREG=%c nr=%c ie=%c il=%c. Hora-%c:%c:%c\n",localMemory[i][4],localMemory[i][5],localMemory[i][6],localMemory[i][7],localMemory[i][0],localMemory[i][1],localMemory[i][2]);
+				printf("Memoria Cheia: NREG=%c nr=%c ie=%c il=%c. Hora-%c:%c:%c\n",localMemory[i][4],localMemory[i][5],localMemory[i][6],localMemory[i][7],localMemory[i][0],localMemory[i][1],localMemory[i][2]);
 			break;
 			
 			}
@@ -182,6 +183,7 @@ void informacaogeral(void){
 		//Enviar OK para Interface
 				cyg_mutex_unlock(&localMemory_mutex);
 				cyg_mbox_put(mbInter, &msg_send);
+				cyg_thread_resume(threadInterface);
 				printf("enviei mensagem para a thread Interface e acordei-a\n");
 	
 }
@@ -195,7 +197,7 @@ void threadProcessing_func(cyg_addrword_t data) {
 	cyg_clock_to_counter(processing_clockH, &countH); // contador associado ao alarme
 	cyg_alarm_create(countH, &alarmecomunicacao, 0, &alarmProc, &alarm);
 
-	char msg_send;
+	
 	unsigned char *msg_rec;
 	int ptransf=0;
 	int ptransfnew=0;
@@ -204,8 +206,10 @@ void threadProcessing_func(cyg_addrword_t data) {
 	//consultar período de transferência
 	//como contar o tempo?
 		case CPT:
+			char msg_send;
 			msg_send = (char)ptransf;
-			//cyg_mbox_put(mbProcInt, &msg_send);
+			cyg_mbox_put(mbInter, &msg_send);
+			cyg_thread_resume(threadInterface);
 			break;
 	//modificar período de transferência
 		case MPT:
@@ -236,6 +240,14 @@ void threadProcessing_func(cyg_addrword_t data) {
 		break;
 		case IG:
 			informacaogeral();
+		break;
+		case TRGC:
+			cyg_mbox_put(mbComTX, &msg_rec);
+			cyg_thread_resume(threadCommunication_TX);
+		break;
+		case TRGI:
+			cyg_mbox_put(mbComTX, &msg_rec);
+			cyg_thread_resume(threadCommunication_TX);
 		break;
 	}
 		

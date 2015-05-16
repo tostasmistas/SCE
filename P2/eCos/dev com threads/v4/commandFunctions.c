@@ -546,7 +546,7 @@ void cmd_cpt(int argc, char** argv) {
 +--------------------------------------------------------------------------*/
 void cmd_mpt(int argc, char** argv) {
 
-	char msg_send[3];
+	char msg_send[2];
 	msg_send[0] = MPT;
 
 	if(argc > 1){
@@ -567,7 +567,7 @@ void cmd_mpt(int argc, char** argv) {
 +--------------------------------------------------------------------------*/
 void cmd_lar(int argc, char** argv) {
 
-	char msg_send[8];
+	char msg_send[7];
 	msg_send[0] = LAR;
 	int i = 0;
 	int j = 0;
@@ -599,7 +599,7 @@ void cmd_lar(int argc, char** argv) {
 +--------------------------------------------------------------------------*/
 void cmd_lat(int argc, char** argv) {
 
-	char msg_send[8];
+	char msg_send[7];
 	msg_send[0] = LAT;
 	int i = 0;
 	int j = 0;
@@ -630,7 +630,7 @@ void cmd_lat(int argc, char** argv) {
 +--------------------------------------------------------------------------*/
 void cmd_lal(int argc, char** argv) {
 
-	char msg_send[8];
+	char msg_send[7];
 	msg_send[0] = LAL;
 	int i = 0;
 	int j = 0;
@@ -662,7 +662,7 @@ void cmd_lal(int argc, char** argv) {
 +--------------------------------------------------------------------------*/
 void cmd_iga(int argc, char** argv) {
 
-	char msg_send[2];
+	char msg_send[1];
 	msg_send[0] = IGA;
 
 	cyg_mbox_put(mbProc, &msg_send);
@@ -684,7 +684,7 @@ void cmd_iga(int argc, char** argv) {
 +--------------------------------------------------------------------------*/
 void cmd_ig(int argc, char** argv) {
 	
-	char msg_send[2];
+	char msg_send[1];
 	msg_send[0] = IG;
 
 	cyg_mbox_put(mbProc, &msg_send);
