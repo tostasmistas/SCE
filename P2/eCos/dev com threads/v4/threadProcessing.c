@@ -10,7 +10,7 @@ cyg_alarm 		alarm;
 
 void alarmecomunicacao(void){
 	char msg_send[8];
-	msg_send[0]=TR;
+	msg_send[0]=TRGC;
 		
 			cyg_mbox_put(mbComTX, &msg_send);
 			
@@ -26,7 +26,7 @@ void gestaoalarmes(void){
 		for(i=0; i<nr; i++){
 			switch(localMemory[i][3]){
 				case 3:
-					printf("Def. Alarme Relógio - %c:%c:%c\n",localMemory[i][4],localMemory[i][5],localMemory[i][6]);
+					printf("Def. Alarme Relogio - %c:%c:%c\n",localMemory[i][4],localMemory[i][5],localMemory[i][6]);
 				break;
 				case 4:
 					printf("Def. Alarme Temperatura - %c\n",localMemory[i][4]);
@@ -35,7 +35,7 @@ void gestaoalarmes(void){
 					printf("Def. Alarme Luminosidade - %c\n",localMemory[i][4]);
 				break;
 				case 6:
-					printf("Activação/Desactivação de Alarmes - %c:%c:%c\n",localMemory[i][0], localMemory[i][1], localMemory[i][2]);
+					printf("Activacao/Desactivacao de Alarmes - %c:%c:%c\n",localMemory[i][0], localMemory[i][1], localMemory[i][2]);
 				break;
 			
 			}
@@ -43,6 +43,7 @@ void gestaoalarmes(void){
 		//Enviar OK para Interface
 				cyg_mutex_unlock(&localMemory_mutex);
 				cyg_mbox_put(mbInter, &msg_send);
+				cyg_thread_resume(threadInterface);
 				printf("enviei mensagem para a thread Interface e acordei-a\n");
 		
 }
@@ -67,13 +68,13 @@ void listalarmes(unsigned char* msg_rec, int type){
 	while(cyg_mutex_lock(&localMemory_mutex)!=true);
 		switch(type){
 			case(1):
-				printf("Alarmes Relógio");
+				printf("Alarmes Relogio\n");
 			break;
 			case(2):
-				printf("Alarmes Temperatura");
+				printf("Alarmes Temperatura\n");
 			break;
 			case(3):
-				printf("Alarmes Luminosidade");
+				printf("Alarmes Luminosidade\n");
 			break;
 		}
 		
@@ -96,7 +97,7 @@ void listalarmes(unsigned char* msg_rec, int type){
 						lowerbound=0;
 							for(j=0; j<3; j++){
 								alarmesrel[j]=localMemory[i][j];
-								
+								indleitura=i;
 								if(alarmesrel[j]>t1[j]){
 									lowerbound++;
 								}
@@ -104,7 +105,7 @@ void listalarmes(unsigned char* msg_rec, int type){
 							if(lowerbound>3){ //h,m,s > h1 m1 s1
 								alarmetemp=localMemory[i][4];
 								alarmelum=localMemory[i][5];
-								printf("Alarme Temperatura- Horas<%c:%c:%c> Temperatura<%c> Luminosidade <%c>\n",alarmesrel[0],alarmesrel[1],alarmesrel[2], alarmetemp, alarmelum);
+								printf("Horas<%c:%c:%c> Temperatura<%c> Luminosidade <%c>\n",alarmesrel[0],alarmesrel[1],alarmesrel[2], alarmetemp, alarmelum);
 							}
 						}
 					}
@@ -115,10 +116,11 @@ void listalarmes(unsigned char* msg_rec, int type){
 							if(localMemory[i][3]==7){ //código alarmes relógio
 								for(j=0; j<3; j++){
 									alarmesrel[j]=localMemory[i][j];
+									indleitura=i;
 								}
 										alarmetemp=localMemory[i][4];
 										alarmelum=localMemory[i][5];
-										printf("Alarme Temperatura- Horas<%c:%c:%c> Temperatura<%c> Luminosidade <%c>\n",alarmesrel[0],alarmesrel[1],alarmesrel[2], alarmetemp, alarmelum);
+										printf("Horas<%c:%c:%c> Temperatura<%c> Luminosidade <%c>\n",alarmesrel[0],alarmesrel[1],alarmesrel[2], alarmetemp, alarmelum);
 
 								}
 							}
@@ -128,6 +130,7 @@ void listalarmes(unsigned char* msg_rec, int type){
 									bound=0;
 									for(j=0; j<3; j++){
 										alarmesrel[j]=localMemory[i][j];
+										indleitura=i;
 										if(alarmesrel[j]>t1[j] && alarmesrel[j]<t2[j]){
 											bound++;
 										}
@@ -135,7 +138,7 @@ void listalarmes(unsigned char* msg_rec, int type){
 									if(bound>3){ 
 										alarmetemp=localMemory[i][4];
 										alarmelum=localMemory[i][5];
-										printf("Alarme Temperatura- Horas<%c:%c:%c> Temperatura<%c> Luminosidade <%c>\n",alarmesrel[0],alarmesrel[1],alarmesrel[2], alarmetemp, alarmelum);
+										printf("Horas<%c:%c:%c> Temperatura<%c> Luminosidade <%c>\n",alarmesrel[0],alarmesrel[1],alarmesrel[2], alarmetemp, alarmelum);
 									}
 								}
 							}
@@ -158,14 +161,18 @@ void informacaogeral(void){
 			switch(localMemory[i][3]){
 			case 1:
 				printf("Inicialização: %c:%c:%c - Temp:%c Lum:%c\n", localMemory[i][0],localMemory[i][1],localMemory[i][2],localMemory[i][4],localMemory[i][5]);
+				ileitura=i;
 			break;
 			case 2:
 				printf("Nova Hora: %c:%c:%c\n" ,localMemory[i][0],localMemory[i][1],localMemory[i][2]);
+				ileitura=i;
 			break;
 			case 10:
+				ileitura=i;
 				printf("Período de Monitorização passou de %c para %c. Hora-%c:%c:%c\n",localMemory[i][4],localMemory[i][5],localMemory[i][0],localMemory[i][1],localMemory[i][2]);
 			break;
 			case 11:
+				ileitura=i;
 				printf("Memória Cheia: NREG=%c nr=%c ie=%c il=%c. Hora-%c:%c:%c\n",localMemory[i][4],localMemory[i][5],localMemory[i][6],localMemory[i][7],localMemory[i][0],localMemory[i][1],localMemory[i][2]);
 			break;
 			
