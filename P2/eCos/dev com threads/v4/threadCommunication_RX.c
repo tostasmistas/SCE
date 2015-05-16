@@ -57,8 +57,8 @@ void threadCommunicationRX_func(cyg_addrword_t data) {
 		else { //o codigo recebido nao foi de memoria cheia mas sim outro comando - agora ha que verificar qual a thread que efectuou um pedido: interface ou processamento
 			if(msgRecFromPIC[0] == 0xCB || msgRecFromPIC[0] == 0xCC) { //pedido feito pelo processamento (transferencia de registos)
 				while(cyg_mutex_lock(&localMemory_mutex) != true); //mutex para bloquear o recurso de escrita na memoria local
-				for(i = 1; i < 200; i++) { 
-					localMemory[indescrita][i-1] = msgRecFromPIC[i];
+				for(i = 1; i < sizeof(msgRecFromPIC); i++) { 
+					localMemory[indescrita][(i%8)-1] = msgRecFromPIC[i];
 					if(i%8 == 0) {
 						indescrita++;
 					}
