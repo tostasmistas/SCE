@@ -61,7 +61,11 @@ void threadCommunicationRX_func(cyg_addrword_t data) {
 					localMemory[indescrita][(i%8)-1] = msgRecFromPIC[i];
 					if(i%8 == 0) {
 						indescrita++;
+						nr++;
 					}
+					if(nr>=NRBUF){
+							nr=NRBUF;
+						}
 					if(indescrita == NRBUF) {
 						indescrita = 0; // voltar a primeira "linha" da memoria
 					}

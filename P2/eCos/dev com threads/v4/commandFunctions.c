@@ -479,12 +479,13 @@ void cmd_lr(int argc, char** argv) {
 			printf("erro: nao introduziu todos os parametros\n");
 		}
 		else{
-			if(cyg_mutex_lock(&localMemory_mutex)==true){
+			while(cyg_mutex_lock(&localMemory_mutex)!=true);
 			//numreg=argc[1];
 			//indice=argc[2];
 				for(i = (int)argv[2]; i < (int)argv[1]; i++){
 					for(j = 0; j < 3; j++){
 						horas[j] = localMemory[i][j];
+						indleitura=i;
 					}
 					codigoev = localMemory[i][3];
 					for(j = 4;j < 8; j++){
@@ -494,7 +495,7 @@ void cmd_lr(int argc, char** argv) {
 							i,horas[0],horas[1],horas[2],codigoev,parametros[4],parametros[5],parametros[6],parametros[7]);
 				}
 				cyg_mutex_unlock(&localMemory_mutex);
-			}
+			
 		}
 	}
 }
