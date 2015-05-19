@@ -441,7 +441,7 @@ void update_EEPROM_external(char codigoev)
 		endereco = 1;
 	}
 
-	ie=endereco*8; //índice de escrita é o seguinte ao que foi escrito agora
+	ie=endereco-1; //índice de escrita é o seguinte ao que foi escrito agora
 
 	init_EEPROM_externa();
 
@@ -463,10 +463,14 @@ void update_EEPROM_external(char codigoev)
 
 char ler_registo(){
 
-	temp=readEEPROMexterna(il); //lê byte
-	il++; // incrementar índice de leitura
-	if(il==(NREG+1)*8){
-		il=8;
+	temp=readEEPROMexterna(il_byte+8); //lê byte
+	il_byte++;
+	if(il_byte%8==0){
+		il++; // incrementar índice de leitura
+	}
+	if(il==NREG){
+		il=0;
+		il_byte=0;
 	}
 	init_EEPROM_externa();
 	return temp;

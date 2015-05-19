@@ -135,21 +135,25 @@ void USART_protocolo_OK(char msg_rec[]){
       case TRGC: // transferir n registos a partir da posição corrente
         escrever_USART(SOM);
         escrever_USART(TRGC);
-        aux = 8*((int)msg_rec[1]-'0');
+        aux = 8*((int)msg_rec[1]);
         for(k=0; k<aux; k++){
-          escrever_USART(ler_registo()+'0');
+          if(il<nr){
+            escrever_USART(ler_registo());
+          }
         }
         escrever_USART(EOM);
         break;
       case TRGI: // transferir n registos a partir do indice i
         escrever_USART(SOM);
         escrever_USART(TRGI);
-        aux = ((int)msg_rec[2]-'0');
+        aux = ((int)msg_rec[2]);
         if (aux>=1 && aux<=NREG){
-          il = aux*8;
-          aux = 8*((int)msg_rec[1]-'0');
+          il = aux;
+          aux = 8*((int)msg_rec[1]);
           for(j=0; j<aux; j++){
-            escrever_USART(ler_registo()+'0');
+            if(il<nr){
+            escrever_USART(ler_registo());
+          }
           }
         }
         else{

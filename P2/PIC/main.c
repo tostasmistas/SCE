@@ -63,8 +63,9 @@ volatile unsigned char protocolo_OK = 0;
 unsigned char checksumIsRight = 0;
 unsigned char NREG = 30;
 unsigned char nr = 0;
-unsigned char ie = 0x08;
-unsigned char il = 0x08;
+unsigned char ie = 0;
+unsigned char il = 0;
+unsigned char il_byte=0;
 
 char temperatura = 0;
 char codigoev = 0;
