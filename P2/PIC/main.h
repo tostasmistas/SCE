@@ -114,6 +114,7 @@ extern unsigned char NREG;
 extern unsigned char nr;
 extern unsigned char ie;
 extern unsigned char il;
+extern unsigned char il_byte;
 
 extern char temperatura;
 extern char codigoev;

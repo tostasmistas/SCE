@@ -7,6 +7,7 @@
 
 cyg_handle_t	processing_clockH, countH;
 cyg_alarm 		alarm;
+int ptransf=0;
 
 void alarmecomunicacao(void){
 	char msg_send[2];
@@ -16,7 +17,7 @@ void alarmecomunicacao(void){
 			cyg_mbox_put(mbComTX, &msg_send);
 			
 			printf("enviei mensagem para a thread Comunicacao e acordei-a\n");
-			cyg_thread_resume(threadCommunication_TX);
+			cyg_thread_resume(threadCommunicationTX);
 }
 
 void gestaoalarmes(void){
@@ -162,18 +163,18 @@ void informacaogeral(void){
 			switch(localMemory[i][3]){
 			case 1:
 				printf("Inicializacaoo: %c:%c:%c - Temp:%c Lum:%c\n", localMemory[i][0],localMemory[i][1],localMemory[i][2],localMemory[i][4],localMemory[i][5]);
-				ileitura=i;
+				indleitura=i;
 			break;
 			case 2:
 				printf("Nova Hora: %c:%c:%c\n" ,localMemory[i][0],localMemory[i][1],localMemory[i][2]);
-				ileitura=i;
+				indleitura=i;
 			break;
 			case 10:
-				ileitura=i;
+				indleitura=i;
 				printf("Periodo de Monitorizacao passou de %c para %c. Hora-%c:%c:%c\n",localMemory[i][4],localMemory[i][5],localMemory[i][0],localMemory[i][1],localMemory[i][2]);
 			break;
 			case 11:
-				ileitura=i;
+				indleitura=i;
 				printf("Memoria Cheia: NREG=%c nr=%c ie=%c il=%c. Hora-%c:%c:%c\n",localMemory[i][4],localMemory[i][5],localMemory[i][6],localMemory[i][7],localMemory[i][0],localMemory[i][1],localMemory[i][2]);
 			break;
 			
@@ -196,18 +197,18 @@ void threadProcessing_func(cyg_addrword_t data) {
 	processing_clockH = cyg_real_time_clock();
 	cyg_clock_to_counter(processing_clockH, &countH); // contador associado ao alarme
 	cyg_alarm_create(countH, &alarmecomunicacao, 0, &alarmProc, &alarm);
-
+	char msg_send[1];
 	
 	unsigned char *msg_rec;
-	int ptransf=0;
+	
 	int ptransfnew=0;
 	msg_rec = cyg_mbox_get(mbProc);
 	switch(msg_rec[0]){
 	//consultar período de transferência
 	//como contar o tempo?
 		case CPT:
-			char msg_send;
-			msg_send = (char)ptransf;
+			
+			msg_send[0] = (char)ptransf;
 			cyg_mbox_put(mbInter, &msg_send);
 			cyg_thread_resume(threadInterface);
 			break;
@@ -242,12 +243,16 @@ void threadProcessing_func(cyg_addrword_t data) {
 			informacaogeral();
 		break;
 		case TRGC:
+			printf("%d\n", (int)msg_rec[0]);
+			printf("n de registos: %d\n", (int)msg_rec[1]);
+			printf("Recebi TRGC\n");
 			cyg_mbox_put(mbComTX, &msg_rec);
-			cyg_thread_resume(threadCommunication_TX);
+			cyg_thread_resume(threadCommunicationTX);
 		break;
 		case TRGI:
+			printf("Recebi TRGI\n");
 			cyg_mbox_put(mbComTX, &msg_rec);
-			cyg_thread_resume(threadCommunication_TX);
+			cyg_thread_resume(threadCommunicationTX);
 		break;
 	}
 		
