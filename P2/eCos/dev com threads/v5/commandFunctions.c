@@ -156,12 +156,13 @@ void cmd_mpm(int argc, char** argv) {
 		printf("erro: nao introduziu todos os parametros\n");
 	}
 	else{
-		{unsigned int x; sscanf(argv[1], "%d", &x); msg_send[1]=(unsigned char)x;}
+		{unsigned int x; sscanf(argv[1], "%d", &x); msg_send[1]=(unsigned int)x;}
 		if(msg_send[1] < 0 || msg_send[1] > 99) {
 			erro = 1;
 			printf("erro: o valor de PMON deve estar entre 0 e 99\n");		
 		}
 		if(erro != 1) {
+			printf("%d\n", msg_send[1]);
 			cyg_mbox_put(mbComTX, &msg_send);
 			  
 
@@ -187,7 +188,6 @@ void cmd_ca(int argc, char** argv) {
 	char msg_send = CALA;
 	cyg_mbox_put(mbComTX, &msg_send);
 	  
-
 	printf("enviei mensagem para a thread communication e acordei-a\n");
 
 	unsigned char *msg_rec;
