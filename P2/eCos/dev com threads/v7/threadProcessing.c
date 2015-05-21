@@ -1,15 +1,9 @@
-me,#include "main.h"
+#include "main.h"
 #include "threads.h"
 #include "threadCommunication_TX.h"
 #include "threadCommunication_RX.h"
 #include "threadProcessing.h"
 #include <cyg/kernel/kapi.h>
-
-cyg_handle_t	processing_clockH, countH; // handles for the counters
-cyg_handle_t 	alarmProcH; // handles for the alarms
-cyg_alarm 		alarmProc;
-
-int ptransf = 0;
 
 /*-------------------------------------------------------------------------+
 | function: rotina associada a alarme da thread de processamento
@@ -18,7 +12,7 @@ void alarme_func(cyg_handle_t alarmH, cyg_addrword_t data){
 
 	char msg_send[2];
 	msg_send[0] = TRGC;
-	msg_send[1]=  10; //transferir periodicamente 10 registos
+	msg_send[1]=  3; //transferir periodicamente 3 registos
 
 	cyg_mutex_lock(&transferRegistos_mutex); //mutex para bloquear o recurso de escrita na variavel global
 	transferRegistos = 2;
@@ -35,11 +29,13 @@ void alarme_func(cyg_handle_t alarmH, cyg_addrword_t data){
 void gestaoalarmes(void){
 
 	int i = 0;
-		
+
+	cyg_mutex_lock(&escritaScreen_mutex); //mutex para bloquear o recurso de escrita no ecra
 	cyg_mutex_lock(&localMemory_mutex);
-	if(localMemory[0][0]=255){
-		printf("Memória Vazia");
-		}else{
+	if(((localMemory[0][0]) = 255)) {
+		printf("memoria local vazia!\n");
+	}
+	else{
 		for(i = 0; i < nr; i++){
 			switch(localMemory[i][3]) {
 				case 3:
@@ -58,8 +54,10 @@ void gestaoalarmes(void){
 					break;
 			}
 		}
-	cyg_mutex_unlock(&localMemory_mutex);
+		cyg_mutex_unlock(&localMemory_mutex);
+		cyg_mutex_unlock(&escritaScreen_mutex); //mutex para bloquear o recurso de escrita no ecra
 	}
+
 	char msg_send = CMD_OK;
 	cyg_mbox_put(mbInter, &msg_send);
 
@@ -80,10 +78,12 @@ void listalarmes(unsigned char* msg_rec, int type){
 	int i = 0;
 	int j = 0;
 
+	cyg_mutex_lock(&escritaScreen_mutex); //mutex para bloquear o recurso de escrita no ecra
 	cyg_mutex_lock(&localMemory_mutex);
-	if(localMemory[0][0]=255){
-		printf("Memória Vazia");
-	}else{
+	if(((localMemory[0][0]) = 255)) {
+		printf("memoria local vazia!\n");
+	}
+	else{
 		switch(type) {
 			case 1:
 				printf("alarmes do relogio:\n");
@@ -172,11 +172,9 @@ void listalarmes(unsigned char* msg_rec, int type){
 								bound++;
 							}
 						}
-						
 						alarmetemp = localMemory[i][4];
 						alarmelum = localMemory[i][5];
-						
-						if(bound > 3) { //h:m:s > h1:m1:s1 && h:m:s < h2:m2:s2					
+						if(bound > 3) { //h:m:s > h1:m1:s1 && h:m:s < h2:m2:s2
 							switch(type) {
 								case 1:
 									printf("\thoras do evento: %d:%d:%d\n", alarmesrel[0], alarmesrel[1], alarmesrel[2]);
@@ -231,8 +229,11 @@ void listalarmes(unsigned char* msg_rec, int type){
 	}
 
 	cyg_mutex_unlock(&localMemory_mutex);
+	cyg_mutex_lock(&escritaScreen_mutex); //mutex para bloquear o recurso de escrita no ecra
+
 	char msg_send = CMD_OK;
 	cyg_mbox_put(mbInter, &msg_send);
+
 	printf("enviei mensagem para a thread Interface e acordei-a\n");
 }
 
@@ -242,11 +243,13 @@ void listalarmes(unsigned char* msg_rec, int type){
 void informacaogeral(void){
 
 	int i = 0;
-	
+
+	cyg_mutex_lock(&escritaScreen_mutex); //mutex para bloquear o recurso de escrita no ecra
 	cyg_mutex_lock(&localMemory_mutex);
-	if(localMemory[0][0]=255){
-		printf("Memória Vazia");
-	}else{
+	if(((localMemory[0][0]) = 255)) {
+		printf("memoria local vazia!\n");
+	}
+	else{
 		for(i = 0; i < nr; i++){
 			switch(localMemory[i][3]){
 				case 1:
@@ -284,7 +287,8 @@ void informacaogeral(void){
 		}
 	}
 	cyg_mutex_unlock(&localMemory_mutex);
-				
+	cyg_mutex_lock(&escritaScreen_mutex); //mutex para bloquear o recurso de escrita no ecra
+
 	char msg_send = CMD_OK;
 	cyg_mbox_put(mbInter, &msg_send);
 
@@ -296,12 +300,9 @@ void informacaogeral(void){
 +--------------------------------------------------------------------------*/
 void threadProcessing_func(cyg_addrword_t data) {
 
-	processing_clockH = cyg_real_time_clock();
-	cyg_clock_to_counter(processing_clockH, &countH); // contador associado ao alarme
-	cyg_alarm_create(countH, alarme_func, (cyg_addrword_t) 0, &alarmProcH, &alarmProc);
-
+	int ptransf = 0;
 	int ptransfnew = 0;
-	int ptransfmin = 0;
+	int ptransfMinutos = 0;
 
 	for(;;){
 		unsigned char *msg_rec;
@@ -313,8 +314,8 @@ void threadProcessing_func(cyg_addrword_t data) {
 				cyg_mbox_put(mbInter, &msg_send);
 				break;
 			case MPT: //modificar período de transferência
-				ptransfmin = (int)msg_rec[1];
-				ptransfnew = ptransfmin * 6000;  //1seg->100 ticks / 1 min ->60*100ticks
+				ptransfMinutos = (int)msg_rec[1];
+				ptransfnew = ptransfMinutos * 6000;  // 1seg -> 100 ticks & 1 min -> 60*100 = 6000 ticks
 				printf("recebi mpt - novo ptransf = %d\n", ptransfnew);
 				if(ptransfnew != 0 && ptransfnew != ptransf){
 					ptransf = ptransfnew;
@@ -322,7 +323,7 @@ void threadProcessing_func(cyg_addrword_t data) {
 					cyg_alarm_initialize(alarmProcH, cyg_current_time()+ptransf, ptransf);
 					printf("depois de Inicializacaoo\n");
 				}
-				if(ptransfnew == 0){
+				else if(ptransfnew == 0){
 					cyg_alarm_disable(alarmProcH);
 				}
 				char msg_send = CMD_OK;

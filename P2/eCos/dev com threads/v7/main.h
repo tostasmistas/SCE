@@ -35,6 +35,9 @@
 
 extern cyg_handle_t 	threadInterface, threadCommunicationRX, threadCommunicationTX, threadProcessing; // handles for the threads
 extern cyg_handle_t 	mbInter, mbComTX, mbProc; // handles for the mailboxs
+extern cyg_handle_t	  processing_clockH, countH; // handles for the counters
+extern cyg_handle_t 	alarmProcH; // handles for the alarms
+extern cyg_alarm 		  alarmProc;
 extern cyg_mutex_t 		localMemory_mutex, transferRegistos_mutex, escritaScreen_mutex;
 
 // memória Local
@@ -43,4 +46,5 @@ extern int nr; //numero de registos
 extern int indescrita; //indice de escrita
 extern int indleitura; //indíce de leitura
 
+// variavel global para identificar quem mandou transferir registos - esta protegida por um mutex
 extern int transferRegistos;

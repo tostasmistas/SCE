@@ -35,6 +35,8 @@ void cmd_cr(int argc, char** argv) {
 
 	unsigned char *msg_rec;
 	msg_rec = cyg_mbox_get(mbInter);
+
+	cyg_mutex_lock(&escritaScreen_mutex); //mutex para bloquear o recurso de escrita no ecra
 	if(msg_rec[1] == CMD_ERRO) {
 		printf("erro na transmissao da mensagem\n");
 	}
@@ -43,6 +45,7 @@ void cmd_cr(int argc, char** argv) {
 		printf("minutos: %d\n", msg_rec[2]);
 		printf("segundos: %d\n", msg_rec[3]);
 	}
+	cyg_mutex_unlock(&escritaScreen_mutex); //mutex para bloquear o recurso de escrita no ecra
 }
 
 /*-------------------------------------------------------------------------+
@@ -55,14 +58,16 @@ void cmd_ar(int argc, char** argv){
 
 	unsigned int i = 0;
 	unsigned char erro = 0;
+
+	cyg_mutex_lock(&escritaScreen_mutex); //mutex para bloquear o recurso de escrita no ecra
  	if (argc > 1) {
     	if(argc < 4) {
     		printf("erro: nao introduziu todos os parametros\n");
 	  	}
 		else{
 			for (i = 0; i < (argc-1); i++) {
-				unsigned int x; 
-				sscanf(argv[i+1], "%d", &x); 
+				unsigned int x;
+				sscanf(argv[i+1], "%d", &x);
 				msg_send[i+1] = (unsigned char)x;
 			}
 			if(msg_send[1] < 0 || msg_send[1] > 23) {
@@ -96,7 +101,7 @@ void cmd_ar(int argc, char** argv){
 	else{
 		printf("erro: nao introduziu parametros\n");
 	}
-
+	cyg_mutex_unlock(&escritaScreen_mutex); //mutex para bloquear o recurso de escrita no ecra
 }
 
 /*-------------------------------------------------------------------------+
@@ -111,6 +116,8 @@ void cmd_ctl(int argc, char** argv) {
 
 	unsigned char *msg_rec;
 	msg_rec = cyg_mbox_get(mbInter);
+
+	cyg_mutex_lock(&escritaScreen_mutex); //mutex para bloquear o recurso de escrita no ecra
 	if(msg_rec[1] == CMD_ERRO) {
 		printf("erro na transmissao da mensagem\n");
 	}
@@ -118,6 +125,7 @@ void cmd_ctl(int argc, char** argv) {
 		printf("temperatura: %d\n", (int)msg_rec[1]);
 		printf("luminosidade: %d\n", (int)msg_rec[2]);
 	}
+	cyg_mutex_unlock(&escritaScreen_mutex); //mutex para bloquear o recurso de escrita no ecra
 }
 
 /*-------------------------------------------------------------------------+
@@ -128,11 +136,12 @@ void cmd_cp(int argc, char** argv) {
 	char msg_send = CPAR;
 	cyg_mbox_put(mbComTX, &msg_send);
 
-
 	printf("enviei mensagem para a thread communication e acordei-a\n");
 
 	unsigned char *msg_rec;
 	msg_rec = cyg_mbox_get(mbInter);
+
+	cyg_mutex_lock(&escritaScreen_mutex); //mutex para bloquear o recurso de escrita no ecra
 	if(msg_rec[1] == CMD_ERRO) {
 		printf("erro na transmissao da mensagem\n");
 	}
@@ -141,6 +150,7 @@ void cmd_cp(int argc, char** argv) {
 		printf("PMON: %d\n", (int)msg_rec[2]);
 		printf("TSOM: %d\n", (int)msg_rec[3]);
 	}
+	cyg_mutex_unlock(&escritaScreen_mutex); //mutex para bloquear o recurso de escrita no ecra
 }
 
 /*-------------------------------------------------------------------------+
@@ -152,12 +162,14 @@ void cmd_mpm(int argc, char** argv) {
 	msg_send[0] = MPMN;
 
 	unsigned char erro = 0;
+
+	cyg_mutex_lock(&escritaScreen_mutex); //mutex para bloquear o recurso de escrita no ecra
 	if(argc <= 1){
 		printf("erro: nao introduziu todos os parametros\n");
 	}
 	else{
-		unsigned int x; 
-		sscanf(argv[1], "%d", &x); 
+		unsigned int x;
+		sscanf(argv[1], "%d", &x);
 		msg_send[1] = (unsigned char)x;
 		if(msg_send[1] < 0 || msg_send[1] > 99) {
 			erro = 1;
@@ -180,6 +192,7 @@ void cmd_mpm(int argc, char** argv) {
 			}
 		}
 	}
+	cyg_mutex_unlock(&escritaScreen_mutex); //mutex para bloquear o recurso de escrita no ecra
 }
 
 /*-------------------------------------------------------------------------+
@@ -194,6 +207,8 @@ void cmd_ca(int argc, char** argv) {
 
 	unsigned char *msg_rec;
 	msg_rec = cyg_mbox_get(mbInter);
+
+	cyg_mutex_lock(&escritaScreen_mutex); //mutex para bloquear o recurso de escrita no ecra
 	if(msg_rec[1] == CMD_ERRO) {
 		printf("erro na transmissao da mensagem\n");
 	}
@@ -205,6 +220,7 @@ void cmd_ca(int argc, char** argv) {
 		printf("alarme da luminosidade: %d\n", (int)msg_rec[5]);
 		printf("estado dos alarmes: %c\n", msg_rec[6]);
 	}
+	cyg_mutex_unlock(&escritaScreen_mutex); //mutex para bloquear o recurso de escrita no ecra
 }
 
 /*-------------------------------------------------------------------------+
@@ -217,14 +233,16 @@ void cmd_dar(int argc, char** argv) {
 
 	unsigned int i = 0;
 	unsigned char erro = 0;
+
+	cyg_mutex_lock(&escritaScreen_mutex); //mutex para bloquear o recurso de escrita no ecra
 	if (argc > 1) {
-    	if(argc < 4) {
-    		printf("erro: nao introduziu todos os parametros\n");
-	  	}
+  	if(argc < 4) {
+  		printf("erro: nao introduziu todos os parametros\n");
+  	}
 		else{
 		  	for (i = 0; i < (argc-1); i++) {
-				unsigned int x; 
-				sscanf(argv[i+1], "%d", &x); 
+				unsigned int x;
+				sscanf(argv[i+1], "%d", &x);
 				msg_send[i+1] = (unsigned char)x;
 			}
 			if(msg_send[1] < 0 || msg_send[1] > 23) {
@@ -254,10 +272,11 @@ void cmd_dar(int argc, char** argv) {
 				}
 			}
 		}
-  	}
-	else{
+	}
+	else {
 		printf("erro: nao introduziu parametros\n");
 	}
+	cyg_mutex_unlock(&escritaScreen_mutex); //mutex para bloquear o recurso de escrita no ecra
 }
 
 /*-------------------------------------------------------------------------+
@@ -269,12 +288,14 @@ void cmd_dat(int argc, char** argv) {
 	msg_send[0] = DALT;
 
 	unsigned char erro = 0;
+
+	cyg_mutex_lock(&escritaScreen_mutex); //mutex para bloquear o recurso de escrita no ecra
 	if(argc <= 1){
 		printf("erro: nao introduziu todos os parametros\n");
 	}
 	else{
-		unsigned int x; 
-		sscanf(argv[1], "%d", &x); 
+		unsigned int x;
+		sscanf(argv[1], "%d", &x);
 		msg_send[1] = (unsigned char)x;
 		if(msg_send[1] < 0 || msg_send[1] > 50) {
 			erro = 1;
@@ -295,6 +316,7 @@ void cmd_dat(int argc, char** argv) {
 			}
 		}
 	}
+	cyg_mutex_unlock(&escritaScreen_mutex); //mutex para bloquear o recurso de escrita no ecra
 }
 
 /*-------------------------------------------------------------------------+
@@ -306,12 +328,14 @@ void cmd_dal(int argc, char** argv) {
 	msg_send[0] = DALL;
 
 	unsigned erro = 0;
+
+	cyg_mutex_lock(&escritaScreen_mutex); //mutex para bloquear o recurso de escrita no ecra
 	if(argc <= 1) {
 		printf("erro: nao introduziu todos os parametros\n");
 	}
 	else {
-		unsigned int x; 
-		sscanf(argv[1], "%d", &x); 
+		unsigned int x;
+		sscanf(argv[1], "%d", &x);
 		msg_send[1] = (unsigned char)x;
 		if(msg_send[1] < 0 || msg_send[1] > 5) {
 			erro = 1;
@@ -333,6 +357,7 @@ void cmd_dal(int argc, char** argv) {
 			}
 		}
 	}
+	cyg_mutex_unlock(&escritaScreen_mutex); //mutex para bloquear o recurso de escrita no ecra
 }
 
 /*-------------------------------------------------------------------------+
@@ -343,17 +368,19 @@ void cmd_aa(int argc, char** argv) {
 	char msg_send = AALA;
 	cyg_mbox_put(mbComTX, &msg_send);
 
-
 	printf("enviei mensagem para a thread communication e acordei-a\n");
 
 	unsigned char *msg_rec;
 	msg_rec = cyg_mbox_get(mbInter);
+
+	cyg_mutex_lock(&escritaScreen_mutex); //mutex para bloquear o recurso de escrita no ecra
 	if(msg_rec[1] == CMD_ERRO) {
 		printf("erro na transmissao da mensagem\n");
 	}
 	else {
 		printf("alarmes desactivados/activados\n");
 	}
+	cyg_mutex_unlock(&escritaScreen_mutex); //mutex para bloquear o recurso de escrita no ecra
 }
 
 /*-------------------------------------------------------------------------+
@@ -364,11 +391,12 @@ void cmd_ir(int argc, char** argv) {
 	char msg_send = IREG;
 	cyg_mbox_put(mbComTX, &msg_send);
 
-
 	printf("enviei mensagem para a thread communication e acordei-a\n");
 
 	unsigned char *msg_rec;
 	msg_rec = cyg_mbox_get(mbInter);
+
+	cyg_mutex_lock(&escritaScreen_mutex); //mutex para bloquear o recurso de escrita no ecra
 	if(msg_rec[1] == CMD_ERRO) {
 		printf("erro na transmissao da mensagem\n");
 	}
@@ -378,6 +406,7 @@ void cmd_ir(int argc, char** argv) {
 		printf("ie: %d\n", (int)msg_rec[3]);
 		printf("il: %d\n", (int)msg_rec[4]);
 	}
+	cyg_mutex_unlock(&escritaScreen_mutex); //mutex para bloquear o recurso de escrita no ecra
 }
 
 /*-------------------------------------------------------------------------+
@@ -392,9 +421,10 @@ void cmd_trc(int argc, char** argv) {
 	transferRegistos = 1;
 	cyg_mutex_unlock(&transferRegistos_mutex); //desbloquear a escrita na variavel global
 
-	if (argc > 1) { 
-		unsigned int x; 
-		sscanf(argv[1], "%d", &x); 
+	cyg_mutex_lock(&escritaScreen_mutex); //mutex para bloquear o recurso de escrita no ecra
+	if (argc > 1) {
+		unsigned int x;
+		sscanf(argv[1], "%d", &x);
 		msg_send[1] = (unsigned char)x;
 
 		cyg_mbox_put(mbComTX, &msg_send);
@@ -413,6 +443,7 @@ void cmd_trc(int argc, char** argv) {
 	else{
 		printf("erro: nao introduziu parametros\n");
 	}
+	cyg_mutex_unlock(&escritaScreen_mutex); //mutex para bloquear o recurso de escrita no ecra
 }
 
 /*-------------------------------------------------------------------------+
@@ -428,14 +459,16 @@ void cmd_tri(int argc, char** argv) {
 	cyg_mutex_unlock(&transferRegistos_mutex); //desbloquear a escrita na variavel global
 
 	unsigned int i = 0;
+
+	cyg_mutex_lock(&escritaScreen_mutex); //mutex para bloquear o recurso de escrita no ecra
 	if (argc > 1) {
 		if(argc < 3) {
 			printf("erro: nao introduziu todos os parametros\n");
 			}
 		else {
 		  	for (i = 0; i < (argc-1); i++) {
-				unsigned int x; 
-				sscanf(argv[i+1], "%d", &x); 
+				unsigned int x;
+				sscanf(argv[i+1], "%d", &x);
 				msg_send[i+1] = (unsigned char)x;
 			}
 
@@ -456,7 +489,7 @@ void cmd_tri(int argc, char** argv) {
 	else {
 		printf("erro: nao introduziu parametros\n");
 	}
-
+	cyg_mutex_unlock(&escritaScreen_mutex); //mutex para bloquear o recurso de escrita no ecra
 }
 
 /*-------------------------------------------------------------------------+
@@ -464,12 +497,13 @@ void cmd_tri(int argc, char** argv) {
 +--------------------------------------------------------------------------*/
 void cmd_irl(int argc, char** argv) {
 
+	cyg_mutex_lock(&escritaScreen_mutex); //mutex para bloquear o recurso de escrita no ecra
 	printf("informacao dos registos locais:\n");
 	printf("NRBUF = %d\n", NRBUF);
 	printf("NR = %d\n", nr);
 	printf("indice escrita = %d\n", indescrita);
 	printf("indice leitura = %d\n", indleitura);
-
+	cyg_mutex_unlock(&escritaScreen_mutex); //mutex para bloquear o recurso de escrita no ecra
 }
 
 /*-------------------------------------------------------------------------+
@@ -485,16 +519,18 @@ void cmd_lr(int argc, char** argv) {
 	int i = 0;
 	int j = 0;
 
+	cyg_mutex_lock(&escritaScreen_mutex); //mutex para bloquear o recurso de escrita no ecra
 	if(argc > 1){
 		if(argc < 3){
 			printf("erro: nao introduziu todos os parametros\n");
 		}
 		else{
 			cyg_mutex_lock(&localMemory_mutex);
-			if(localMemory[0][0]=255){
-				printf("Memória Vazia");
-			}else{
-				sscanf(argv[1], "%d", &numreg); 
+			if(((localMemory[0][0]) = 255)) {
+				printf("memoria local vazia!\n");
+			}
+			else {
+				sscanf(argv[1], "%d", &numreg);
 				sscanf(argv[2], "%d", &indice);
 				for(i = indice; i < numreg; i++) {
 					for(j = 0; j < 3; j++) {
@@ -507,12 +543,12 @@ void cmd_lr(int argc, char** argv) {
 					}
 					printf("registo %d:\n", i);
 					printf("\thoras do evento: %d:%d:%d\n", horas[0], horas[1], horas[2]);
-					printf("\tcodigo do evento: %d\n", codigoev);	
+					printf("\tcodigo do evento: %d\n", codigoev);
 					switch(codigoev) {
 						case 1:
 							printf("\ttemperatura: %d\n", parametros[0]);
 							printf("\tluminosidade: %d\n", parametros[1]);
-							break; 
+							break;
 						case 2:
 							printf("\tnova hora: %d:%d:%d\n", parametros[0], parametros[1], parametros[2]);
 							break;
@@ -557,12 +593,12 @@ void cmd_lr(int argc, char** argv) {
 					}
 				}
 			cyg_mutex_unlock(&localMemory_mutex);
-		
 		}
 	}
 	else {
 		printf("erro: nao introduziu parametros\n");
 	}
+	cyg_mutex_unlock(&escritaScreen_mutex); //mutex para bloquear o recurso de escrita no ecra
 }
 
 /*-------------------------------------------------------------------------+
@@ -573,15 +609,17 @@ void cmd_er(int argc, char** argv) {
 	int i;
 	int j;
 	cyg_mutex_lock(&localMemory_mutex);
-		for(i = 0;i < NRBUF; i++){
-			for(j=0; j<8; j++){
+	for(i = 0; i < NRBUF; i++){
+		for(j = 0; j < 8; j++){
 			localMemory[i][j] = 255;
-			}
 		}
-		indescrita = 0;
-		indleitura = 0;
-		nr = 0;
-		printf("registos eliminados\n");
+	}
+	indescrita = 0;
+	indleitura = 0;
+	nr = 0;
+	cyg_mutex_lock(&escritaScreen_mutex); //mutex para bloquear o recurso de escrita no ecra
+	printf("registos eliminados\n");
+	cyg_mutex_unlock(&escritaScreen_mutex); //mutex para bloquear o recurso de escrita no ecra
 	cyg_mutex_unlock(&localMemory_mutex);
 }
 
@@ -597,6 +635,7 @@ void cmd_cpt(int argc, char** argv) {
 
 	printf("enviei mensagem para a thread processing e acordei-a\n");
 
+	cyg_mutex_lock(&escritaScreen_mutex); //mutex para bloquear o recurso de escrita no ecra
 	unsigned char *msg_rec;
 	msg_rec = cyg_mbox_get(mbInter);
 	if(msg_rec[0] == CMD_ERRO) {
@@ -605,6 +644,7 @@ void cmd_cpt(int argc, char** argv) {
 	else {
 		printf("periodo de transferencia: %d\n", msg_rec[0]); //verificar se recebe array ou so um byte
 	}
+	cyg_mutex_unlock(&escritaScreen_mutex); //mutex para bloquear o recurso de escrita no ecra
 }
 
 /*-------------------------------------------------------------------------+
@@ -615,10 +655,11 @@ void cmd_mpt(int argc, char** argv) {
 	char msg_send[2];
 	msg_send[0] = MPT;
 
-	if(argc > 1){
-		unsigned int x; 
-		sscanf(argv[1], "%d", &x); 
-		msg_send[1] = (unsigned char)x;	
+	cyg_mutex_lock(&escritaScreen_mutex); //mutex para bloquear o recurso de escrita no ecra
+	if(argc > 1) {
+		unsigned int x;
+		sscanf(argv[1], "%d", &x);
+		msg_send[1] = (unsigned char)x;
 
 		cyg_mbox_put(mbProc, &msg_send);
 
@@ -633,9 +674,10 @@ void cmd_mpt(int argc, char** argv) {
 			printf("periodo de transferencia modificado\n");
 		}
 	}
-	else{
+	else {
 		printf("erro: nao introduziu todos os parametros\n");
 	}
+	cyg_mutex_unlock(&escritaScreen_mutex); //mutex para bloquear o recurso de escrita no ecra
 }
 
 /*-------------------------------------------------------------------------+
@@ -643,7 +685,7 @@ void cmd_mpt(int argc, char** argv) {
 +--------------------------------------------------------------------------*/
 void cmd_lar(int argc, char** argv) {
 
-	unsigned char msg_send[7] = {255}; 
+	unsigned char msg_send[7] = {255};
 	unsigned int i = 0;
 	for(i = 0; i < 7; i++) {
 		msg_send[i] = 255;
@@ -652,8 +694,8 @@ void cmd_lar(int argc, char** argv) {
 
 	if (argc > 1) { // sao especificados instantes de tempo
 		for (i = 0; i < (argc-1); i++) {
-			unsigned int x; 
-			sscanf(argv[i+1], "%d", &x); 
+			unsigned int x;
+			sscanf(argv[i+1], "%d", &x);
 			msg_send[i+1] = (unsigned char)x;
 			//as restantes posicoes do array continuam a -1, para que depois se possa identificar que so se especificou t1
 		}
@@ -667,12 +709,15 @@ void cmd_lar(int argc, char** argv) {
 
 	unsigned char *msg_rec;
 	msg_rec = cyg_mbox_get(mbInter);
+
+	cyg_mutex_lock(&escritaScreen_mutex); //mutex para bloquear o recurso de escrita no ecra
 	if(msg_rec[1] == CMD_ERRO) {
 		printf("erro na transmissao da mensagem\n");
 	}
 	else {
 		printf("todos os registos pedidos do alarme do relogio foram listados\n");
 	}
+	cyg_mutex_unlock(&escritaScreen_mutex); //mutex para bloquear o recurso de escrita no ecra
 }
 
 /*-------------------------------------------------------------------------+
@@ -680,7 +725,7 @@ void cmd_lar(int argc, char** argv) {
 +--------------------------------------------------------------------------*/
 void cmd_lat(int argc, char** argv) {
 
-	unsigned char msg_send[7] = {255}; 
+	unsigned char msg_send[7] = {255};
 	unsigned int i = 0;
 	for(i = 0; i < 7; i++) {
 		msg_send[i] = 255;
@@ -689,8 +734,8 @@ void cmd_lat(int argc, char** argv) {
 
 	if (argc > 1) { // sao especificados instantes de tempo
 		for (i = 0; i < (argc-1); i++) {
-			unsigned int x; 
-			sscanf(argv[i+1], "%d", &x); 
+			unsigned int x;
+			sscanf(argv[i+1], "%d", &x);
 			msg_send[i+1] = (unsigned char)x;
 			//as restantes posicoes do array continuam a -1, para que depois se possa identificar que so se especificou t1
 		}
@@ -704,12 +749,15 @@ void cmd_lat(int argc, char** argv) {
 
 	unsigned char *msg_rec;
 	msg_rec = cyg_mbox_get(mbInter);
+
+	cyg_mutex_lock(&escritaScreen_mutex); //mutex para bloquear o recurso de escrita no ecra
 	if(msg_rec[1] == CMD_ERRO) {
 		printf("erro transmissão da mensagem\n");
 	}
 	else {
 		printf("todos os registos pedidos do alarme da temperatura foram listados\n");
 	}
+	cyg_mutex_unlock(&escritaScreen_mutex); //mutex para bloquear o recurso de escrita no ecra
 }
 
 /*-------------------------------------------------------------------------+
@@ -717,7 +765,7 @@ void cmd_lat(int argc, char** argv) {
 +--------------------------------------------------------------------------*/
 void cmd_lal(int argc, char** argv) {
 
-	unsigned char msg_send[7] = {255}; 
+	unsigned char msg_send[7] = {255};
 	unsigned int i = 0;
 	for(i = 0; i < 7; i++) {
 		msg_send[i] = 255;
@@ -744,12 +792,15 @@ void cmd_lal(int argc, char** argv) {
 
 	unsigned char *msg_rec;
 	msg_rec = cyg_mbox_get(mbInter);
+
+	cyg_mutex_lock(&escritaScreen_mutex); //mutex para bloquear o recurso de escrita no ecra
 	if(msg_rec[1] == CMD_ERRO) {
 		printf("erro na transmissao da mensagem\n");
 	}
 	else {
 		printf("todos os registos pedidos do alarme da luminosidade foram listados\n");
 	}
+	cyg_mutex_unlock(&escritaScreen_mutex); //mutex para bloquear o recurso de escrita no ecra
 }
 
 /*-------------------------------------------------------------------------+
@@ -766,12 +817,15 @@ void cmd_iga(int argc, char** argv) {
 
 	unsigned char *msg_rec;
 	msg_rec = cyg_mbox_get(mbInter);
+
+	cyg_mutex_lock(&escritaScreen_mutex); //mutex para bloquear o recurso de escrita no ecra
 	if(msg_rec[1] == CMD_ERRO) {
 		printf("erro na transmissao da mensagem\n");
 	}
 	else {
 		printf("todos os registos da gestao de alarme foram listados\n");
 	}
+	cyg_mutex_unlock(&escritaScreen_mutex); //mutex para bloquear o recurso de escrita no ecra
 }
 
 /*-------------------------------------------------------------------------+
@@ -788,10 +842,13 @@ void cmd_ig(int argc, char** argv) {
 
 	unsigned char *msg_rec;
 	msg_rec = cyg_mbox_get(mbInter);
+
+	cyg_mutex_lock(&escritaScreen_mutex); //mutex para bloquear o recurso de escrita no ecra
 	if(msg_rec[1] == CMD_ERRO) {
 		printf("erro na transmissao da mensagem\n");
 	}
 	else {
 		printf("todos os registos de informacao geral foram listados\n");
 	}
+	cyg_mutex_unlock(&escritaScreen_mutex); //mutex para bloquear o recurso de escrita no ecra
 }

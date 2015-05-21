@@ -23,7 +23,7 @@ void threadCommunicationRX_func(cyg_addrword_t data) {
 	unsigned char index = 0;
 	unsigned int i = 0;
 	unsigned char msgRecFromPIC[97] = {255}; //na posicao 0 armazenar o CMD e nas restantes 200 posicoes os registos
-	
+
 	for (;;) {
 		recv_hex(&byteRead, 1); //esta thread esta sempre bloqueada a ler um byte
 
@@ -71,7 +71,7 @@ void threadCommunicationRX_func(cyg_addrword_t data) {
 						printf("bloqueei\n");
 						for(i = 1; i < 97; i++) {
 							if(msgRecFromPIC[i] == 255) {
-								break;	
+								break;
 							}
 							localMemory[indescrita][(i%8)-1] = msgRecFromPIC[i];
 							printf("%d ", msgRecFromPIC[i]);
@@ -94,7 +94,7 @@ void threadCommunicationRX_func(cyg_addrword_t data) {
 					}
 					else if(transferRegistos == 2) {	//pedido feito pelo processamento (transferencia periodica de registos fixos)
 						transferRegistos = 0;
-						cyg_mutex_unlock(&localMemory_mutex); //desbloquear a escrita na variavel global
+						cyg_mutex_unlock(&transferRegistos_mutex); //desbloquear a escrita na variavel global
 						printf("pedido de transfer registos feito pelo processamento\n");
 						cyg_mutex_lock(&localMemory_mutex); //mutex para bloquear o recurso de escrita na memoria local
 						for(i = 1; i < 97; i++) {

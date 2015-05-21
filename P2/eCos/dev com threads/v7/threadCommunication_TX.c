@@ -27,9 +27,7 @@ void threadCommunicationTX_func(cyg_addrword_t data) {
 		erro = 0;
 		msg_rec = cyg_mbox_get(mbComTX); // verificar qual a mensagem que a thread de interface enviou
 
-		cyg_mutex_lock(&escritaScreen_mutex); //mutex para bloquear o recurso de escrita no ecra
 		printf("recebi msg da thread interface!\n");
-		cyg_mutex_unlock(&escritaScreen_mutex); //desbloquear a escrita no ecra
 
 		switch(msg_rec[0]){
 			case CRLG:
