@@ -491,6 +491,9 @@ void cmd_lr(int argc, char** argv) {
 		}
 		else{
 			cyg_mutex_lock(&localMemory_mutex);
+			if(localMemory[0][0]=255){
+				printf("Memória Vazia");
+			}else{
 				sscanf(argv[1], "%d", &numreg); 
 				sscanf(argv[2], "%d", &indice);
 				for(i = indice; i < numreg; i++) {
@@ -552,7 +555,9 @@ void cmd_lr(int argc, char** argv) {
 							break;
 						}
 					}
+				}
 			cyg_mutex_unlock(&localMemory_mutex);
+		
 		}
 	}
 	else {
@@ -566,9 +571,12 @@ void cmd_lr(int argc, char** argv) {
 void cmd_er(int argc, char** argv) {
 
 	int i;
+	int j;
 	cyg_mutex_lock(&localMemory_mutex);
 		for(i = 0;i < NRBUF; i++){
-			localMemory[i] = 0;
+			for(j=0; j<8; j++){
+			localMemory[i][j] = 255;
+			}
 		}
 		indescrita = 0;
 		indleitura = 0;

@@ -11,6 +11,12 @@ void localMemory_init(void) {
       localMemory[i] = (char *)malloc(8 * sizeof(char));
       //pointer to a single array with 8 chars
 	}
+	
+	for(i = 0;i < NRBUF; i++){
+		for(j=0; j<8; i++){
+			localMemory[i][j] = 255;
+		}
+	}
 	indescrita = 0;
 	indleitura = 0;
 	nr = 0;
