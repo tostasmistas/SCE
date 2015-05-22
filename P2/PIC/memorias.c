@@ -462,7 +462,6 @@ void update_EEPROM_external(char codigoev)
 }
 
 char ler_registo(){
-
 	temp=readEEPROMexterna(il_byte+8); //lê byte
 	il_byte++;
 	if(il_byte%8==0){

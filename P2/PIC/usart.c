@@ -147,7 +147,7 @@ void USART_protocolo_OK(char msg_rec[]){
         escrever_USART(SOM);
         escrever_USART(TRGI);
         aux = ((int)msg_rec[2]);
-        if (aux>=1 && aux<=NREG){
+        if (aux>=0 && aux<NREG){
           il = aux;
           il_byte=il*8;
           aux = 8*((int)msg_rec[1]);
